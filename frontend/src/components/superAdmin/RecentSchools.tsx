@@ -1,111 +1,328 @@
-import type { School } from "../../features/schools/school.api";
+import React from "react";
+import {
+  ArrowUpRight,
+  MoreHorizontal,
+} from "lucide-react";
 
-interface RecentSchoolsProps {
-  schools: School[];
-  loading: boolean;
+interface RecentSchool {
+  id: number | string;
+  name: string;
+  location: string;
+  students: number;
+  status: "Active" | "Inactive" | "Suspended";
+  plan: string;
 }
 
-const RecentSchools = ({
+interface RecentSchoolsProps {
+  schools: RecentSchool[];
+  loading?: boolean;
+}
+
+const RecentSchools: React.FC<RecentSchoolsProps> = ({
   schools,
-  loading,
-}: RecentSchoolsProps) => {
-  if (loading) {
-    return (
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <p className="text-gray-500">
-          Loading schools...
-        </p>
-      </div>
-    );
-  }
-
+  loading = false,
+}) => {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+    <section className="rounded-lg bg-white">
 
-      <div className="p-5 border-b border-gray-200 flex items-center justify-between">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-4">
+
         <div>
-          <h2 className="font-semibold text-gray-800">
-            Recent Schools
+          <h2 className="text-[12px] font-semibold text-[#172033]">
+            Recent schools
           </h2>
 
-          <p className="text-sm text-gray-500 mt-1">
-            Recently added schools
+          <p className="mt-0.5 text-[9px] text-[#60708A]">
+            Recently registered schools
           </p>
         </div>
 
-        <span className="text-sm text-blue-600">
-          {schools.length} Total
-        </span>
+        <button
+          type="button"
+          className="
+            flex
+            items-center
+            gap-1
+            text-[9px]
+            font-medium
+            text-[#2563EB]
+            hover:text-[#1D4ED8]
+          "
+        >
+          View all
+          <ArrowUpRight
+            size={11}
+            strokeWidth={1.8}
+          />
+        </button>
       </div>
 
-      {schools.length === 0 ? (
-        <div className="p-8 text-center text-gray-500">
-          No schools found.
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
+      {/* Table */}
+      <div className="overflow-x-auto">
 
-          <table className="w-full">
+        <table className="w-full border-collapse">
 
-            <thead>
-              <tr className="text-left text-xs text-gray-500 border-b">
-                <th className="px-5 py-3">
-                  School
-                </th>
+          <thead>
+            <tr className="bg-[#F8FAFC]">
 
-                <th className="px-5 py-3">
-                  Code
-                </th>
+              <th
+                className="
+                  px-4
+                  py-2.5
+                  text-left
+                  text-[8px]
+                  font-semibold
+                  uppercase
+                  tracking-wide
+                  text-[#60708A]
+                "
+              >
+                School
+              </th>
 
-                <th className="px-5 py-3">
-                  Email
-                </th>
+              <th
+                className="
+                  px-4
+                  py-2.5
+                  text-left
+                  text-[8px]
+                  font-semibold
+                  uppercase
+                  tracking-wide
+                  text-[#60708A]
+                "
+              >
+                Location
+              </th>
 
-                <th className="px-5 py-3">
-                  Created
-                </th>
+              <th
+                className="
+                  px-4
+                  py-2.5
+                  text-left
+                  text-[8px]
+                  font-semibold
+                  uppercase
+                  tracking-wide
+                  text-[#60708A]
+                "
+              >
+                Students
+              </th>
+
+              <th
+                className="
+                  px-4
+                  py-2.5
+                  text-left
+                  text-[8px]
+                  font-semibold
+                  uppercase
+                  tracking-wide
+                  text-[#60708A]
+                "
+              >
+                Plan
+              </th>
+
+              <th
+                className="
+                  px-4
+                  py-2.5
+                  text-left
+                  text-[8px]
+                  font-semibold
+                  uppercase
+                  tracking-wide
+                  text-[#60708A]
+                "
+              >
+                Status
+              </th>
+
+              <th className="w-10" />
+
+            </tr>
+          </thead>
+
+          <tbody>
+            {loading ? (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="
+                    px-4
+                    py-8
+                    text-center
+                    text-[10px]
+                    text-[#60708A]
+                  "
+                >
+                  Loading schools...
+                </td>
               </tr>
-            </thead>
+            ) : schools.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="
+                    px-4
+                    py-8
+                    text-center
+                    text-[10px]
+                    text-[#60708A]
+                  "
+                >
+                  No schools found
+                </td>
+              </tr>
+            ) : (
+              schools.map((school) => (
+                <tr
+                  key={school.id}
+                  className="hover:bg-[#FAFBFD]"
+                >
 
-            <tbody>
-              {schools.slice(0, 5).map(
-                (school) => (
-                  <tr
-                    key={school._id}
-                    className="border-b last:border-b-0 hover:bg-gray-50"
-                  >
-                    <td className="px-5 py-4">
-                      <p className="font-medium text-gray-800">
-                        {school.name}
-                      </p>
-                    </td>
+                  {/* School */}
+                  <td className="px-4 py-3">
 
-                    <td className="px-5 py-4 text-sm text-gray-600">
-                      {school.code}
-                    </td>
+                    <div className="flex items-center gap-2.5">
 
-                    <td className="px-5 py-4 text-sm text-gray-600">
-                      {school.email || "-"}
-                    </td>
+                      <div
+                        className="
+                          flex
+                          h-7
+                          w-7
+                          shrink-0
+                          items-center
+                          justify-center
+                          rounded-md
+                          bg-[#EAF1FF]
+                          text-[9px]
+                          font-semibold
+                          text-[#2563EB]
+                        "
+                      >
+                        {school.name
+                          .charAt(0)
+                          .toUpperCase()}
+                      </div>
 
-                    <td className="px-5 py-4 text-sm text-gray-600">
-                      {school.createdAt
-                        ? new Date(
-                            school.createdAt
-                          ).toLocaleDateString()
-                        : "-"}
-                    </td>
-                  </tr>
-                )
-              )}
-            </tbody>
+                      <div className="min-w-0">
+                        <p
+                          className="
+                            truncate
+                            text-[9px]
+                            font-semibold
+                            text-[#172033]
+                          "
+                        >
+                          {school.name}
+                        </p>
+                      </div>
 
-          </table>
+                    </div>
+                  </td>
 
-        </div>
-      )}
+                  {/* Location */}
+                  <td className="px-4 py-3">
+                    <span className="text-[9px] text-[#60708A]">
+                      {school.location}
+                    </span>
+                  </td>
 
-    </div>
+                  {/* Students */}
+                  <td className="px-4 py-3">
+                    <span className="text-[9px] font-medium text-[#172033]">
+                      {school.students.toLocaleString()}
+                    </span>
+                  </td>
+
+                  {/* Plan */}
+                  <td className="px-4 py-3">
+                    <span className="text-[9px] text-[#60708A]">
+                      {school.plan}
+                    </span>
+                  </td>
+
+                  {/* Status */}
+                  <td className="px-4 py-3">
+
+                    <span
+                      className={`
+                        inline-flex
+                        items-center
+                        gap-1
+                        rounded-full
+                        px-2
+                        py-1
+                        text-[8px]
+                        font-medium
+
+                        ${
+                          school.status === "Active"
+                            ? "bg-[#EAF8EE] text-[#00852D]"
+                            : school.status === "Inactive"
+                            ? "bg-[#EAF1FF] text-[#2563EB]"
+                            : "bg-[#FDECEC] text-[#DC2626]"
+                        }
+                      `}
+                    >
+                      <span
+                        className={`
+                          h-1
+                          w-1
+                          rounded-full
+
+                          ${
+                            school.status === "Active"
+                              ? "bg-[#16A34A]"
+                              : school.status === "Inactive"
+                              ? "bg-[#2563EB]"
+                              : "bg-[#DC2626]"
+                          }
+                        `}
+                      />
+
+                      {school.status}
+                    </span>
+
+                  </td>
+
+                  {/* More */}
+                  <td className="px-3 py-3 text-right">
+
+                    <button
+                      type="button"
+                      className="
+                        flex
+                        h-6
+                        w-6
+                        items-center
+                        justify-center
+                        rounded-md
+                        text-[#60708A]
+                        hover:bg-[#F3F5F8]
+                      "
+                    >
+                      <MoreHorizontal
+                        size={13}
+                        strokeWidth={1.8}
+                      />
+                    </button>
+
+                  </td>
+
+                </tr>
+              ))
+            )}
+          </tbody>
+
+        </table>
+      </div>
+
+    </section>
   );
 };
 

@@ -1,5 +1,124 @@
+// import {
+//   Routes,
+//   Route,
+//   Navigate,
+// } from "react-router-dom";
+
+// import Login from "../pages/auth/Login";
+// import ProtectedRoute from "./ProtectedRoute";
+
+// import SuperAdminDashboard
+//   from "../pages/superAdmin/SuperAdminDashboard";
+
+// import SchoolAdminDashboard
+//   from "../pages/schoolAdmin/Dashboard";
+
+//   import Schools
+//   from "../pages/superAdmin/Schools";
+
+//   import SchoolDetails
+//   from "../pages/superAdmin/SchoolDetails";
+
+//   import AddSchool
+//   from "../pages/superAdmin/AddSchool";
+
+  
+
+// import { UserRole } from "../types/auth.types";
+
+
+// const AppRoutes = () => {
+//   return (
+//     <Routes>
+
+//       {/* Login */}
+//       <Route
+//         path="/login"
+//         element={<Login />}
+//       />
+
+//       {/* Super Admin */}
+//       <Route
+//         path="/super-admin/dashboard"
+//         element={
+//           <ProtectedRoute
+//             allowedRoles={[
+//               UserRole.SUPER_ADMIN,
+//             ]}
+//           >
+//             <SuperAdminDashboard />
+//           </ProtectedRoute>
+//         }
+//       />
+
+//       {/* School Admin */}
+//       <Route
+//         path="/school-admin/dashboard"
+//         element={
+//           <ProtectedRoute
+//             allowedRoles={[
+//               UserRole.SCHOOL_ADMIN,
+//             ]}
+//           >
+//             <SchoolAdminDashboard />
+//           </ProtectedRoute>
+//         }
+//       />
+
+
+//       <Route
+//   path="/super-admin/schools"
+//   element={
+//     <ProtectedRoute
+//       allowedRoles={[UserRole.SUPER_ADMIN]}
+//     >
+//       <Schools />
+//     </ProtectedRoute>
+//   }
+// />
+
+// <Route
+//   path="/super-admin/schools/add"
+//   element={
+//     <ProtectedRoute
+//       allowedRoles={[UserRole.SUPER_ADMIN]}
+//     >
+//       <AddSchool />
+//     </ProtectedRoute>
+//   }
+// />
+
+// <Route
+//   path="/super-admin/schools/details"
+//   element={
+//     <ProtectedRoute
+//       allowedRoles={[UserRole.SUPER_ADMIN]}
+//     >
+//       <SchoolDetails />
+//     </ProtectedRoute>
+//   }
+// />
+
+
+//       {/* Unknown URL */}
+//       <Route
+//         path="*"
+//         element={
+//           <Navigate
+//             to="/login"
+//             replace
+//           />
+//         }
+//       />
+
+//     </Routes>
+//   );
+// };
+
+// export default AppRoutes;
+
+
 import {
-  BrowserRouter,
   Routes,
   Route,
   Navigate,
@@ -8,62 +127,132 @@ import {
 import Login from "../pages/auth/Login";
 import ProtectedRoute from "./ProtectedRoute";
 
-import SuperAdminDashboard from "../pages/superAdmin/Dashboard";
+import SuperAdminLayout
+  from "../components/layout/SuperAdminLayout";
+
+import SuperAdminDashboard
+  from "../pages/superAdmin/SuperAdminDashboard";
+
+import Schools
+  from "../pages/superAdmin/Schools";
+
+import SchoolDetails
+  from "../pages/superAdmin/SchoolDetails";
+
+import AddSchool
+  from "../pages/superAdmin/AddSchool";
+
+import SchoolAdminDashboard
+  from "../pages/schoolAdmin/Dashboard";
 
 import { UserRole } from "../types/auth.types";
 
-const SchoolAdminDashboard = () => {
-  return <h1>School Admin Dashboard</h1>;
-};
 
 const AppRoutes = () => {
   return (
-    <BrowserRouter>
-      <Routes>
+    <Routes>
 
-        {/* Login */}
-        <Route
-          path="/login"
-          element={<Login />}
-        />
+      {/* =====================================================
+          LOGIN
+      ===================================================== */}
 
-        {/* Super Admin */}
+      <Route
+        path="/login"
+        element={<Login />}
+      />
+
+
+      {/* =====================================================
+          SUPER ADMIN
+      ===================================================== */}
+
+      <Route
+        element={
+          <ProtectedRoute
+            allowedRoles={[
+              UserRole.SUPER_ADMIN,
+            ]}
+          >
+            <SuperAdminLayout />
+          </ProtectedRoute>
+        }
+      >
+
+        {/* Dashboard */}
+
         <Route
           path="/super-admin/dashboard"
           element={
-            <ProtectedRoute
-              allowedRoles={[UserRole.SUPER_ADMIN]}
-            >
-              <SuperAdminDashboard />
-            </ProtectedRoute>
+            <SuperAdminDashboard />
           }
         />
 
-        {/* School Admin */}
+
+        {/* Schools */}
+
         <Route
-          path="/school-admin/dashboard"
+          path="/super-admin/schools"
           element={
-            <ProtectedRoute
-              allowedRoles={[UserRole.SCHOOL_ADMIN]}
-            >
-              <SchoolAdminDashboard />
-            </ProtectedRoute>
+            <Schools />
           }
         />
 
-        {/* Unknown URL */}
+
+        {/* Add School */}
+
         <Route
-          path="*"
+          path="/super-admin/schools/add"
           element={
-            <Navigate
-              to="/login"
-              replace
-            />
+            <AddSchool />
           }
         />
 
-      </Routes>
-    </BrowserRouter>
+
+        {/* School Details */}
+
+        <Route
+          path="/super-admin/schools/details"
+          element={
+            <SchoolDetails />
+          }
+        />
+
+      </Route>
+
+
+      {/* =====================================================
+          SCHOOL ADMIN
+      ===================================================== */}
+
+      <Route
+        path="/school-admin/dashboard"
+        element={
+          <ProtectedRoute
+            allowedRoles={[
+              UserRole.SCHOOL_ADMIN,
+            ]}
+          >
+            <SchoolAdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+
+      {/* =====================================================
+          UNKNOWN URL
+      ===================================================== */}
+
+      <Route
+        path="*"
+        element={
+          <Navigate
+            to="/login"
+            replace
+          />
+        }
+      />
+
+    </Routes>
   );
 };
 

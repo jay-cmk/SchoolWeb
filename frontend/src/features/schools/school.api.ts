@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export interface School {
   _id: string;
@@ -29,12 +29,9 @@ const getAuthHeaders = () => {
 };
 
 export const getSchoolsApi = async () => {
-  const response = await axios.get(
-    `${API_URL}/schools/schools`,
-    {
-      headers: getAuthHeaders(),
-    }
-  );
+  const response = await axios.get(`${API_URL}/super-admin/schools`, {
+    headers: getAuthHeaders(),
+  });
 
   return response.data.data.schools as School[];
 };
