@@ -21,3 +21,29 @@
     --tertiary-foreground: 355.7 100% 97.3%;
   }
 }
+
+
+
+/* index.css */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #315783 transparent;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #315783;
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #38BDF8;
+}

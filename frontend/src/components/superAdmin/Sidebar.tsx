@@ -111,7 +111,6 @@
 
 
 
-
 import React from "react";
 import {
   useLocation,
@@ -135,9 +134,13 @@ import {
   GraduationCap,
 } from "lucide-react";
 
+import { useAppDispatch } from "../../app/hooks";
+import { logout } from "../../features/auth/auth.slice";
+
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useAppDispatch();
 
   const menuItems = [
     {
@@ -210,8 +213,17 @@ const Sidebar: React.FC = () => {
   };
 
   const handleNavigation = (path: string) => {
-    console.log("Navigating to:", path);
     navigate(path);
+  };
+
+  const handleLogout = () => {
+    // Redux state clear
+    dispatch(logout());
+
+    // Login page par redirect
+    navigate("/login", {
+      replace: true,
+    });
   };
 
   return (
@@ -229,7 +241,7 @@ const Sidebar: React.FC = () => {
     >
       <div className="flex h-full flex-col px-4 py-5">
 
-        {/* Logo */}
+        {/* ================= LOGO ================= */}
 
         <div className="flex items-center gap-3 px-2">
 
@@ -280,15 +292,13 @@ const Sidebar: React.FC = () => {
 
         </div>
 
-        {/* Main Menu */}
+        {/* ================= MAIN MENU ================= */}
 
         <nav className="mt-7 space-y-1">
 
           {menuItems.map((item) => {
             const Icon = item.icon;
-
-            const active =
-              isActive(item.path);
+            const active = isActive(item.path);
 
             return (
               <button
@@ -314,7 +324,6 @@ const Sidebar: React.FC = () => {
                   }
                 `}
               >
-
                 <Icon
                   size={17}
                   strokeWidth={1.8}
@@ -341,19 +350,18 @@ const Sidebar: React.FC = () => {
 
         </nav>
 
-        {/* Bottom */}
+        {/* ================= BOTTOM MENU ================= */}
 
         <div className="mt-auto">
 
+          {/* Divider */}
           <div className="mb-4 h-px bg-[#E7EBF1]" />
 
           <div className="space-y-1">
 
             {bottomItems.map((item) => {
               const Icon = item.icon;
-
-              const active =
-                isActive(item.path);
+              const active = isActive(item.path);
 
               return (
                 <button
@@ -404,15 +412,11 @@ const Sidebar: React.FC = () => {
               );
             })}
 
-            {/* Logout */}
+            {/* ================= LOGOUT ================= */}
 
             <button
               type="button"
-              onClick={() => {
-                console.log(
-                  "Logout clicked"
-                );
-              }}
+              onClick={handleLogout}
               className="
                 flex
                 h-[38px]
@@ -424,8 +428,8 @@ const Sidebar: React.FC = () => {
                 text-left
                 text-[#52627A]
                 transition-colors
-                hover:bg-[#F7F9FC]
-                hover:text-[#172033]
+                hover:bg-[#FFF1F1]
+                hover:text-[#DC2626]
               "
             >
 

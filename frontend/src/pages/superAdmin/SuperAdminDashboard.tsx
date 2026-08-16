@@ -144,14 +144,11 @@
 // export default SuperAdminDashboard;
 
 
-
 import { useEffect, useMemo, useState } from "react";
 
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { getSchools } from "../../features/schools/school.slice";
 
-import Sidebar from "../../components/superAdmin/Sidebar";
-import Topbar from "../../components/superAdmin/Topbar";
 import StatCard from "../../components/superAdmin/StatCard";
 import RevenueOverview from "../../components/superAdmin/RevenueOverview";
 import SchoolStatus from "../../components/superAdmin/SchoolStatus";
@@ -161,22 +158,31 @@ import RecentActivity from "../../components/superAdmin/RecentActivity";
 const SuperAdminDashboard = () => {
   const dispatch = useAppDispatch();
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [period, setPeriod] = useState("Last 6 months");
 
   const { schools, loading, error } = useAppSelector(
     (state) => state.schools
   );
 
+  // ================= FETCH SCHOOLS =================
+
   useEffect(() => {
     dispatch(getSchools());
   }, [dispatch]);
 
+  // ================= SCHOOL COUNTS =================
+
   const totalSchools = schools.length;
 
+  // Abhi ke liye sabhi schools ko active maan rahe hain.
+  // Baad me school.status ke according calculate kar sakte ho.
   const activeSchools = schools.length;
+
   const inactiveSchools = 0;
+
   const suspendedSchools = 0;
+
+  // ================= RECENT SCHOOLS =================
 
   const recentSchools = useMemo(() => {
     return [...schools]
@@ -188,174 +194,163 @@ const SuperAdminDashboard = () => {
       .slice(0, 3)
       .map((school, index) => ({
         id: school._id || index,
+
         name: school.name || "Unnamed School",
+
         location:
           school.address?.city ||
           school.address?.state ||
           "India",
+
         students: 0,
+
         plan: "Standard",
+
         status: "Active" as const,
       }));
   }, [schools]);
 
+  // ================= UI =================
+
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-[#F7F9FC]">
+    <div className="w-full bg-[#F7F9FC]">
 
-      {/* ================= SIDEBAR ================= */}
+      <div className="w-full px-5 py-7">
 
-      <div className="hidden h-screen w-[184px] shrink-0 lg:block">
-        <Sidebar
-          open={true}
-          onClose={() => setSidebarOpen(false)}
-        />
-      </div>
+        {/* ================= HEADER ================= */}
 
-      {/* Mobile Sidebar */}
-      {sidebarOpen && (
-        <div className="lg:hidden">
-          <Sidebar
-            open={sidebarOpen}
-            onClose={() => setSidebarOpen(false)}
-          />
-        </div>
-      )}
+        <div className="mb-7">
 
-      {/* ================= MAIN AREA ================= */}
+          <h1 className="text-[28px] font-bold leading-none text-[#172033]">
+            Super Admin Dashboard
+          </h1>
 
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+          <p className="mt-2 text-[14px] text-[#60708A]">
+            Manage and monitor your school SaaS platform.
+          </p>
 
-        {/* TOPBAR */}
-
-        <div className="h-[70px] shrink-0">
-          <Topbar
-            onMenuClick={() => setSidebarOpen(true)}
-          />
         </div>
 
-        {/* ================= PAGE ================= */}
+        {/* ================= ERROR ================= */}
 
-        <main className="flex-1 overflow-y-auto">
+        {error && (
+          <div className="mb-6 rounded-lg bg-[#FFF1F1] px-4 py-3 text-[12px] text-[#DC2626]">
+            {error}
+          </div>
+        )}
 
-          <div className="w-full px-5 py-7">
+        {/* ================= STAT CARDS ================= */}
 
-            {/* HEADER */}
+        <div className="mb-7 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
 
-            <div className="mb-7">
+          {/* Total Schools */}
 
-              <h1 className="text-[28px] font-bold leading-none text-[#172033]">
-                Super Admin Dashboard
-              </h1>
+          <StatCard
+            title="Total Schools"
+            value={loading ? "..." : totalSchools}
+            description="Schools registered"
+            trend="+12"
+            trendLabel="this month"
+            icon="school"
+            accent="blue"
+          />
 
-              <p className="mt-2 text-[14px] text-[#60708A]">
-                Manage and monitor your school SaaS platform.
-              </p>
+          {/* Active Schools */}
 
-            </div>
+          <StatCard
+            title="Active Schools"
+            value={loading ? "..." : activeSchools}
+            description="Currently active"
+            trend="+8"
+            trendLabel="this month"
+            icon="circle-check"
+            accent="green"
+          />
 
-            {/* ERROR */}
+          {/* School Admins */}
 
-            {error && (
-              <div className="mb-6 rounded-lg bg-[#FFF1F1] px-4 py-3 text-[12px] text-[#DC2626]">
-                {error}
-              </div>
-            )}
+          <StatCard
+            title="School Admins"
+            value="-"
+            description="Admin management"
+            trendLabel="admin management"
+            icon="users"
+            accent="purple"
+          />
 
-            {/* ================= STAT CARDS ================= */}
+          {/* Platform Status */}
 
-            <div className="mb-7 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <StatCard
+            title="Platform Status"
+            value="Active"
+            description="System is running"
+            trend="100%"
+            trendLabel="system uptime"
+            icon="activity"
+            accent="green"
+          />
 
-  <StatCard
-    title="Total Schools"
-    value={loading ? "..." : totalSchools}
-    description="Schools registered"
-    trend="+12"
-    trendLabel="this month"
-    icon="school"
-    accent="blue"
-  />
+        </div>
 
-  <StatCard
-    title="Active Schools"
-    value={loading ? "..." : activeSchools}
-    description="Currently active"
-    trend="+8"
-    trendLabel="this month"
-    icon="circle-check"
-    accent="green"
-  />
+        {/* ================= ANALYTICS ================= */}
 
-  <StatCard
-    title="School Admins"
-    value="-"
-    description="Admin management"
-    trendLabel="admin management"
-    icon="users"
-    accent="purple"
-  />
+        <div className="grid w-full grid-cols-1 gap-4 xl:grid-cols-[minmax(0,2.1fr)_minmax(300px,0.9fr)]">
 
-  <StatCard
-    title="Platform Status"
-    value="Active"
-    description="System is running"
-    trend="100%"
-    trendLabel="system uptime"
-    icon="activity"
-    accent="green"
-  />
+          {/* Revenue Overview */}
 
-</div>
+          <div className="min-w-0">
 
-            {/* ================= ANALYTICS ================= */}
-
-            <div className="grid w-full grid-cols-1 gap-4 xl:grid-cols-[minmax(0,2.1fr)_minmax(300px,0.9fr)]">
-
-              {/* Revenue */}
-
-              <div className="min-w-0">
-                <RevenueOverview
-                  period={period}
-                  onPeriodChange={setPeriod}
-                />
-              </div>
-
-              {/* School Status */}
-
-              <div className="min-w-0">
-                <SchoolStatus
-                  totalCount={totalSchools}
-                  activeCount={activeSchools}
-                  inactiveCount={inactiveSchools}
-                  suspendedCount={suspendedSchools}
-                />
-              </div>
-
-            </div>
-
-            {/* ================= BOTTOM ================= */}
-
-            <div className="mt-4 grid w-full grid-cols-1 gap-4 xl:grid-cols-[minmax(0,2.1fr)_minmax(300px,0.9fr)]">
-
-              <div className="min-w-0">
-                <RecentSchools
-                  schools={recentSchools}
-                  loading={loading}
-                />
-              </div>
-
-              <div className="min-w-0">
-                <RecentActivity
-                  activities={[]}
-                />
-              </div>
-
-            </div>
+            <RevenueOverview
+              period={period}
+              onPeriodChange={setPeriod}
+            />
 
           </div>
 
-        </main>
+          {/* School Status */}
+
+          <div className="min-w-0">
+
+            <SchoolStatus
+              totalCount={totalSchools}
+              activeCount={activeSchools}
+              inactiveCount={inactiveSchools}
+              suspendedCount={suspendedSchools}
+            />
+
+          </div>
+
+        </div>
+
+        {/* ================= BOTTOM ================= */}
+
+        <div className="mt-4 grid w-full grid-cols-1 gap-4 xl:grid-cols-[minmax(0,2.1fr)_minmax(300px,0.9fr)]">
+
+          {/* Recent Schools */}
+
+          <div className="min-w-0">
+
+            <RecentSchools
+              schools={recentSchools}
+              loading={loading}
+            />
+
+          </div>
+
+          {/* Recent Activity */}
+
+          <div className="min-w-0">
+
+            <RecentActivity
+              activities={[]}
+            />
+
+          </div>
+
+        </div>
 
       </div>
+
     </div>
   );
 };
