@@ -45,6 +45,9 @@ import superAdminRoutes from "./modules/super-admin/superAdmin.routes";
 
 import schoolAdminRoutes from "./modules/schoolAdmin/schoolAdmin.routes";
 
+import academicSessionRoutes
+  from "./modules/academic/academicSession.routes";
+
 const app = express();
 
 app.use(
@@ -82,6 +85,12 @@ app.use(
 app.use(
   "/api/v1/school-admin",
   schoolAdminRoutes
+);
+
+
+app.use(
+  "/api/v1/academic",
+  academicSessionRoutes
 );
 
 export default app;

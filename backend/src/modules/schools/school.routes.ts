@@ -3,7 +3,11 @@ import { Router } from "express";
 import {
   createSchoolController,
   getSchoolsController,
-  createSchoolAdminController
+  createSchoolAdminController,
+   getSchoolByIdController,
+  updateSchoolController,
+  updateSchoolStatusController,
+  
 } from "./school.controller";
 
 const router = Router();
@@ -23,6 +27,34 @@ router.post(
   createSchoolAdminController
 );
 
+
+
+
+
+// ==============================
+// SCHOOL STATUS
+// ==============================
+
+router.patch(
+  "/:schoolId/status",
+  updateSchoolStatusController
+);
+
+
+// ==============================
+// SINGLE SCHOOL
+// ==============================
+
+router.get(
+  "/:schoolId",
+  getSchoolByIdController
+);
+
+
+router.put(
+  "/:schoolId",
+  updateSchoolController
+);
 
 
 export default router;

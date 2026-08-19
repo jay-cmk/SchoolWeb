@@ -145,7 +145,15 @@ import AddSchool
 import SchoolAdminDashboard
   from "../pages/schoolAdmin/Dashboard";
 
+// Academic Pages
+import Sessions from "../pages/schoolAdmin/academic/sessions/Sessions";
+import Classes from "../pages/schoolAdmin/academic/classes/Classes";
+import Sections from "../pages/schoolAdmin/academic/sections/Sections";
+import Subjects from "../pages/schoolAdmin/academic/subjects/Subjects";  
+
 import { UserRole } from "../types/auth.types";
+import SchoolAdminLayout from "../components/layout/SchoolAdminLayout";
+import AcademicSessionDetails from "../pages/schoolAdmin/academic/sessions/Sessions";
 
 
 const AppRoutes = () => {
@@ -220,22 +228,34 @@ const AppRoutes = () => {
       </Route>
 
 
-      {/* =====================================================
-          SCHOOL ADMIN
-      ===================================================== */}
-
+     {/* ============================================
+          SCHOOL ADMIN - With Layout (Dashboard + Academic)
+      ============================================ */}
       <Route
-        path="/school-admin/dashboard"
         element={
-          <ProtectedRoute
-            allowedRoles={[
-              UserRole.SCHOOL_ADMIN,
-            ]}
-          >
-            <SchoolAdminDashboard />
+          <ProtectedRoute allowedRoles={[UserRole.SCHOOL_ADMIN]}>
+            <SchoolAdminLayout
+             />  {/* ← यह Layout बनाना होगा */}
           </ProtectedRoute>
         }
-      />
+      >
+        {/* Dashboard */}
+        <Route path="/school-admin/dashboard" element={<SchoolAdminDashboard />} />
+
+        {/* Academic Pages */}
+        <Route path="/school-admin/academic/sessions" element={<Sessions />} />
+        <Route path="/school-admin/academic/classes" element={<Classes />} />
+        <Route path="/school-admin/academic/sections" element={<Sections />} />
+        <Route path="/school-admin/academic/subjects" element={<Subjects />} />
+
+         {/* Academic Session Details */}
+        <Route 
+          path="/school-admin/academic/sessions/:sessionId" 
+          element={<AcademicSessionDetails />} 
+        />
+      </Route>
+
+
 
 
       {/* =====================================================
