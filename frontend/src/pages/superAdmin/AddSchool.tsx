@@ -1,532 +1,360 @@
-import React, { useState, useRef } from 'react';
-import { Icon } from '@iconify/react';
+import { useState, type FormEvent, type InputHTMLAttributes, type ReactNode } from "react";
+import { Icon } from "@iconify/react";
+import { useAppDispatch } from "../../app/hooks";
+import { createSchool } from "../../features/schools/school.slice";
+import { createSchoolAdmin } from "../../features/schoolAdmins/schoolAdmin.slice";
 
-// ==========================================
-// TypeScript Interfaces
-// ==========================================
+type Errors = Record<string, string>;
+
+interface SchoolPayload {
+  name: string;
+  code: string;
+  email: string;
+  phone: string;
+  address: {
+    addressLine: string;
+    city: string;
+    state: string;
+    pincode: string;
+    country: string;
+  };
+}
+
+interface SchoolAdminPayload {
+  name: string;
+  email: string;
+  mobile: string;
+  password: string;
+}
+
+interface SubscriptionForm {
+  plan: string;
+  status: string;
+  startDate: string;
+  expiryDate: string;
+}
+
+interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
+  label: string;
+  error?: string;
+}
 
 interface FormSectionProps {
   title: string;
   description: string;
   icon: string;
-  isAccent?: boolean;
-  children: React.ReactNode;
+  accent?: boolean;
+  children: ReactNode;
 }
 
-interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
-  error?: string;
-}
-
-interface SelectFieldProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-  label: string;
-  options: string[];
-}
-
-interface LogoUploaderProps {
-  logoPreview: string | null;
-  onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onRemove: () => void;
-}
-
-// ==========================================
-// Helper Sub-components
-// ==========================================
-
-const FormSection: React.FC<FormSectionProps> = ({
+const FormSection = ({
   title,
   description,
   icon,
-  isAccent = false,
+  accent = false,
   children,
-}) => {
-  return (
-    <section className="border-t border-[#E5E7EB] pt-8 first:border-t-0 first:pt-0">
-      <div className="mb-5 flex items-center gap-3">
-        <div
-          className={`flex h-9 w-9 items-center justify-center rounded-lg ${
-            isAccent
-              ? 'bg-[#8B5CF6] text-white'
-              : 'bg-[#F3F4F6] text-[#6B7280]'
-          }`}
-        >
-          <Icon icon={icon} className="text-lg" />
-        </div>
-        <div>
-          <h2 className="text-lg font-semibold text-[#111827]">{title}</h2>
-          <p className="text-sm text-[#6B7280]">{description}</p>
-        </div>
-      </div>
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">{children}</div>
-    </section>
-  );
-};
-
-const InputField: React.FC<InputFieldProps> = ({ label, error, ...props }) => {
-  return (
-    <label className="block">
-      <span className="mb-2 block text-sm font-semibold text-[#111827]">{label}</span>
-      <input
-        {...props}
-        className={`min-h-11 w-full rounded-lg border bg-white px-3 text-sm text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/20 transition-all ${
-          error ? 'border-[#EF4444] focus:border-[#EF4444]' : 'border-[#D1D5DB] focus:border-[#3B82F6]'
+}: FormSectionProps) => (
+  <section className="border-t border-[#E5E7EB] pt-8 first:border-t-0 first:pt-0">
+    <div className="mb-5 flex items-center gap-3">
+      <div
+        className={`flex h-9 w-9 items-center justify-center rounded-lg ${
+          accent ? "bg-[#8B5CF6] text-white" : "bg-[#F3F4F6] text-[#6B7280]"
         }`}
-      />
-      {error && <p className="mt-1 text-xs text-[#EF4444]">{error}</p>}
-    </label>
-  );
-};
-
-const SelectField: React.FC<SelectFieldProps> = ({ label, options, ...props }) => {
-  return (
-    <label className="block">
-      <span className="mb-2 block text-sm font-semibold text-[#111827]">{label}</span>
-      <select
-        {...props}
-        className="min-h-11 w-full rounded-lg border border-[#D1D5DB] bg-white px-3 text-sm text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/20 focus:border-[#3B82F6] transition-all"
       >
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
-};
-
-const LogoUploader: React.FC<LogoUploaderProps> = ({ logoPreview, onUpload, onRemove }) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleButtonClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  return (
-    <div className="md:col-span-2">
-      <span className="mb-2 block text-sm font-semibold text-[#111827]">School Logo</span>
-      <div className="flex items-center gap-4 rounded-xl border border-dashed border-[#D1D5DB] bg-[#F9FAFB] p-4">
-        <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-white text-[#3B82F6] border border-[#E5E7EB] overflow-hidden shrink-0">
-          {logoPreview ? (
-            <img src={logoPreview} alt="School Logo Preview" className="h-full w-full object-cover" />
-          ) : (
-            <Icon icon="lucide:image" className="text-2xl" />
-          )}
-        </div>
-        <div>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={onUpload}
-            accept="image/*"
-            className="hidden"
-          />
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={handleButtonClick}
-              className="text-sm font-semibold text-[#3B82F6] hover:underline cursor-pointer"
-            >
-              Upload logo
-            </button>
-            {logoPreview && (
-              <button
-                type="button"
-                onClick={onRemove}
-                className="text-sm font-semibold text-[#EF4444] hover:underline cursor-pointer"
-              >
-                Remove
-              </button>
-            )}
-          </div>
-          <p className="mt-1 text-xs text-[#6B7280]">PNG, JPG or SVG up to 2MB</p>
-        </div>
+        <Icon icon={icon} className="text-lg" />
+      </div>
+      <div>
+        <h2 className="text-lg font-semibold text-[#111827]">{title}</h2>
+        <p className="text-sm text-[#6B7280]">{description}</p>
       </div>
     </div>
-  );
-};
+    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">{children}</div>
+  </section>
+);
 
-// ==========================================
-// Main Page Component
-// ==========================================
+const InputField = ({ label, error, ...props }: InputFieldProps) => (
+  <label className="block">
+    <span className="mb-2 block text-sm font-semibold text-[#111827]">{label}</span>
+    <input
+      {...props}
+      className={`min-h-11 w-full rounded-lg border bg-white px-3 text-sm text-[#111827] outline-none transition-all focus:ring-2 focus:ring-[#3B82F6]/20 ${
+        error
+          ? "border-[#EF4444] focus:border-[#EF4444]"
+          : "border-[#D1D5DB] focus:border-[#3B82F6]"
+      }`}
+    />
+    {error && <p className="mt-1 text-xs text-[#EF4444]">{error}</p>}
+  </label>
+);
 
-const AddSchool: React.FC = () => {
-  // State Variables
-  const [schoolLogo, setSchoolLogo] = useState<File | null>(null);
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [schoolName, setSchoolName] = useState('');
-  const [schoolCode, setSchoolCode] = useState('');
-  const [schoolEmail, setSchoolEmail] = useState('');
-  const [schoolPhone, setSchoolPhone] = useState('');
-  const [address, setAddress] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('');
-  const [country, setCountry] = useState('India');
-  const [pincode, setPincode] = useState('');
+const AddSchool = () => {
+  const dispatch = useAppDispatch();
+  const [school, setSchool] = useState<SchoolPayload>({
+    name: "",
+    code: "",
+    email: "",
+    phone: "",
+    address: {
+      addressLine: "",
+      city: "",
+      state: "",
+      pincode: "",
+      country: "India",
+    },
+  });
 
-  const [adminName, setAdminName] = useState('');
-  const [adminEmail, setAdminEmail] = useState('');
-  const [adminMobile, setAdminMobile] = useState('');
-  const [adminPassword, setAdminPassword] = useState('');
+  const [admin, setAdmin] = useState<SchoolAdminPayload>({
+    name: "",
+    email: "",
+    mobile: "",
+    password: "",
+  });
+
+  const [subscriptionEnabled, setSubscriptionEnabled] = useState(false);
+  const [subscription, setSubscription] = useState<SubscriptionForm>({
+    plan: "Premium",
+    status: "Active",
+    startDate: "",
+    expiryDate: "",
+  });
+
   const [showPassword, setShowPassword] = useState(false);
+  const [createdSchoolId, setCreatedSchoolId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Errors>({});
+  const [message, setMessage] = useState("");
 
-  const [selectedPlan, setSelectedPlan] = useState('Premium');
-  const [subscriptionStatus, setSubscriptionStatus] = useState('Active');
-  const [startDate, setStartDate] = useState('');
-  const [expiryDate, setExpiryDate] = useState('');
+  const updateSchool = (field: keyof Omit<SchoolPayload, "address">, value: string) => {
+    setSchool((current) => ({ ...current, [field]: value }));
+  };
 
-  // UI Feedback States
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const updateAddress = (field: keyof SchoolPayload["address"], value: string) => {
+    setSchool((current) => ({
+      ...current,
+      address: { ...current.address, [field]: value },
+    }));
+  };
 
-  // Event Handlers
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        alert('File size exceeds 2MB limit.');
-        return;
+  const updateAdmin = (field: keyof SchoolAdminPayload, value: string) => {
+    setAdmin((current) => ({ ...current, [field]: value }));
+  };
+
+  const validate = () => {
+    const next: Errors = {};
+    const emailPattern = /^\S+@\S+\.\S+$/;
+    const mobilePattern = /^\d{10}$/;
+
+    if (!school.name.trim()) next.schoolName = "School name is required";
+    if (!school.code.trim()) next.schoolCode = "School code is required";
+    if (!emailPattern.test(school.email)) next.schoolEmail = "Valid school email is required";
+    if (!mobilePattern.test(school.phone)) next.schoolPhone = "Enter a 10 digit phone number";
+    if (!school.address.addressLine.trim()) next.addressLine = "Address is required";
+    if (!school.address.city.trim()) next.city = "City is required";
+    if (!school.address.state.trim()) next.state = "State is required";
+    if (!/^\d{6}$/.test(school.address.pincode)) next.pincode = "Enter a 6 digit pincode";
+    if (!school.address.country.trim()) next.country = "Country is required";
+
+    if (!admin.name.trim()) next.adminName = "Admin name is required";
+    if (!emailPattern.test(admin.email)) next.adminEmail = "Valid admin email is required";
+    if (!mobilePattern.test(admin.mobile)) next.adminMobile = "Enter a 10 digit mobile number";
+    if (admin.password.length < 8) next.adminPassword = "Password must contain at least 8 characters";
+
+    if (subscriptionEnabled) {
+      if (!subscription.startDate) next.startDate = "Start date is required";
+      if (!subscription.expiryDate) next.expiryDate = "Expiry date is required";
+      if (
+        subscription.startDate &&
+        subscription.expiryDate &&
+        new Date(subscription.expiryDate) <= new Date(subscription.startDate)
+      ) {
+        next.expiryDate = "Expiry date must be after start date";
       }
-      setSchoolLogo(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setLogoPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
     }
+
+    setErrors(next);
+    return Object.keys(next).length === 0;
   };
 
-  const handleRemoveLogo = () => {
-    setSchoolLogo(null);
-    setLogoPreview(null);
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  };
-
-  const handleCancel = () => {
-    // Reset all form fields
-    setSchoolLogo(null);
-    setLogoPreview(null);
-    setSchoolName('');
-    setSchoolCode('');
-    setSchoolEmail('');
-    setSchoolPhone('');
-    setAddress('');
-    setCity('');
-    setState('');
-    setCountry('India');
-    setPincode('');
-    setAdminName('');
-    setAdminEmail('');
-    setAdminMobile('');
-    setAdminPassword('');
-    setSelectedPlan('Premium');
-    setSubscriptionStatus('Active');
-    setStartDate('');
-    setExpiryDate('');
+  const resetForm = () => {
+    setSchool({
+      name: "",
+      code: "",
+      email: "",
+      phone: "",
+      address: { addressLine: "", city: "", state: "", pincode: "", country: "India" },
+    });
+    setAdmin({ name: "", email: "", mobile: "", password: "" });
+    setSubscriptionEnabled(false);
+    setSubscription({ plan: "Premium", status: "Active", startDate: "", expiryDate: "" });
+    setCreatedSchoolId(null);
     setErrors({});
-    setSuccessMessage(null);
   };
 
-  const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!validate()) return;
 
-    if (!schoolName.trim()) newErrors.schoolName = 'School name is required';
-    if (!schoolCode.trim()) newErrors.schoolCode = 'School code is required';
-    if (!schoolEmail.trim()) {
-      newErrors.schoolEmail = 'School email is required';
-    } else if (!/\S+@\S+\.\S+/.test(schoolEmail)) {
-      newErrors.schoolEmail = 'Invalid email address';
-    }
-    if (!schoolPhone.trim()) {
-      newErrors.schoolPhone = 'School phone is required';
-    } else if (!/^\+?[0-9\s-]{10,15}$/.test(schoolPhone.replace(/\s/g, ''))) {
-      newErrors.schoolPhone = 'Invalid phone number format';
-    }
+    setLoading(true);
+    setMessage("");
+    let schoolId = createdSchoolId;
 
-    if (!adminName.trim()) newErrors.adminName = 'Admin name is required';
-    if (!adminEmail.trim()) {
-      newErrors.adminEmail = 'Admin email is required';
-    } else if (!/\S+@\S+\.\S+/.test(adminEmail)) {
-      newErrors.adminEmail = 'Invalid email address';
-    }
-    if (!adminMobile.trim()) {
-      newErrors.adminMobile = 'Admin mobile is required';
-    } else if (!/^\+?[0-9\s-]{10,15}$/.test(adminMobile.replace(/\s/g, ''))) {
-      newErrors.adminMobile = 'Invalid mobile number';
-    }
-    if (!adminPassword.trim()) {
-      newErrors.adminPassword = 'Password is required';
-    } else if (adminPassword.length < 6) {
-      newErrors.adminPassword = 'Password must be at least 6 characters';
-    }
+    try {
+      if (!schoolId) {
+        // API 1: POST /super-admin/schools
+        const createdSchool = await dispatch(
+          createSchool({
+            ...school,
+            name: school.name.trim(),
+            code: school.code.trim().toUpperCase(),
+            email: school.email.trim().toLowerCase(),
+            phone: school.phone.trim(),
+            address: {
+              addressLine: school.address.addressLine.trim(),
+              city: school.address.city.trim(),
+              state: school.address.state.trim(),
+              pincode: school.address.pincode.trim(),
+              country: school.address.country.trim(),
+            },
+          }),
+        ).unwrap();
 
-    if (!startDate) newErrors.startDate = 'Start date is required';
-    if (!expiryDate) newErrors.expiryDate = 'Expiry date is required';
-    if (startDate && expiryDate && new Date(startDate) >= new Date(expiryDate)) {
-      newErrors.expiryDate = 'Expiry date must be after start date';
+        schoolId = createdSchool._id;
+        setCreatedSchoolId(schoolId);
+      }
+
+      // API 2: POST /super-admin/schools/:schoolId/admin
+      await dispatch(
+        createSchoolAdmin({
+          schoolId,
+          data: {
+            name: admin.name.trim(),
+            email: admin.email.trim().toLowerCase(),
+            mobile: admin.mobile.trim(),
+            password: admin.password,
+          },
+        }),
+      ).unwrap();
+
+      // Subscription is optional UI data for now. When its backend API is ready,
+      // call it here with schoolId and `subscription`.
+      setMessage("School and school admin created successfully.");
+      resetForm();
+    } catch (error: unknown) {
+      setMessage(
+        schoolId
+          ? `School is already created. Admin creation failed: ${
+              typeof error === "string" ? error : "Please try again."
+            }`
+          : typeof error === "string"
+            ? error
+            : "School setup could not be completed.",
+      );
+    } finally {
+      setLoading(false);
     }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-
-    setIsLoading(true);
-    setSuccessMessage(null);
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      setSuccessMessage('School tenant registered successfully!');
-      setTimeout(() => {
-        handleCancel();
-      }, 2000);
-    }, 1500);
   };
 
   return (
     <div className="min-h-screen w-full bg-[#F7F9FC] p-1">
-      {/* Back Button */}
-      <button
-        onClick={handleCancel}
-        className="mb-1 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#3B82F6] hover:text-[#3B82F6]/80 transition-colors cursor-pointer"
-      >
-        <Icon icon="lucide:arrow-left" className="text-lg" />
-        Back to Schools
-      </button>
-
-      {/* Success Toast */}
-      {successMessage && (
-        <div className="mb-6 p-4 bg-[#10B981]/10 border border-[#10B981] text-[#065F46] rounded-xl flex items-center gap-3">
-          <Icon icon="lucide:check-circle" className="text-xl shrink-0 text-[#10B981]" />
-          <p className="text-sm font-medium">{successMessage}</p>
-        </div>
-      )}
-
-      {/* Main Form Card */}
       <div className="rounded-xl border border-[#E5E7EB] bg-white shadow-sm">
-        <div className="border-b border-[#E5E7EB] px-7 py-3">
+        <div className="border-b border-[#E5E7EB] px-7 py-4">
           <p className="text-sm font-medium text-[#3B82F6]">Super Admin / Schools / New</p>
           <h1 className="mt-1 text-2xl font-bold text-[#111827]">Add School</h1>
           <p className="mt-2 text-sm text-[#6B7280]">
-            Register a new school tenant and set up its first administrator.
+            Create the school first and then its primary school administrator.
           </p>
         </div>
 
+        {message && (
+          <div className="mx-5 mt-5 rounded-lg border border-[#3B82F6]/30 bg-[#EFF6FF] p-3 text-sm text-[#1D4ED8]">
+            {message}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-8 p-5">
-          {/* Section 1: School Information */}
           <FormSection
             title="School Information"
-            description="Core school profile and contact details."
+            description="Main school details used while creating the school."
             icon="lucide:school"
           >
-            <LogoUploader
-              logoPreview={logoPreview}
-              onUpload={handleLogoUpload}
-              onRemove={handleRemoveLogo}
-            />
-
-            <InputField
-              label="School Name"
-              placeholder="e.g. Riverside Academy"
-              value={schoolName}
-              onChange={(e) => setSchoolName(e.target.value)}
-              error={errors.schoolName}
-            />
-
-            <InputField
-              label="School Code"
-              placeholder="e.g. RSA001"
-              value={schoolCode}
-              onChange={(e) => setSchoolCode(e.target.value)}
-              error={errors.schoolCode}
-            />
-
-            <InputField
-              label="School Email"
-              type="email"
-              placeholder="admin@school.edu"
-              value={schoolEmail}
-              onChange={(e) => setSchoolEmail(e.target.value)}
-              error={errors.schoolEmail}
-            />
-
-            <InputField
-              label="School Phone"
-              placeholder="+91 20 4455 9200"
-              value={schoolPhone}
-              onChange={(e) => setSchoolPhone(e.target.value)}
-              error={errors.schoolPhone}
-            />
-
+            <InputField label="School Name" value={school.name} onChange={(e) => updateSchool("name", e.target.value)} error={errors.schoolName} placeholder="XYZ Public School" />
+            <InputField label="School Code" value={school.code} onChange={(e) => updateSchool("code", e.target.value)} error={errors.schoolCode} placeholder="XYZ001" />
+            <InputField label="School Email" type="email" value={school.email} onChange={(e) => updateSchool("email", e.target.value)} error={errors.schoolEmail} placeholder="info@abcschool.com" />
+            <InputField label="School Phone" value={school.phone} onChange={(e) => updateSchool("phone", e.target.value.replace(/\D/g, "").slice(0, 10))} error={errors.schoolPhone} placeholder="9876543650" />
             <div className="md:col-span-2">
-              <InputField
-                label="Address"
-                placeholder="Street address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-              />
+              <InputField label="Address Line" value={school.address.addressLine} onChange={(e) => updateAddress("addressLine", e.target.value)} error={errors.addressLine} placeholder="Main Road Gopiganj" />
             </div>
-
-            <InputField
-              label="City"
-              placeholder="Pune"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-            />
-
-            <InputField
-              label="State"
-              placeholder="Maharashtra"
-              value={state}
-              onChange={(e) => setState(e.target.value)}
-            />
-
-            <InputField
-              label="Country"
-              placeholder="India"
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-            />
-
-            <InputField
-              label="Pincode"
-              placeholder="411001"
-              value={pincode}
-              onChange={(e) => setPincode(e.target.value)}
-            />
+            <InputField label="City" value={school.address.city} onChange={(e) => updateAddress("city", e.target.value)} error={errors.city} placeholder="Bhopal" />
+            <InputField label="State" value={school.address.state} onChange={(e) => updateAddress("state", e.target.value)} error={errors.state} placeholder="Madhya Pradesh" />
+            <InputField label="Pincode" value={school.address.pincode} onChange={(e) => updateAddress("pincode", e.target.value.replace(/\D/g, "").slice(0, 6))} error={errors.pincode} placeholder="462001" />
+            <InputField label="Country" value={school.address.country} onChange={(e) => updateAddress("country", e.target.value)} error={errors.country} placeholder="India" />
           </FormSection>
 
-          {/* Section 2: School Admin */}
           <FormSection
             title="School Admin"
-            description="Invite the primary administrator for this tenant."
+            description="Login details for the school's first administrator."
             icon="lucide:user-round"
           >
-            <InputField
-              label="Admin Name"
-              placeholder="Full name"
-              value={adminName}
-              onChange={(e) => setAdminName(e.target.value)}
-              error={errors.adminName}
-            />
-
-            <InputField
-              label="Admin Email"
-              type="email"
-              placeholder="admin@school.edu"
-              value={adminEmail}
-              onChange={(e) => setAdminEmail(e.target.value)}
-              error={errors.adminEmail}
-            />
-
-            <InputField
-              label="Admin Mobile"
-              placeholder="+91 98765 43210"
-              value={adminMobile}
-              onChange={(e) => setAdminMobile(e.target.value)}
-              error={errors.adminMobile}
-            />
-
-            <div className="block">
+            <InputField label="Admin Name" value={admin.name} onChange={(e) => updateAdmin("name", e.target.value)} error={errors.adminName} placeholder="JayAdmin" />
+            <InputField label="Admin Email" type="email" value={admin.email} onChange={(e) => updateAdmin("email", e.target.value)} error={errors.adminEmail} placeholder="jay@abcschool.com" />
+            <InputField label="Admin Mobile" value={admin.mobile} onChange={(e) => updateAdmin("mobile", e.target.value.replace(/\D/g, "").slice(0, 10))} error={errors.adminMobile} placeholder="9876543210" />
+            <div>
               <span className="mb-2 block text-sm font-semibold text-[#111827]">Password</span>
               <div className="relative">
                 <input
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Create a secure password"
-                  value={adminPassword}
-                  onChange={(e) => setAdminPassword(e.target.value)}
-                  className={`min-h-11 w-full rounded-lg border bg-white px-3 pr-10 text-sm text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/20 transition-all ${
-                    errors.adminPassword ? 'border-[#EF4444]' : 'border-[#D1D5DB] focus:border-[#3B82F6]'
-                  }`}
+                  type={showPassword ? "text" : "password"}
+                  value={admin.password}
+                  onChange={(e) => updateAdmin("password", e.target.value)}
+                  placeholder="Admin@12345"
+                  className={`min-h-11 w-full rounded-lg border bg-white px-3 pr-10 text-sm outline-none ${errors.adminPassword ? "border-[#EF4444]" : "border-[#D1D5DB]"}`}
                 />
-                <button
-                  type="button"
-                  onClick={togglePasswordVisibility}
-                  className="absolute right-3 top-3 text-lg text-[#6B7280] hover:text-[#111827] transition-colors"
-                >
-                  <Icon icon={showPassword ? 'lucide:eye-off' : 'lucide:eye'} />
+                <button type="button" onClick={() => setShowPassword((value) => !value)} className="absolute right-3 top-3 text-[#6B7280]">
+                  <Icon icon={showPassword ? "lucide:eye-off" : "lucide:eye"} />
                 </button>
               </div>
-              {errors.adminPassword && (
-                <p className="mt-1 text-xs text-[#EF4444]">{errors.adminPassword}</p>
-              )}
+              {errors.adminPassword && <p className="mt-1 text-xs text-[#EF4444]">{errors.adminPassword}</p>}
             </div>
           </FormSection>
 
-          {/* Section 3: Subscription */}
           <FormSection
-            title="Subscription"
-            description="Set the plan and its initial billing window."
+            title="Subscription (Optional)"
+            description="Enable this only when you want to configure a plan now."
             icon="lucide:credit-card"
-            isAccent={true}
+            accent
           >
-            <SelectField
-              label="Select Plan"
-              options={['Premium', 'Standard', 'Enterprise']}
-              value={selectedPlan}
-              onChange={(e) => setSelectedPlan(e.target.value)}
-            />
+            <label className="flex items-center gap-3 md:col-span-2">
+              <input type="checkbox" checked={subscriptionEnabled} onChange={(e) => setSubscriptionEnabled(e.target.checked)} className="h-4 w-4" />
+              <span className="text-sm font-semibold text-[#111827]">Configure subscription now</span>
+            </label>
 
-            <SelectField
-              label="Subscription Status"
-              options={['Active', 'Inactive']}
-              value={subscriptionStatus}
-              onChange={(e) => setSubscriptionStatus(e.target.value)}
-            />
-
-            <InputField
-              label="Start Date"
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              error={errors.startDate}
-            />
-
-            <InputField
-              label="Expiry Date"
-              type="date"
-              value={expiryDate}
-              onChange={(e) => setExpiryDate(e.target.value)}
-              error={errors.expiryDate}
-            />
+            {subscriptionEnabled && (
+              <>
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold">Plan</span>
+                  <select value={subscription.plan} onChange={(e) => setSubscription((current) => ({ ...current, plan: e.target.value }))} className="min-h-11 w-full rounded-lg border border-[#D1D5DB] bg-white px-3 text-sm">
+                    <option value="Premium">Premium</option>
+                    <option value="Standard">Standard</option>
+                    <option value="Enterprise">Enterprise</option>
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold">Status</span>
+                  <select value={subscription.status} onChange={(e) => setSubscription((current) => ({ ...current, status: e.target.value }))} className="min-h-11 w-full rounded-lg border border-[#D1D5DB] bg-white px-3 text-sm">
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </label>
+                <InputField label="Start Date" type="date" value={subscription.startDate} onChange={(e) => setSubscription((current) => ({ ...current, startDate: e.target.value }))} error={errors.startDate} />
+                <InputField label="Expiry Date" type="date" value={subscription.expiryDate} onChange={(e) => setSubscription((current) => ({ ...current, expiryDate: e.target.value }))} error={errors.expiryDate} />
+              </>
+            )}
           </FormSection>
 
-          {/* Form Actions */}
-          <div className="flex items-center justify-end gap-3 border-t border-[#E5E7EB] pt-6">
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="min-h-11 rounded-lg border border-[#D1D5DB] bg-white px-5 text-sm font-semibold text-[#111827] hover:bg-[#F9FAFB] transition-colors cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="min-h-11 rounded-lg bg-[#3B82F6] px-5 text-sm font-semibold text-white shadow-md hover:bg-[#3B82F6]/90 transition-colors flex items-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <>
-                  <Icon icon="lucide:loader-2" className="animate-spin text-lg" />
-                  Creating...
-                </>
-              ) : (
-                <>
-                  <Icon icon="lucide:plus" className="text-lg" />
-                  Create School
-                </>
-              )}
+          <div className="flex justify-end gap-3 border-t border-[#E5E7EB] pt-6">
+            <button type="button" onClick={resetForm} className="min-h-11 rounded-lg border border-[#D1D5DB] px-5 text-sm font-semibold">Cancel</button>
+            <button type="submit" disabled={loading} className="flex min-h-11 items-center gap-2 rounded-lg bg-[#3B82F6] px-5 text-sm font-semibold text-white disabled:opacity-60">
+              <Icon icon={loading ? "lucide:loader-2" : "lucide:plus"} className={loading ? "animate-spin" : ""} />
+              {loading ? "Creating..." : "Create School & Admin"}
             </button>
           </div>
         </form>

@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 
 import { User } from "../auth/user.model";
 import { UserRole } from "../../constants/roles";
+import { SchoolStatus } from "../../constants/school";
 
 interface CreateSchoolData {
   name: string;
@@ -26,6 +27,29 @@ interface CreateSchoolAdminData {
   email: string;
   mobile?: string;
   password: string;
+}
+
+
+interface UpdateSchoolData {
+  name?: string;
+  email?: string;
+  phone?: string;
+  logo?: string;
+
+  address?: {
+    addressLine?: string;
+    city?: string;
+    state?: string;
+    pincode?: string;
+    country?: string;
+  };
+}
+
+
+interface UpdateSchoolAdminData {
+  name?: string;
+  email?: string;
+  mobile?: string;
 }
 
 
@@ -112,6 +136,105 @@ export const createSchoolAdmin = async (
     role: user.role,
     schoolId: user.schoolId,
   };
+};
+
+
+export const getSchoolById = async (
+  schoolId: string
+) => {
+  if (!mongoose.Types.ObjectId.isValid(schoolId)) {
+    throw new Error("Invalid school ID");
+  }
+
+  const school = await School.findById(
+    schoolId
+  ).lean();
+
+  if (!school) {
+    throw new Error("School not found");
+  }
+
+  return school;
+};
+
+
+export const updateSchool = async (
+  schoolId: string,
+  data: UpdateSchoolData
+) => {
+  if (!mongoose.Types.ObjectId.isValid(schoolId)) {
+    throw new Error("Invalid school ID");
+  }
+
+  const school = await School.findById(
+    schoolId
+  );
+
+  if (!school) {
+    throw new Error("School not found");
+  }
+
+  if (data.name !== undefined) {
+    school.name = data.name.trim();
+  }
+
+  if (data.email !== undefined) {
+    school.email = data.email
+      .toLowerCase()
+      .trim();
+  }
+
+  if (data.phone !== undefined) {
+    school.phone = data.phone.trim();
+  }
+
+  if (data.logo !== undefined) {
+    school.logo = data.logo.trim();
+  }
+
+  if (data.address !== undefined) {
+    school.address = {
+      ...school.address,
+      ...data.address,
+    };
+  }
+
+  await school.save();
+
+  return school;
+};
+
+
+export const updateSchoolStatus = async (
+  schoolId: string,
+  status: SchoolStatus
+) => {
+  if (!mongoose.Types.ObjectId.isValid(schoolId)) {
+    throw new Error("Invalid school ID");
+  }
+
+  if (
+    !Object.values(SchoolStatus).includes(status)
+  ) {
+    throw new Error("Invalid school status");
+  }
+
+  const school = await School.findByIdAndUpdate(
+    schoolId,
+    {
+      status,
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  if (!school) {
+    throw new Error("School not found");
+  }
+
+  return school;
 };
 
 

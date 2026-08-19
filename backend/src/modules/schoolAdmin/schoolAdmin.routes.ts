@@ -1,7 +1,9 @@
 import { Router } from "express";
 
 import {
-  getSchoolAdminDashboardController,
+  getSchoolAdminDashboardController,getSchoolAdminsController,
+  updateSchoolAdminController,
+  updateSchoolAdminStatusController,
 } from "./schoolAdmin.controller";
 
 import { authenticate } from "../../middlewares/auth.middleware";
@@ -15,6 +17,24 @@ router.get(
   authenticate,
   authorize(UserRole.SCHOOL_ADMIN),
   getSchoolAdminDashboardController
+);
+
+
+router.get(
+  "/:schoolId/admin",
+  getSchoolAdminsController
+);
+
+
+router.put(
+  "/:schoolId/admin/:adminId",
+  updateSchoolAdminController
+);
+
+
+router.patch(
+  "/:schoolId/admin/:adminId/status",
+  updateSchoolAdminStatusController
 );
 
 export default router;
