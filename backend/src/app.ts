@@ -45,8 +45,18 @@ import superAdminRoutes from "./modules/super-admin/superAdmin.routes";
 
 import schoolAdminRoutes from "./modules/schoolAdmin/schoolAdmin.routes";
 
+import academicRoutes from "./modules/academic/academic.routes";
+
+
+
+
 import academicSessionRoutes
   from "./modules/academic/academicSession.routes";
+import teacherRoutes
+  from "./modules/teachers/teacher.routes";
+
+import attendanceRoutes
+  from "./modules/attendance/attendance.routes";  
 
 const app = express();
 
@@ -88,9 +98,37 @@ app.use(
 );
 
 
+// app.use(
+//   "/api/v1/academic",
+//   academicSessionRoutes
+// );
+
+
+
 app.use(
   "/api/v1/academic",
-  academicSessionRoutes
+  academicRoutes
 );
 
+
+
+app.use(
+  "/api/v1/academic",
+  academicRoutes
+);
+
+
+
+
+
+app.use(
+  "/api/v1/teachers",
+  teacherRoutes
+);
+
+
+app.use(
+  "/api/v1/attendance",
+  attendanceRoutes
+);
 export default app;
