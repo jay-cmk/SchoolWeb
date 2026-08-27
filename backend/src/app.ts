@@ -33,7 +33,6 @@
 
 // export default app;
 
-
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -45,13 +44,15 @@ import superAdminRoutes from "./modules/super-admin/superAdmin.routes";
 
 import schoolAdminRoutes from "./modules/schoolAdmin/schoolAdmin.routes";
 
+import studentRoutes from "./modules/students/student.routes";
+
 const app = express();
 
 app.use(
   cors({
     origin: true,
     credentials: true,
-  })
+  }),
 );
 
 app.use(helmet());
@@ -74,14 +75,19 @@ app.get("/api/v1/health", (_req, res) => {
 
 app.use("/api/v1/auth", authRoutes);
 
-app.use(
-  "/api/v1/super-admin",
-  superAdminRoutes
-);
+app.use("/api/v1/super-admin", superAdminRoutes);
 
-app.use(
-  "/api/v1/school-admin",
-  schoolAdminRoutes
-);
+app.use("/api/v1/school-admin", schoolAdminRoutes);
+
+// Health check
+app.get("/api/v1/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "School ERP API is running",
+  });
+});
+
+// Student API
+app.use("/api/v1/students", studentRoutes);
 
 export default app;

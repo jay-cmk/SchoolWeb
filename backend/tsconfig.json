@@ -63,6 +63,8 @@
     "noImplicitAny": true,
 
     "sourceMap": true,
+    "declaration": false,
+    "sourceMap": true,
 
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true
