@@ -47,6 +47,9 @@ import schoolAdminRoutes from "./modules/schoolAdmin/schoolAdmin.routes";
 
 import academicRoutes from "./modules/academic/academic.routes";
 
+import timetableRoutes
+  from "./modules/timetable/timetable.routes";
+
 
 
 
@@ -57,6 +60,12 @@ import teacherRoutes
 
 import attendanceRoutes
   from "./modules/attendance/attendance.routes";  
+
+import homeworkRoutes
+  from "./modules/homework/homework.routes";  
+
+import homeworkSubmissionRoutes
+  from "./modules/homework/homeworkSubmission.routes";  
 
 const app = express();
 
@@ -130,5 +139,24 @@ app.use(
 app.use(
   "/api/v1/attendance",
   attendanceRoutes
+);
+
+
+
+
+app.use(
+  "/api/v1/timetable",
+  timetableRoutes
+);
+
+
+app.use(
+  "/api/v1/homework",
+  homeworkRoutes
+);
+
+app.use(
+  "/api/v1/homework-submissions",
+  homeworkSubmissionRoutes
 );
 export default app;

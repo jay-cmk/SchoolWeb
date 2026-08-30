@@ -22,6 +22,17 @@ import subjectAssignmentReducer
  import attendanceReducer
   from "../features/attendance/attendance.slice"; 
 
+  import timetableReducer
+  from "../features/timetable/timetable.slice";
+
+import homeworkReducer from "../features/homework/homework.slice";  
+
+import homeworkSubmissionReducer
+  from "../features/homework/homeworkSubmission.slice";
+
+import schoolAdminDashboardReducer
+  from "../features/schoolAdminDashboard/schoolAdminDashboard.slice";  
+
 
 
 
@@ -42,9 +53,17 @@ export const store = configureStore({
   subjectAssignments:
         subjectAssignmentReducer,
   attendance:
-    attendanceReducer,   
+    attendanceReducer,  
     
+  timetable:
+        timetableReducer,  
     
+   homework: homeworkReducer, 
+   
+   homeworkSubmission: homeworkSubmissionReducer, 
+
+   schoolAdminDashboard:
+  schoolAdminDashboardReducer,
   },
 
 });
