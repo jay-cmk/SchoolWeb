@@ -43,8 +43,9 @@ import authRoutes from "./modules/auth/auth.routes";
 import superAdminRoutes from "./modules/super-admin/superAdmin.routes";
 
 import schoolAdminRoutes from "./modules/schoolAdmin/schoolAdmin.routes";
-
 import studentRoutes from "./modules/students/student.routes";
+import academicSessionRoutes
+  from "./modules/academic/academicSession.routes";
 
 const app = express();
 
@@ -89,5 +90,11 @@ app.get("/api/v1/health", (req, res) => {
 
 // Student API
 app.use("/api/v1/students", studentRoutes);
+
+// Academic API
+app.use(
+  "/api/v1/academic",
+  academicSessionRoutes
+);
 
 export default app;

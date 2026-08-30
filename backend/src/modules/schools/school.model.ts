@@ -24,7 +24,11 @@ export interface ISchool extends Document {
 
   createdAt: Date;
   updatedAt: Date;
+
+  isActive: boolean;
 }
+
+
 
 const schoolSchema = new Schema<ISchool>(
   {
@@ -103,6 +107,8 @@ const schoolSchema = new Schema<ISchool>(
     timestamps: true,
   }
 );
+
+
 
 export const School = mongoose.model<ISchool>(
   "School",
