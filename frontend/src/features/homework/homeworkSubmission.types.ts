@@ -1,6 +1,273 @@
+// import type {
+//   Homework,
+// } from "./homework.types";
+
+// export const HomeworkSubmissionStatus = {
+//   SUBMITTED: "SUBMITTED",
+//   LATE: "LATE",
+// } as const;
+
+// export type HomeworkSubmissionStatus =
+//   (typeof HomeworkSubmissionStatus)[keyof typeof HomeworkSubmissionStatus];
+
+
+// export const HomeworkReviewStatus = {
+//   PENDING: "PENDING",
+//   REVIEWED: "REVIEWED",
+// } as const;
+
+// export type HomeworkReviewStatus =
+//   (typeof HomeworkReviewStatus)[keyof typeof HomeworkReviewStatus];
+
+
+// export interface SubmissionAttachment {
+//   fileName: string;
+//   fileUrl: string;
+//   fileType?: string;
+//   fileSize?: number;
+// }
+
+
+// export interface SubmissionStudent {
+//   _id: string;
+
+//   name?: string;
+
+//   firstName?: string;
+//   lastName?: string;
+
+//   admissionNumber?: string;
+//   rollNumber?: string;
+
+//   email?: string;
+// }
+
+
+// export interface SubmissionReviewer {
+//   _id: string;
+//   name?: string;
+//   email?: string;
+// }
+
+
+// export interface HomeworkSubmission {
+//   _id: string;
+
+//   schoolId?: string;
+
+//   homeworkId:
+//     | string
+//     | Homework;
+
+//   studentId:
+//     | string
+//     | SubmissionStudent;
+
+//   submissionText?: string;
+
+//   attachment?: SubmissionAttachment;
+
+//   submissionStatus:
+//     HomeworkSubmissionStatus;
+
+//   reviewStatus:
+//     HomeworkReviewStatus;
+
+//   submittedAt: string;
+
+//   remarks?: string;
+
+//   marks?: number;
+
+//   reviewedBy?:
+//     | string
+//     | SubmissionReviewer;
+
+//   reviewedAt?: string;
+
+//   isActive?: boolean;
+
+//   createdAt?: string;
+//   updatedAt?: string;
+// }
+
+
+// // ======================================================
+// // CREATE SUBMISSION
+// // ======================================================
+
+// export interface CreateHomeworkSubmissionData {
+//   homeworkId: string;
+//   studentId: string;
+
+//   submissionText?: string;
+
+//   attachment?: SubmissionAttachment;
+// }
+
+
+// // ======================================================
+// // UPDATE SUBMISSION
+// // ======================================================
+
+// export interface UpdateHomeworkSubmissionData {
+//   submissionText?: string;
+
+//   attachment?:
+//     | SubmissionAttachment
+//     | null;
+// }
+
+
+// // ======================================================
+// // REVIEW SUBMISSION
+// // ======================================================
+
+// export interface ReviewHomeworkSubmissionData {
+//   remarks?: string;
+//   marks?: number;
+// }
+
+
+// // ======================================================
+// // FILTERS
+// // ======================================================
+
+// export interface HomeworkSubmissionFilters {
+//   studentId?: string;
+
+//   submissionStatus?:
+//     HomeworkSubmissionStatus;
+
+//   reviewStatus?:
+//     HomeworkReviewStatus;
+
+//   search?: string;
+
+//   page?: number;
+//   limit?: number;
+// }
+
+
+// // ======================================================
+// // PAGINATION
+// // ======================================================
+
+// export interface HomeworkSubmissionPagination {
+//   page: number;
+//   limit: number;
+//   total: number;
+//   totalPages: number;
+// }
+
+
+// // ======================================================
+// // STATS
+// // ======================================================
+
+// export interface HomeworkSubmissionStats {
+//   totalSubmitted: number;
+
+//   onTimeSubmitted: number;
+
+//   lateSubmitted: number;
+
+//   reviewed: number;
+
+//   pendingReview: number;
+
+//   /*
+//     Student module complete hone ke baad
+//     backend se ye values bhi aa sakti hain:
+
+//     totalStudents?: number;
+//     pendingStudents?: number;
+//   */
+// }
+
+
+// // ======================================================
+// // API RESPONSES
+// // ======================================================
+
+// export interface HomeworkSubmissionListResponse {
+//   success: boolean;
+
+//   data: {
+//     submissions:
+//       HomeworkSubmission[];
+
+//     pagination?:
+//       HomeworkSubmissionPagination;
+//   };
+// }
+
+
+// export interface HomeworkSubmissionDetailsResponse {
+//   success: boolean;
+
+//   data: {
+//     submission:
+//       HomeworkSubmission | null;
+//   };
+// }
+
+
+// export interface HomeworkSubmissionCreateResponse {
+//   success: boolean;
+
+//   message: string;
+
+//   data: {
+//     submission:
+//       HomeworkSubmission;
+//   };
+// }
+
+
+// export interface HomeworkSubmissionUpdateResponse {
+//   success: boolean;
+
+//   message: string;
+
+//   data: {
+//     submission:
+//       HomeworkSubmission;
+//   };
+// }
+
+
+// export interface HomeworkSubmissionStatsResponse {
+//   success: boolean;
+
+//   data: {
+//     stats:
+//       HomeworkSubmissionStats;
+//   };
+// }
+
+
+// export interface HomeworkSubmissionDeleteResponse {
+//   success: boolean;
+//   message: string;
+// }
+
+
+
+
+
+// ======================================================
+// HOMEWORK SUBMISSION TYPES
+// ======================================================
+
 import type {
   Homework,
 } from "./homework.types";
+
+
+// ======================================================
+// SUBMISSION STATUS
+// ======================================================
 
 export const HomeworkSubmissionStatus = {
   SUBMITTED: "SUBMITTED",
@@ -8,8 +275,14 @@ export const HomeworkSubmissionStatus = {
 } as const;
 
 export type HomeworkSubmissionStatus =
-  (typeof HomeworkSubmissionStatus)[keyof typeof HomeworkSubmissionStatus];
+  (typeof HomeworkSubmissionStatus)[
+    keyof typeof HomeworkSubmissionStatus
+  ];
 
+
+// ======================================================
+// REVIEW STATUS
+// ======================================================
 
 export const HomeworkReviewStatus = {
   PENDING: "PENDING",
@@ -17,16 +290,29 @@ export const HomeworkReviewStatus = {
 } as const;
 
 export type HomeworkReviewStatus =
-  (typeof HomeworkReviewStatus)[keyof typeof HomeworkReviewStatus];
+  (typeof HomeworkReviewStatus)[
+    keyof typeof HomeworkReviewStatus
+  ];
 
+
+// ======================================================
+// ATTACHMENT
+// ======================================================
 
 export interface SubmissionAttachment {
   fileName: string;
+
   fileUrl: string;
+
   fileType?: string;
+
   fileSize?: number;
 }
 
+
+// ======================================================
+// POPULATED STUDENT
+// ======================================================
 
 export interface SubmissionStudent {
   _id: string;
@@ -34,21 +320,38 @@ export interface SubmissionStudent {
   name?: string;
 
   firstName?: string;
+
   lastName?: string;
 
   admissionNumber?: string;
+
   rollNumber?: string;
 
   email?: string;
+
+  profileImage?: string;
 }
 
+
+// ======================================================
+// REVIEWER
+//
+// reviewedBy = User._id
+// Teacher._id nahi.
+// ======================================================
 
 export interface SubmissionReviewer {
   _id: string;
+
   name?: string;
+
   email?: string;
 }
 
+
+// ======================================================
+// HOMEWORK SUBMISSION
+// ======================================================
 
 export interface HomeworkSubmission {
   _id: string;
@@ -65,7 +368,8 @@ export interface HomeworkSubmission {
 
   submissionText?: string;
 
-  attachment?: SubmissionAttachment;
+  attachment?:
+    SubmissionAttachment;
 
   submissionStatus:
     HomeworkSubmissionStatus;
@@ -88,26 +392,38 @@ export interface HomeworkSubmission {
   isActive?: boolean;
 
   createdAt?: string;
+
   updatedAt?: string;
 }
 
 
 // ======================================================
 // CREATE SUBMISSION
+//
+// SCHOOL_ADMIN generic endpoint.
+//
+// Teacher ko generic create permission nahi.
+// Student ke /me endpoints alag hain.
 // ======================================================
 
 export interface CreateHomeworkSubmissionData {
   homeworkId: string;
+
   studentId: string;
 
   submissionText?: string;
 
-  attachment?: SubmissionAttachment;
+  attachment?:
+    SubmissionAttachment;
 }
 
 
 // ======================================================
 // UPDATE SUBMISSION
+//
+// SCHOOL_ADMIN generic endpoint.
+//
+// Teacher ko generic update permission nahi.
 // ======================================================
 
 export interface UpdateHomeworkSubmissionData {
@@ -121,16 +437,21 @@ export interface UpdateHomeworkSubmissionData {
 
 // ======================================================
 // REVIEW SUBMISSION
+//
+// SCHOOL_ADMIN + TEACHER
 // ======================================================
 
 export interface ReviewHomeworkSubmissionData {
   remarks?: string;
+
   marks?: number;
 }
 
 
 // ======================================================
 // FILTERS
+//
+// SCHOOL_ADMIN + TEACHER
 // ======================================================
 
 export interface HomeworkSubmissionFilters {
@@ -145,6 +466,7 @@ export interface HomeworkSubmissionFilters {
   search?: string;
 
   page?: number;
+
   limit?: number;
 }
 
@@ -155,8 +477,11 @@ export interface HomeworkSubmissionFilters {
 
 export interface HomeworkSubmissionPagination {
   page: number;
+
   limit: number;
+
   total: number;
+
   totalPages: number;
 }
 
@@ -176,13 +501,22 @@ export interface HomeworkSubmissionStats {
 
   pendingReview: number;
 
-  /*
-    Student module complete hone ke baad
-    backend se ye values bhi aa sakti hain:
+  totalStudents?: number;
 
-    totalStudents?: number;
-    pendingStudents?: number;
-  */
+  pendingStudents?: number;
+}
+
+
+// ======================================================
+// LIST DATA
+// ======================================================
+
+export interface HomeworkSubmissionListData {
+  submissions:
+    HomeworkSubmission[];
+
+  pagination?:
+    HomeworkSubmissionPagination;
 }
 
 
@@ -192,6 +526,8 @@ export interface HomeworkSubmissionStats {
 
 export interface HomeworkSubmissionListResponse {
   success: boolean;
+
+  message?: string;
 
   data: {
     submissions:
@@ -205,6 +541,8 @@ export interface HomeworkSubmissionListResponse {
 
 export interface HomeworkSubmissionDetailsResponse {
   success: boolean;
+
+  message?: string;
 
   data: {
     submission:
@@ -240,6 +578,8 @@ export interface HomeworkSubmissionUpdateResponse {
 export interface HomeworkSubmissionStatsResponse {
   success: boolean;
 
+  message?: string;
+
   data: {
     stats:
       HomeworkSubmissionStats;
@@ -249,5 +589,34 @@ export interface HomeworkSubmissionStatsResponse {
 
 export interface HomeworkSubmissionDeleteResponse {
   success: boolean;
+
   message: string;
+}
+
+
+// ======================================================
+// REDUX STATE
+// ======================================================
+
+export interface HomeworkSubmissionState {
+  submissions:
+    HomeworkSubmission[];
+
+  selectedSubmission:
+    HomeworkSubmission | null;
+
+  studentSubmission:
+    HomeworkSubmission | null;
+
+  stats:
+    HomeworkSubmissionStats | null;
+
+  pagination:
+    HomeworkSubmissionPagination | null;
+
+  loading: boolean;
+
+  saving: boolean;
+
+  error: string | null;
 }

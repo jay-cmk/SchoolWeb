@@ -43,8 +43,7 @@
 // export default HomeworkList;
 
 
-
-import {
+import React, {
   useEffect,
   useState,
 } from "react";
@@ -67,6 +66,7 @@ import HomeworkCalendar from "../../../components/homework/HomeworkCalendar";
 import HomeworkState from "../../../components/homework/HomeworkState";
 
 import {
+  deleteHomework,
   getHomeworks,
   getHomeworkStats,
 } from "../../../features/homework/homework.slice";
@@ -75,36 +75,59 @@ import type {
   HomeworkFilters as HomeworkFiltersType,
 } from "../../../features/homework/homework.types";
 
-
-
-
-
-
-
-
 import { getSessions } from "../../../features/academic/sessions/session.slice";
 import { getClasses } from "../../../features/academic/classes/class.slice";
 import { getSections } from "../../../features/academic/sections/section.slice";
 import { getSubjects } from "../../../features/academic/subjects/subject.slice";
 import { getTeachers } from "../../../features/teachers/teacher.slice";
 
+
+// ======================================================
+// TYPES
+// ======================================================
+
 type ViewMode =
   | "list"
   | "calendar";
 
+
+// ======================================================
+// COMPONENT
+// ======================================================
+
 const HomeworkList = () => {
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
   const dispatch =
     useDispatch<any>();
 
-  const [viewMode, setViewMode] =
-    useState<ViewMode>("list");
 
-  const [filters, setFilters] =
+  // ====================================================
+  // LOCAL STATE
+  // ====================================================
+
+  const [
+    viewMode,
+    setViewMode,
+  ] =
+    useState<ViewMode>(
+      "list"
+    );
+
+
+  const [
+    filters,
+    setFilters,
+  ] =
     useState<HomeworkFiltersType>(
       {}
     );
+
+
+  // ====================================================
+  // REDUX STATE
+  // ====================================================
 
   const homeworkState =
     useSelector(
@@ -112,124 +135,275 @@ const HomeworkList = () => {
         state.homework
     );
 
+
   const sessions =
     useSelector(
       (state: any) =>
-        state.sessions?.sessions ?? []
+        state.sessions
+          ?.sessions ?? []
     );
+
 
   const classes =
     useSelector(
       (state: any) =>
-        state.classes?.classes ?? []
+        state.classes
+          ?.classes ?? []
     );
+
 
   const sections =
     useSelector(
       (state: any) =>
-        state.sections?.sections ?? []
+        state.sections
+          ?.sections ?? []
     );
+
 
   const subjects =
     useSelector(
       (state: any) =>
-        state.subjects?.subjects ?? []
+        state.subjects
+          ?.subjects ?? []
     );
+
 
   const teachers =
     useSelector(
       (state: any) =>
-        state.teachers?.teachers ?? []
+        state.teachers
+          ?.teachers ?? []
     );
 
+
+  // ====================================================
+  // HOMEWORK STATE
+  // ====================================================
+
   const homeworks =
-    homeworkState?.homeworks ?? [];
+    homeworkState?.homeworks ??
+    [];
+
 
   const stats =
-    homeworkState?.stats ?? null;
+    homeworkState?.stats ??
+    null;
+
 
   const pagination =
-    homeworkState?.pagination ?? null;
+    homeworkState?.pagination ??
+    null;
+
 
   const loading =
     Boolean(
       homeworkState?.loading
     );
 
+
   const error =
-    homeworkState?.error ?? null;
+    homeworkState?.error ??
+    null;
+
+
+  // ====================================================
+  // FETCH FILTER OPTIONS
+  // ====================================================
 
   useEffect(() => {
-    dispatch(getSessions());
-
-    dispatch(getClasses());
-
     dispatch(
-      getSections(undefined)
+      getSessions()
     );
 
     dispatch(
-      getSubjects(undefined)
+      getClasses()
     );
 
     dispatch(
-      getTeachers(undefined)
+      getSections(
+        undefined
+      )
+    );
+
+    dispatch(
+      getSubjects(
+        undefined
+      )
+    );
+
+    dispatch(
+      getTeachers(
+        undefined
+      )
     );
   }, [dispatch]);
 
+
+  // ====================================================
+  // FETCH HOMEWORK
+  // ====================================================
+
   useEffect(() => {
     dispatch(
-      getHomeworks(filters)
+      getHomeworks(
+        filters
+      )
     );
 
     dispatch(
       getHomeworkStats()
     );
-  }, [dispatch, filters]);
+  }, [
+    dispatch,
+    filters,
+  ]);
 
-  const handleReset = () => {
-    setFilters({});
-  };
+
+  // ====================================================
+  // RESET FILTER
+  // ====================================================
+
+  const handleReset =
+    () => {
+      setFilters({});
+    };
+
+
+  // ====================================================
+  // PAGINATION
+  // ====================================================
 
   const handlePageChange = (
     page: number
   ) => {
-    setFilters((current) => ({
-      ...current,
-      page,
-    }));
+    setFilters(
+      (current) => ({
+        ...current,
+        page,
+      })
+    );
   };
+
+
+  // ====================================================
+  // VIEW HOMEWORK
+  // ====================================================
+
+  const handleView = (
+    homeworkId: string
+  ) => {
+    navigate(
+      `/school-admin/homework/${homeworkId}`
+    );
+  };
+
+
+  // ====================================================
+  // VIEW SUBMISSIONS
+  // ====================================================
+
+  const handleSubmissions = (
+    homeworkId: string
+  ) => {
+    navigate(
+      `/school-admin/homework/${homeworkId}/submissions`
+    );
+  };
+
+
+  // ====================================================
+  // DELETE HOMEWORK
+  // ====================================================
+
+  const handleDelete =
+    async (
+      homeworkId: string
+    ) => {
+      const confirmed =
+        window.confirm(
+          "Are you sure you want to delete this homework?"
+        );
+
+
+      if (!confirmed) {
+        return;
+      }
+
+
+      try {
+        await dispatch(
+          deleteHomework(
+            homeworkId
+          )
+        ).unwrap();
+
+
+        // Refresh stats after deletion
+        dispatch(
+          getHomeworkStats()
+        );
+
+      } catch (error) {
+        console.error(
+          "Failed to delete homework:",
+          error
+        );
+      }
+    };
+
+
+  // ====================================================
+  // PAGE
+  // ====================================================
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8">
+
       <div className="mx-auto max-w-[1600px]">
-        {/* Breadcrumb */}
+
+        {/* ==================================================
+            BREADCRUMB
+        ================================================== */}
+
         <div className="mb-4 flex items-center gap-2 text-sm text-slate-500">
+
           <span>
             Academic
           </span>
+
 
           <Icon
             icon="lucide:chevron-right"
           />
 
+
           <span className="font-medium text-slate-800">
             Homework
           </span>
+
         </div>
 
-        {/* Header */}
+
+        {/* ==================================================
+            HEADER
+        ================================================== */}
+
         <div className="mb-6 flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
+
           <div>
+
             <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">
               Homework
             </h1>
+
 
             <p className="mt-1 text-sm text-slate-500">
               Create, manage and track
               student homework.
             </p>
+
           </div>
+
 
           <button
             type="button"
@@ -240,24 +414,38 @@ const HomeworkList = () => {
             }
             className="flex h-11 items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 text-sm font-medium text-white hover:bg-blue-700"
           >
+
             <Icon
               icon="lucide:plus"
               className="text-lg"
             />
 
             Add Homework
+
           </button>
+
         </div>
 
-        {/* Stats */}
+
+        {/* ==================================================
+            STATS
+        ================================================== */}
+
         <div className="mb-6">
+
           <HomeworkStats
             stats={stats}
           />
+
         </div>
 
-        {/* Filters */}
+
+        {/* ==================================================
+            FILTERS
+        ================================================== */}
+
         <div className="mb-6">
+
           <HomeworkFilters
             filters={filters}
             sessions={sessions}
@@ -265,49 +453,86 @@ const HomeworkList = () => {
             sections={sections}
             subjects={subjects}
             teachers={teachers}
-            onChange={(newFilters) =>
+            onChange={(
+              newFilters
+            ) =>
               setFilters({
                 ...newFilters,
                 page: 1,
               })
             }
-            onReset={handleReset}
+            onReset={
+              handleReset
+            }
           />
+
         </div>
 
-        {/* Main */}
+
+        {/* ==================================================
+            MAIN
+        ================================================== */}
+
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-          {/* Toolbar */}
+
+          {/* ==================================================
+              TOOLBAR
+          ================================================== */}
+
           <div className="flex flex-col justify-between gap-3 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-center">
+
             <div>
+
               <h2 className="font-semibold text-slate-900">
                 Homework Records
               </h2>
 
+
               <p className="mt-0.5 text-xs text-slate-500">
+
                 {pagination?.total ??
                   homeworks.length}{" "}
+
                 homework found
+
               </p>
+
             </div>
 
+
+            {/* ==================================================
+                VIEW SWITCH
+            ================================================== */}
+
             <div className="flex rounded-lg border border-slate-200 bg-slate-50 p-1">
+
+              {/* LIST */}
+
               <button
                 type="button"
                 onClick={() =>
-                  setViewMode("list")
+                  setViewMode(
+                    "list"
+                  )
                 }
                 className={`flex h-9 items-center gap-2 rounded-md px-3 text-sm font-medium transition ${
-                  viewMode === "list"
+                  viewMode ===
+                  "list"
                     ? "bg-white text-blue-600 shadow-sm"
                     : "text-slate-500 hover:text-slate-800"
                 }`}
               >
+
                 <Icon
                   icon="lucide:list"
                 />
+
                 List
+
               </button>
+
+
+              {/* CALENDAR */}
 
               <button
                 type="button"
@@ -323,55 +548,114 @@ const HomeworkList = () => {
                     : "text-slate-500 hover:text-slate-800"
                 }`}
               >
+
                 <Icon
                   icon="lucide:calendar-days"
                 />
+
                 Calendar
+
               </button>
+
             </div>
+
           </div>
 
+
+          {/* ==================================================
+              CONTENT
+          ================================================== */}
+
           {loading &&
-          homeworks.length === 0 ? (
+          homeworks.length ===
+            0 ? (
+
             <HomeworkState
               type="loading"
             />
+
           ) : error ? (
+
             <HomeworkState
               type="error"
-              message={error}
+              message={
+                error
+              }
             />
+
           ) : homeworks.length ===
             0 ? (
+
             <HomeworkState
               type="empty"
               title="No homework found"
               message="Create your first homework or change the selected filters."
             />
+
           ) : viewMode ===
             "calendar" ? (
+
             <HomeworkCalendar
-              homeworks={homeworks}
+              homeworks={
+                homeworks
+              }
             />
+
           ) : (
+
             <>
+
+              {/* ==================================================
+                  HOMEWORK TABLE
+              ================================================== */}
+
               <HomeworkTable
-                homeworks={homeworks}
+                homeworks={
+                  homeworks
+                }
+                onView={
+                  handleView
+                }
+                onSubmissions={
+                  handleSubmissions
+                }
+                onDelete={
+                  handleDelete
+                }
               />
+
+
+              {/* ==================================================
+                  PAGINATION
+              ================================================== */}
 
               {pagination &&
                 pagination.totalPages >
                   1 && (
+
                   <div className="flex flex-col items-center justify-between gap-3 border-t border-slate-200 px-5 py-4 sm:flex-row">
+
                     <p className="text-sm text-slate-500">
+
                       Page{" "}
-                      {pagination.page} of{" "}
+
+                      {
+                        pagination.page
+                      }{" "}
+
+                      of{" "}
+
                       {
                         pagination.totalPages
                       }
+
                     </p>
 
+
                     <div className="flex gap-2">
+
+                      {/* PREVIOUS */}
+
                       <button
                         type="button"
                         disabled={
@@ -386,11 +670,17 @@ const HomeworkList = () => {
                         }
                         className="flex h-9 items-center gap-1 rounded-lg border border-slate-300 px-3 text-sm text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
                       >
+
                         <Icon
                           icon="lucide:chevron-left"
                         />
+
                         Previous
+
                       </button>
+
+
+                      {/* NEXT */}
 
                       <button
                         type="button"
@@ -406,20 +696,31 @@ const HomeworkList = () => {
                         }
                         className="flex h-9 items-center gap-1 rounded-lg border border-slate-300 px-3 text-sm text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
                       >
+
                         Next
+
                         <Icon
                           icon="lucide:chevron-right"
                         />
+
                       </button>
+
                     </div>
+
                   </div>
                 )}
+
             </>
+
           )}
+
         </div>
+
       </div>
+
     </div>
   );
 };
+
 
 export default HomeworkList;

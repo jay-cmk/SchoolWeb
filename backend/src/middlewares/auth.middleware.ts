@@ -1,5 +1,116 @@
-import { NextFunction, Request, Response } from "express";
-import { verifyAccessToken } from "../utils/jwt";
+// import { NextFunction, Request, Response } from "express";
+// import { verifyAccessToken } from "../utils/jwt";
+
+// export const authenticate = (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ): void => {
+//   try {
+//     const authHeader = req.headers.authorization;
+
+//     if (!authHeader) {
+//       res.status(401).json({
+//         success: false,
+//         message: "Authorization header is required",
+//       });
+
+//       return;
+//     }
+
+//     const [scheme, token] = authHeader.split(" ");
+
+//     if (scheme !== "Bearer" || !token) {
+//       res.status(401).json({
+//         success: false,
+//         message: "Invalid authorization format",
+//       });
+
+//       return;
+//     }
+
+//     const payload = verifyAccessToken(token);
+
+//     req.user = payload;
+
+//     next();
+//   } catch (error) {
+//     res.status(401).json({
+//       success: false,
+//       message: "Invalid or expired access token",
+//     });
+//   }
+// };
+
+
+
+
+
+
+
+
+// import { NextFunction, Request, Response } from "express";
+// import { verifyAccessToken } from "../utils/jwt";
+
+// export const authenticate = (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ): void => {
+//   try {
+//     const authHeader = req.headers.authorization;
+
+//     if (!authHeader) {
+//       res.status(401).json({
+//         success: false,
+//         message: "Authorization header is required",
+//       });
+
+//       return;
+//     }
+
+//     const [scheme, token] = authHeader.split(" ");
+
+//     if (scheme !== "Bearer" || !token) {
+//       res.status(401).json({
+//         success: false,
+//         message: "Invalid authorization format",
+//       });
+
+//       return;
+//     }
+
+//     const payload = verifyAccessToken(token);
+
+//     req.user = payload;
+
+//     next();
+//   } catch (error) {
+//     res.status(401).json({
+//       success: false,
+//       message: "Invalid or expired access token",
+//     });
+//   }
+// };
+
+
+
+
+
+import {
+  NextFunction,
+  Request,
+  Response,
+} from "express";
+
+import {
+  verifyAccessToken,
+} from "../utils/jwt";
+
+import type {
+  AuthTokenPayload,
+} from "../types/auth.types";
+
 
 export const authenticate = (
   req: Request,
@@ -7,37 +118,49 @@ export const authenticate = (
   next: NextFunction
 ): void => {
   try {
-    const authHeader = req.headers.authorization;
+    const authHeader =
+      req.headers.authorization;
 
     if (!authHeader) {
       res.status(401).json({
         success: false,
-        message: "Authorization header is required",
+        message:
+          "Authorization header is required",
       });
 
       return;
     }
 
-    const [scheme, token] = authHeader.split(" ");
+    const [scheme, token] =
+      authHeader.split(" ");
 
-    if (scheme !== "Bearer" || !token) {
+    if (
+      scheme !== "Bearer" ||
+      !token
+    ) {
       res.status(401).json({
         success: false,
-        message: "Invalid authorization format",
+        message:
+          "Invalid authorization format",
       });
 
       return;
     }
 
-    const payload = verifyAccessToken(token);
+    const payload =
+      verifyAccessToken(
+        token
+      ) as AuthTokenPayload;
 
     req.user = payload;
 
     next();
+
   } catch (error) {
     res.status(401).json({
       success: false,
-      message: "Invalid or expired access token",
+      message:
+        "Invalid or expired access token",
     });
   }
 };

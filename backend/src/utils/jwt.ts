@@ -8,11 +8,13 @@
 
 // export const generateAccessToken = (
 //   userId: string,
-//   role: UserRole
+//   role: UserRole,
+//   schoolId?: string
 // ): string => {
 //   const payload: AuthTokenPayload = {
 //     userId,
 //     role,
+//     ...(schoolId ? { schoolId } : {}),
 //   };
 
 //   return jwt.sign(payload, env.jwtAccessSecret, {
@@ -30,30 +32,137 @@
 // };
 
 
+
+
+
+
+
+
+
+// import jwt from "jsonwebtoken";
+
+// import { env } from "../config/env";
+
+// import { UserRole } from "../constants/roles";
+
+// import type {
+//   AuthTokenPayload,
+// } from "../types/auth.types";
+
+
+// export const generateAccessToken = (
+//   userId: string,
+//   role: UserRole,
+//   schoolId?: string,
+//   studentId?: string
+// ): string => {
+
+//   const payload: AuthTokenPayload = {
+//     userId,
+
+//     role,
+
+//     ...(schoolId
+//       ? {
+//           schoolId,
+//         }
+//       : {}),
+
+//     ...(studentId
+//       ? {
+//           studentId,
+//         }
+//       : {}),
+//   };
+
+
+//   return jwt.sign(
+//     payload,
+//     env.jwtAccessSecret,
+//     {
+//       expiresIn: "60m",
+//     }
+//   );
+// };
+
+
+// export const verifyAccessToken = (
+//   token: string
+// ): AuthTokenPayload => {
+
+//   return jwt.verify(
+//     token,
+//     env.jwtAccessSecret
+//   ) as AuthTokenPayload;
+// };
+
+
+
+
+
+
 import jwt from "jsonwebtoken";
+
 import { env } from "../config/env";
+
 import { UserRole } from "../constants/roles";
-import { AuthTokenPayload } from "../types/auth.types";
+
+import type {
+  AuthTokenPayload,
+} from "../types/auth.types";
+
 
 export const generateAccessToken = (
   userId: string,
+
   role: UserRole,
-  schoolId?: string
+
+  schoolId?: string,
+
+  studentId?: string,
+
+  teacherId?: string
 ): string => {
+
   const payload: AuthTokenPayload = {
     userId,
+
     role,
-    ...(schoolId ? { schoolId } : {}),
+
+    ...(schoolId
+      ? {
+          schoolId,
+        }
+      : {}),
+
+    ...(studentId
+      ? {
+          studentId,
+        }
+      : {}),
+
+    ...(teacherId
+      ? {
+          teacherId,
+        }
+      : {}),
   };
 
-  return jwt.sign(payload, env.jwtAccessSecret, {
-    expiresIn: "15m",
-  });
+
+  return jwt.sign(
+    payload,
+    env.jwtAccessSecret,
+    {
+      expiresIn: "60m",
+    }
+  );
 };
+
 
 export const verifyAccessToken = (
   token: string
 ): AuthTokenPayload => {
+
   return jwt.verify(
     token,
     env.jwtAccessSecret

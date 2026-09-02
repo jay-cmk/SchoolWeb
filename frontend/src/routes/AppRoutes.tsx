@@ -625,6 +625,7 @@ import HomeworkDetails
 
 import StudentSubmissions
   from "../pages/schoolAdmin/homework/StudentSubmissions";
+import EditHomework from "../pages/schoolAdmin/homework/EditHomework";
 
 
 // ============================================
@@ -961,6 +962,11 @@ const AppRoutes = () => {
             <StudentSubmissions />
           }
         />
+
+        <Route
+  path="/school-admin/homework/:homeworkId/edit"
+  element={<EditHomework />}
+/>
 
 
       </Route>

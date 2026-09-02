@@ -1,3 +1,39 @@
+// import express from "express";
+// import cors from "cors";
+// import helmet from "helmet";
+// import morgan from "morgan";
+// import cookieParser from "cookie-parser";
+
+// const app = express();
+
+// app.use(
+//   cors({
+//     origin: true,
+//     credentials: true,
+//   })
+// );
+
+// app.use(helmet());
+
+// app.use(morgan("dev"));
+
+// app.use(express.json());
+
+// app.use(express.urlencoded({ extended: true }));
+
+// app.use(cookieParser());
+
+// app.get("/api/v1/health", (_req, res) => {
+//   res.status(200).json({
+//     success: true,
+//     message: "School SaaS API is running",
+//     timestamp: new Date().toISOString(),
+//   });
+// });
+
+// export default app;
+
+
 
 
 // import express from "express";
@@ -70,16 +106,13 @@
 // app.use("/api/v1/students", studentRoutes);
 
 // // Academic API
-// app.use(
-//   "/api/v1/academic",
-//   academicSessionRoutes
-// );
+
 
 
 
 // app.use(
 //   "/api/v1/academic",
-//   academicSessionRoutes
+//   academicRoutes
 // );
 
 
@@ -124,6 +157,8 @@
 
 
 
+
+
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -140,13 +175,13 @@ import superAdminRoutes from "./modules/super-admin/superAdmin.routes";
 
 import schoolAdminRoutes from "./modules/schoolAdmin/schoolAdmin.routes";
 
-import studentRoutes from "./modules/students/student.routes";
-
-import academicSessionRoutes from "./modules/academic/academicSession.routes";
+import academicRoutes from "./modules/academic/academic.routes";
 
 import teacherRoutes from "./modules/teachers/teacher.routes";
 
 import attendanceRoutes from "./modules/attendance/attendance.routes";
+
+import studentRoutes from "./modules/students/student.routes";
 
 import timetableRoutes from "./modules/timetable/timetable.routes";
 
@@ -199,10 +234,8 @@ app.get(
   (_req, res) => {
     res.status(200).json({
       success: true,
-      message:
-        "School ERP API is running",
-      timestamp:
-        new Date().toISOString(),
+      message: "School SaaS API is running",
+      timestamp: new Date().toISOString(),
     });
   }
 );
@@ -239,22 +272,12 @@ app.use(
 
 
 // ============================================
-// STUDENTS
-// ============================================
-
-app.use(
-  "/api/v1/students",
-  studentRoutes
-);
-
-
-// ============================================
 // ACADEMIC
 // ============================================
 
 app.use(
   "/api/v1/academic",
-  academicSessionRoutes
+  academicRoutes
 );
 
 
@@ -265,6 +288,16 @@ app.use(
 app.use(
   "/api/v1/teachers",
   teacherRoutes
+);
+
+
+// ============================================
+// STUDENTS
+// ============================================
+
+app.use(
+  "/api/v1/students",
+  studentRoutes
 );
 
 
@@ -317,9 +350,5 @@ app.use(
   feeRoutes
 );
 
-
-// ============================================
-// EXPORT
-// ============================================
 
 export default app;
