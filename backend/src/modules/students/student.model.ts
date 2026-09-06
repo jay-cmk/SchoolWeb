@@ -430,6 +430,8 @@ export interface IStudentDocument
 
   aadhaarNumber?: string;
 
+  apaarId?: string;
+
   photo?: string;
 
   // ============================================
@@ -734,6 +736,17 @@ const studentSchema =
       },
 
 
+      apaarId: {
+        type: String,
+        trim: true,
+
+        match: [
+          /^\d{12}$/,
+          "APAAR ID must be exactly 12 digits",
+        ],
+      },
+
+
       photo: {
         type: String,
         trim: true,
@@ -852,6 +865,28 @@ studentSchema.index(
   {
     unique: true,
     sparse: true,
+  }
+);
+
+
+// ============================================
+// UNIQUE APAAR ID
+// SCHOOL + APAAR ID
+// ============================================
+
+studentSchema.index(
+  {
+    schoolId: 1,
+    apaarId: 1,
+  },
+  {
+    unique: true,
+
+    partialFilterExpression: {
+      apaarId: {
+        $type: "string",
+      },
+    },
   }
 );
 

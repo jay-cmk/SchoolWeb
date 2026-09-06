@@ -1,246 +1,940 @@
-import React, { useEffect, useMemo, useState } from "react";
-
-import { useNavigate } from "react-router-dom";
-
-import { Icon } from "@iconify/react";
-
-import { getSessions } from "../../../features/academic/sessions/session.slice";
-
-import { getClasses } from "../../../features/academic/classes/class.slice";
-
-import { getSections } from "../../../features/academic/sections/section.slice";
+import React, {
+  useEffect,
+  useState,
+} from "react";
 
 import {
-  clearStudents,
-  getStudentsByEnrollment,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
+
+import {
+  Icon,
+} from "@iconify/react";
+
+import {
+  clearSelectedStudent,
+  clearStudentError,
+  getStudentById,
+  updateStudent,
 } from "../../../features/student/student.slice";
 
 import type {
-  Student,
-  StudentEnrollmentFilters,
+  AdmissionCategory,
+  AdmissionType,
+  StudentAddress,
+  StudentBloodGroup,
+  StudentCategory,
+  StudentGender,
+  StudentParentDetails,
+  StudentStatus,
+  UpdateStudentData,
 } from "../../../features/student/student.types";
 
-import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../../../app/hooks";
 
-const ClassWiseStudents: React.FC = () => {
-  const dispatch = useAppDispatch();
 
-  const navigate = useNavigate();
+/* =====================================================
+   HELPERS
+===================================================== */
 
-  // ============================================
-  // REDUX
-  // ============================================
+const emptyAddress =
+  (): StudentAddress => ({
+    addressLine: "",
+    city: "",
+    district: "",
+    state: "",
+    pincode: "",
+    country: "India",
+  });
 
-  const { sessions, loading: sessionLoading } = useAppSelector(
-    (state) => state.sessions,
-  );
 
-  const { classes, loading: classLoading } = useAppSelector(
-    (state) => state.classes,
-  );
+const emptyParent =
+  (): StudentParentDetails => ({
+    name: "",
+    mobile: "",
+    aadhaarNumber: "",
+    occupation: "",
+  });
 
-  const { sections, loading: sectionLoading } = useAppSelector(
-    (state) => state.sections,
-  );
+
+const relationName = (
+  value:
+    | string
+    | {
+        name?: string;
+      }
+    | undefined
+) => {
+  if (!value) {
+    return "—";
+  }
+
+  if (
+    typeof value ===
+    "string"
+  ) {
+    return value;
+  }
+
+  return value.name ?? "—";
+};
+
+
+const toDateInputValue = (
+  value?: string
+) => {
+  if (!value) {
+    return "";
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return "";
+  }
+
+  return date
+    .toISOString()
+    .slice(0, 10);
+};
+
+
+/* =====================================================
+   COMPONENT
+===================================================== */
+
+const EditStudent: React.FC = () => {
+  const dispatch =
+    useAppDispatch();
+
+  const navigate =
+    useNavigate();
 
   const {
-    students,
-    loading: studentLoading,
-    error: studentError,
-  } = useAppSelector((state) => state.students);
+    studentId,
+  } = useParams<{
+    studentId: string;
+  }>();
 
-  const { selectedSessionId } = useAppSelector(
-    (state) => state.sessionSelection,
+
+  const {
+    selectedStudent,
+    loading,
+    error,
+  } = useAppSelector(
+    (state) =>
+      state.students
   );
 
-  // ============================================
-  // LOCAL STATE
-  // ============================================
 
-  const [classId, setClassId] = useState("");
+  /* ===================================================
+     ADMISSION DETAILS
+  =================================================== */
 
-  const [sectionId, setSectionId] = useState("");
+  const [
+    admissionNumber,
+    setAdmissionNumber,
+  ] = useState("");
 
-  const [searchQuery, setSearchQuery] = useState("");
+  const [
+    admissionDate,
+    setAdmissionDate,
+  ] = useState("");
 
-  // ============================================
-  // INITIAL SESSIONS
-  // ============================================
+  const [
+    admissionType,
+    setAdmissionType,
+  ] = useState<AdmissionType>(
+    "NEW"
+  );
+
+  const [
+    admissionCategory,
+    setAdmissionCategory,
+  ] =
+    useState<AdmissionCategory>(
+      "REGULAR"
+    );
+
+
+  /* ===================================================
+     PERSONAL DETAILS
+  =================================================== */
+
+  const [
+    name,
+    setName,
+  ] = useState("");
+
+  const [
+    dob,
+    setDob,
+  ] = useState("");
+
+  const [
+    gender,
+    setGender,
+  ] =
+    useState<StudentGender | "">(
+      ""
+    );
+
+  const [
+    bloodGroup,
+    setBloodGroup,
+  ] =
+    useState<
+      StudentBloodGroup | ""
+    >("");
+
+  const [
+    religion,
+    setReligion,
+  ] = useState("");
+
+  const [
+    category,
+    setCategory,
+  ] =
+    useState<
+      StudentCategory | ""
+    >("");
+
+  const [
+    caste,
+    setCaste,
+  ] = useState("");
+
+  const [
+    aadhaarNumber,
+    setAadhaarNumber,
+  ] = useState("");
+
+  const [
+    apaarId,
+    setApaarId,
+  ] = useState("");
+
+  const [
+    mobile,
+    setMobile,
+  ] = useState("");
+
+  const [
+    email,
+    setEmail,
+  ] = useState("");
+
+  const [
+    status,
+    setStatus,
+  ] =
+    useState<StudentStatus>(
+      "ACTIVE"
+    );
+
+
+  /* ===================================================
+     PHOTO
+  =================================================== */
+
+  const [
+    photo,
+    setPhoto,
+  ] =
+    useState<File | null>(
+      null
+    );
+
+  const [
+    photoPreview,
+    setPhotoPreview,
+  ] =
+    useState<string | null>(
+      null
+    );
+
+  const [
+    existingPhoto,
+    setExistingPhoto,
+  ] = useState("");
+
+
+  /* ===================================================
+     ADDRESS / PARENTS
+  =================================================== */
+
+  const [
+    currentAddress,
+    setCurrentAddress,
+  ] =
+    useState<StudentAddress>(
+      emptyAddress()
+    );
+
+  const [
+    permanentAddress,
+    setPermanentAddress,
+  ] =
+    useState<StudentAddress>(
+      emptyAddress()
+    );
+
+  const [
+    sameAsCurrent,
+    setSameAsCurrent,
+  ] = useState(false);
+
+  const [
+    father,
+    setFather,
+  ] =
+    useState<StudentParentDetails>(
+      emptyParent()
+    );
+
+  const [
+    mother,
+    setMother,
+  ] =
+    useState<StudentParentDetails>(
+      emptyParent()
+    );
+
+  const [
+    formError,
+    setFormError,
+  ] =
+    useState<string | null>(
+      null
+    );
+
+
+  /* ===================================================
+     LOAD STUDENT DIRECTLY BY ROUTE ID
+  =================================================== */
 
   useEffect(() => {
-    if (sessions.length === 0) {
-      dispatch(getSessions());
-    }
-  }, [dispatch, sessions.length]);
-
-  // ============================================
-  // GLOBAL SESSION CHANGE
-  // ============================================
-
-  useEffect(() => {
-    setClassId("");
-    setSectionId("");
-    setSearchQuery("");
-
-    dispatch(clearStudents());
-
-    if (!selectedSessionId) {
+    if (!studentId) {
       return;
     }
 
     dispatch(
-      getClasses({
-        sessionId: selectedSessionId,
-      }),
+      getStudentById(
+        studentId
+      )
     );
-  }, [dispatch, selectedSessionId]);
 
-  // ============================================
-  // FILTER CLASSES
-  // ============================================
-
-  const filteredClasses = useMemo(() => {
-    if (!selectedSessionId) {
-      return [];
-    }
-
-    return classes.filter(
-      (classItem) => classItem.sessionId === selectedSessionId,
-    );
-  }, [classes, selectedSessionId]);
-
-  // ============================================
-  // FILTER SECTIONS
-  // ============================================
-
-  const filteredSections = useMemo(() => {
-    if (!selectedSessionId || !classId) {
-      return [];
-    }
-
-    return sections.filter(
-      (section) =>
-        section.sessionId === selectedSessionId && section.classId === classId,
-    );
-  }, [sections, selectedSessionId, classId]);
-
-  // ============================================
-  // SELECTED DATA
-  // ============================================
-
-  const selectedSession = useMemo(
-    () => sessions.find((session) => session._id === selectedSessionId),
-    [sessions, selectedSessionId],
-  );
-
-  const selectedClass = useMemo(
-    () => filteredClasses.find((classItem) => classItem._id === classId),
-    [filteredClasses, classId],
-  );
-
-  const selectedSection = useMemo(
-    () => filteredSections.find((section) => section._id === sectionId),
-    [filteredSections, sectionId],
-  );
-
-  // ============================================
-  // CLASS CHANGE
-  // ============================================
-
-  const handleClassChange = (value: string) => {
-    setClassId(value);
-    setSectionId("");
-    setSearchQuery("");
-
-    dispatch(clearStudents());
-
-    if (!selectedSessionId || !value) {
-      return;
-    }
-
-    dispatch(
-      getSections({
-        sessionId: selectedSessionId,
-
-        classId: value,
-      }),
-    );
-  };
-
-  // ============================================
-  // SECTION CHANGE
-  // ============================================
-
-  const handleSectionChange = (value: string) => {
-    setSectionId(value);
-    setSearchQuery("");
-
-    dispatch(clearStudents());
-  };
-
-  // ============================================
-  // LOAD STUDENTS FROM ENROLLMENT HISTORY
-  // ============================================
-
-  useEffect(() => {
-    if (!selectedSessionId || !classId || !sectionId) {
-      return;
-    }
-
-    const filters: StudentEnrollmentFilters = {
-      sessionId: selectedSessionId,
-
-      classId,
-
-      sectionId,
-    };
-
-    dispatch(getStudentsByEnrollment(filters));
-  }, [dispatch, selectedSessionId, classId, sectionId]);
-
-  // ============================================
-  // SEARCH
-  // ============================================
-
-  const filteredStudents = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
-
-    if (!query) {
-      return students;
-    }
-
-    return students.filter((student) => {
-      const name = student.name?.toLowerCase() || "";
-
-      const admissionNumber = student.admissionNumber?.toLowerCase() || "";
-
-      const rollNumber = student.rollNumber?.toString().toLowerCase() || "";
-
-      const email = student.email?.toLowerCase() || "";
-
-      const mobile = student.mobile?.toLowerCase() || "";
-
-      return (
-        name.includes(query) ||
-        admissionNumber.includes(query) ||
-        rollNumber.includes(query) ||
-        email.includes(query) ||
-        mobile.includes(query)
+    return () => {
+      dispatch(
+        clearSelectedStudent()
       );
+
+      dispatch(
+        clearStudentError()
+      );
+    };
+  }, [
+    dispatch,
+    studentId,
+  ]);
+
+
+  /* ===================================================
+     POPULATE FORM
+  =================================================== */
+
+  useEffect(() => {
+    if (
+      !selectedStudent ||
+      selectedStudent._id !==
+        studentId
+    ) {
+      return;
+    }
+
+    setAdmissionNumber(
+      selectedStudent
+        .admissionNumber ?? ""
+    );
+
+    setAdmissionDate(
+      toDateInputValue(
+        selectedStudent
+          .admissionDate
+      )
+    );
+
+    setAdmissionType(
+      selectedStudent
+        .admissionType ??
+        "NEW"
+    );
+
+    setAdmissionCategory(
+      selectedStudent
+        .admissionCategory ??
+        "REGULAR"
+    );
+
+    setName(
+      selectedStudent.name ?? ""
+    );
+
+    setDob(
+      toDateInputValue(
+        selectedStudent.dob
+      )
+    );
+
+    setGender(
+      selectedStudent.gender ?? ""
+    );
+
+    setBloodGroup(
+      selectedStudent
+        .bloodGroup ?? ""
+    );
+
+    setReligion(
+      selectedStudent
+        .religion ?? ""
+    );
+
+    setCategory(
+      selectedStudent
+        .category ?? ""
+    );
+
+    setCaste(
+      selectedStudent.caste ?? ""
+    );
+
+    setAadhaarNumber(
+      selectedStudent
+        .aadhaarNumber ?? ""
+    );
+
+    setApaarId(
+      selectedStudent.apaarId ?? ""
+    );
+
+    setMobile(
+      selectedStudent.mobile ?? ""
+    );
+
+    setEmail(
+      selectedStudent.email ?? ""
+    );
+
+    setStatus(
+      selectedStudent.status ??
+        "ACTIVE"
+    );
+
+    setExistingPhoto(
+      selectedStudent.photo ?? ""
+    );
+
+    setCurrentAddress({
+      ...emptyAddress(),
+      ...(
+        selectedStudent
+          .currentAddress ??
+        selectedStudent.address ??
+        {}
+      ),
     });
-  }, [students, searchQuery]);
 
-  // ============================================
-  // VIEW STUDENT
-  // ============================================
+    setPermanentAddress({
+      ...emptyAddress(),
+      ...(
+        selectedStudent
+          .permanentAddress ??
+        {}
+      ),
+    });
 
-  const handleViewStudent = (student: Student) => {
-    navigate(`/school-admin/students/${student._id}`);
+    setFather({
+      ...emptyParent(),
+      ...(
+        selectedStudent.father ??
+        {}
+      ),
+    });
+
+    setMother({
+      ...emptyParent(),
+      ...(
+        selectedStudent.mother ??
+        {}
+      ),
+    });
+  }, [
+    selectedStudent,
+    studentId,
+  ]);
+
+
+  useEffect(() => {
+    return () => {
+      if (photoPreview) {
+        URL.revokeObjectURL(
+          photoPreview
+        );
+      }
+    };
+  }, [photoPreview]);
+
+
+  /* ===================================================
+     CHANGE HANDLERS
+  =================================================== */
+
+  const handlePhotoChange = (
+    event:
+      React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file =
+      event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/webp",
+    ];
+
+    if (
+      !allowedTypes.includes(
+        file.type
+      )
+    ) {
+      setFormError(
+        "Photo must be JPG, PNG or WEBP."
+      );
+
+      event.target.value = "";
+
+      return;
+    }
+
+    if (
+      file.size >
+      2 * 1024 * 1024
+    ) {
+      setFormError(
+        "Student photo must be less than 2 MB."
+      );
+
+      event.target.value = "";
+
+      return;
+    }
+
+    if (photoPreview) {
+      URL.revokeObjectURL(
+        photoPreview
+      );
+    }
+
+    setPhoto(file);
+
+    setPhotoPreview(
+      URL.createObjectURL(file)
+    );
+
+    setFormError(null);
   };
 
-  // ============================================
-  // COMMON INPUT CLASS
-  // ============================================
+
+  const removeNewPhoto = () => {
+    if (photoPreview) {
+      URL.revokeObjectURL(
+        photoPreview
+      );
+    }
+
+    setPhoto(null);
+    setPhotoPreview(null);
+  };
+
+
+  const updateCurrentAddress = (
+    key: keyof StudentAddress,
+    value: string
+  ) => {
+    setCurrentAddress(
+      (previous) => ({
+        ...previous,
+        [key]: value,
+      })
+    );
+
+    if (sameAsCurrent) {
+      setPermanentAddress(
+        (previous) => ({
+          ...previous,
+          [key]: value,
+        })
+      );
+    }
+  };
+
+
+  const updatePermanentAddress = (
+    key: keyof StudentAddress,
+    value: string
+  ) => {
+    setPermanentAddress(
+      (previous) => ({
+        ...previous,
+        [key]: value,
+      })
+    );
+  };
+
+
+  const updateFather = (
+    key:
+      keyof StudentParentDetails,
+    value: string
+  ) => {
+    setFather(
+      (previous) => ({
+        ...previous,
+        [key]: value,
+      })
+    );
+  };
+
+
+  const updateMother = (
+    key:
+      keyof StudentParentDetails,
+    value: string
+  ) => {
+    setMother(
+      (previous) => ({
+        ...previous,
+        [key]: value,
+      })
+    );
+  };
+
+
+  /* ===================================================
+     VALIDATION / CLEANERS
+  =================================================== */
+
+  const validateTwelveDigits = (
+    value: string,
+    label: string
+  ) => {
+    if (
+      value &&
+      !/^\d{12}$/.test(value)
+    ) {
+      setFormError(
+        `${label} must contain exactly 12 digits.`
+      );
+
+      return false;
+    }
+
+    return true;
+  };
+
+
+  const cleanAddress = (
+    source: StudentAddress
+  ): StudentAddress => {
+    const result:
+      StudentAddress = {};
+
+    (
+      [
+        "addressLine",
+        "city",
+        "district",
+        "state",
+        "pincode",
+        "country",
+      ] as const
+    ).forEach((key) => {
+      const value =
+        source[key]?.trim();
+
+      if (value) {
+        result[key] = value;
+      }
+    });
+
+    return result;
+  };
+
+
+  const cleanParent = (
+    source:
+      StudentParentDetails
+  ): StudentParentDetails => {
+    const result:
+      StudentParentDetails = {};
+
+    (
+      [
+        "name",
+        "mobile",
+        "aadhaarNumber",
+        "occupation",
+      ] as const
+    ).forEach((key) => {
+      const value =
+        source[key]?.trim();
+
+      if (value) {
+        result[key] = value;
+      }
+    });
+
+    return result;
+  };
+
+
+  /* ===================================================
+     SUBMIT
+  =================================================== */
+
+  const handleSubmit = async (
+    event:
+      React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+
+    if (!studentId) {
+      setFormError(
+        "Student ID is missing."
+      );
+
+      return;
+    }
+
+    if (!name.trim()) {
+      setFormError(
+        "Student name is required."
+      );
+
+      return;
+    }
+
+    if (
+      !admissionNumber.trim()
+    ) {
+      setFormError(
+        "Admission number is required."
+      );
+
+      return;
+    }
+
+    if (!gender) {
+      setFormError(
+        "Please select student gender."
+      );
+
+      return;
+    }
+
+    if (
+      !validateTwelveDigits(
+        aadhaarNumber,
+        "Student Aadhaar number"
+      ) ||
+      !validateTwelveDigits(
+        apaarId,
+        "APAAR ID"
+      ) ||
+      !validateTwelveDigits(
+        father.aadhaarNumber ??
+          "",
+        "Father Aadhaar number"
+      ) ||
+      !validateTwelveDigits(
+        mother.aadhaarNumber ??
+          "",
+        "Mother Aadhaar number"
+      )
+    ) {
+      return;
+    }
+
+    const data:
+      UpdateStudentData = {
+        name:
+          name.trim(),
+
+        admissionNumber:
+          admissionNumber
+            .trim(),
+
+        gender:
+          gender as StudentGender,
+
+        admissionType,
+
+        admissionCategory,
+
+        status,
+      };
+
+    if (admissionDate) {
+      data.admissionDate =
+        admissionDate;
+    }
+
+    if (dob) {
+      data.dob = dob;
+    }
+
+    if (bloodGroup) {
+      data.bloodGroup =
+        bloodGroup;
+    }
+
+    if (religion.trim()) {
+      data.religion =
+        religion.trim();
+    }
+
+    if (category) {
+      data.category =
+        category;
+    }
+
+    if (caste.trim()) {
+      data.caste =
+        caste.trim();
+    }
+
+    if (aadhaarNumber.trim()) {
+      data.aadhaarNumber =
+        aadhaarNumber.trim();
+    }
+
+    if (apaarId.trim()) {
+      data.apaarId =
+        apaarId.trim();
+    }
+
+    if (mobile.trim()) {
+      data.mobile =
+        mobile.trim();
+    }
+
+    if (email.trim()) {
+      data.email =
+        email
+          .trim()
+          .toLowerCase();
+    }
+
+    if (photo) {
+      data.photo = photo;
+    }
+
+    const cleanedCurrent =
+      cleanAddress(
+        currentAddress
+      );
+
+    if (
+      Object.keys(
+        cleanedCurrent
+      ).length > 0
+    ) {
+      data.currentAddress =
+        cleanedCurrent;
+
+      data.address =
+        cleanedCurrent;
+    }
+
+    const cleanedPermanent =
+      cleanAddress(
+        permanentAddress
+      );
+
+    if (
+      Object.keys(
+        cleanedPermanent
+      ).length > 0
+    ) {
+      data.permanentAddress =
+        cleanedPermanent;
+    }
+
+    const cleanedFather =
+      cleanParent(father);
+
+    if (
+      Object.keys(
+        cleanedFather
+      ).length > 0
+    ) {
+      data.father =
+        cleanedFather;
+    }
+
+    const cleanedMother =
+      cleanParent(mother);
+
+    if (
+      Object.keys(
+        cleanedMother
+      ).length > 0
+    ) {
+      data.mother =
+        cleanedMother;
+    }
+
+    setFormError(null);
+
+    try {
+      await dispatch(
+        updateStudent({
+          studentId,
+          data,
+        })
+      ).unwrap();
+
+      navigate(
+        `/school-admin/students/${studentId}`
+      );
+    } catch (updateError) {
+      console.error(
+        "Failed to update student:",
+        updateError
+      );
+    }
+  };
+
+
+  /* ===================================================
+     UI HELPERS
+  =================================================== */
 
   const inputClassName = `
     min-h-11
@@ -254,6 +948,7 @@ const ClassWiseStudents: React.FC = () => {
     text-[#15243B]
     outline-none
     transition-all
+    placeholder:text-[#9CA3AF]
     focus:border-[#1F5FAE]
     focus:ring-1
     focus:ring-[#1F5FAE]
@@ -262,997 +957,909 @@ const ClassWiseStudents: React.FC = () => {
     disabled:text-[#9CA3AF]
   `;
 
-  // ============================================
-  // LOADING
-  // ============================================
+  const labelClassName =
+    "mb-2 block text-sm font-semibold text-[#15243B]";
 
-  const initialLoading = studentLoading && students.length === 0;
 
-  // ============================================
-  // RETRY
-  // ============================================
+  const SectionHeader = ({
+    icon,
+    title,
+    description,
+  }: {
+    icon: string;
+    title: string;
+    description: string;
+  }) => (
+    <div className="border-b border-[#E5E7EB] px-5 py-4">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#E8F0FB] text-[#1F5FAE]">
+          <Icon
+            icon={icon}
+            className="text-xl"
+          />
+        </div>
 
-  const handleRetry = () => {
-    if (!selectedSessionId || !classId || !sectionId) {
-      return;
-    }
+        <div>
+          <h2 className="font-semibold text-[#15243B]">
+            {title}
+          </h2>
 
-    const filters: StudentEnrollmentFilters = {
-      sessionId: selectedSessionId,
+          <p className="text-xs text-[#6B7280]">
+            {description}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 
-      classId,
 
-      sectionId,
-    };
+  if (
+    loading &&
+    !selectedStudent
+  ) {
+    return (
+      <div className="flex min-h-[420px] items-center justify-center bg-[#F7F9FC]">
+        <div className="text-center">
+          <Icon
+            icon="lucide:loader-circle"
+            className="mx-auto animate-spin text-4xl text-[#1F5FAE]"
+          />
 
-    dispatch(getStudentsByEnrollment(filters));
-  };
+          <p className="mt-3 text-sm text-[#6B7280]">
+            Loading student...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+
+  if (
+    !loading &&
+    !selectedStudent
+  ) {
+    return (
+      <div className="flex min-h-[420px] items-center justify-center bg-[#F7F9FC] p-6">
+        <div className="max-w-md rounded-xl border border-red-200 bg-white p-6 text-center">
+          <Icon
+            icon="lucide:circle-alert"
+            className="mx-auto text-4xl text-red-500"
+          />
+
+          <h2 className="mt-3 font-semibold text-[#15243B]">
+            Student not found
+          </h2>
+
+          <p className="mt-2 text-sm text-[#6B7280]">
+            {error ??
+              "Unable to load student details."}
+          </p>
+
+          <button
+            type="button"
+            onClick={() =>
+              navigate(
+                "/school-admin/students"
+              )
+            }
+            className="mt-5 min-h-11 rounded-lg bg-[#1F5FAE] px-5 text-sm font-semibold text-white"
+          >
+            Back to Students
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+
+  const previewSource =
+    photoPreview ||
+    existingPhoto;
+
+
+  /* ===================================================
+     UI
+  =================================================== */
 
   return (
-    <div
-      className="
-        min-h-full
-        bg-[#F7F9FC]
-        p-4
-        md:p-6
-        lg:p-8
-      "
-    >
-      {/* ========================================
-          HEADER
-      ======================================== */}
-
-      <div
-        className="
-          mb-6
-          flex
-          flex-col
-          gap-4
-          lg:flex-row
-          lg:items-center
-          lg:justify-between
-        "
-      >
+    <div className="min-h-full bg-[#F7F9FC] p-4 md:p-6 lg:p-8">
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <div
-            className="
-              mb-2
-              flex
-              items-center
-              gap-2
-              text-sm
-              text-[#6B7280]
-            "
-          >
+          <div className="mb-2 flex items-center gap-2 text-sm text-[#6B7280]">
             <button
               type="button"
-              onClick={() => navigate("/school-admin/students")}
-              className="
-                hover:text-[#1F5FAE]
-              "
+              onClick={() =>
+                navigate(
+                  "/school-admin/students"
+                )
+              }
+              className="hover:text-[#1F5FAE]"
             >
               Students
             </button>
 
-            <Icon icon="lucide:chevron-right" className="text-sm" />
+            <Icon icon="lucide:chevron-right" />
 
-            <span
-              className="
-                text-[#15243B]
-              "
-            >
-              Class-wise Students
+            <span className="text-[#15243B]">
+              Edit Student
             </span>
           </div>
 
-          <h1
-            className="
-              text-2xl
-              font-bold
-              text-[#15243B]
-              md:text-3xl
-            "
-          >
-            Class-wise Students
+          <h1 className="text-2xl font-bold text-[#15243B] md:text-3xl">
+            Edit Student
           </h1>
 
-          <p
-            className="
-              mt-1
-              text-sm
-              text-[#6B7280]
-            "
-          >
-            View students from the selected academic session, class and section.
+          <p className="mt-1 text-sm text-[#6B7280]">
+            Update student profile, admission, parent and address details.
           </p>
         </div>
 
         <button
           type="button"
-          disabled={!selectedSessionId}
-          onClick={() => navigate("/school-admin/students/add")}
-          className="
-            inline-flex
-            min-h-11
-            items-center
-            justify-center
-            gap-2
-            rounded-lg
-            bg-[#1F5FAE]
-            px-5
-            text-sm
-            font-semibold
-            text-white
-            transition-colors
-            hover:bg-[#174F91]
-            disabled:cursor-not-allowed
-            disabled:opacity-50
-          "
+          onClick={() =>
+            navigate(
+              `/school-admin/students/${studentId}`
+            )
+          }
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[#D1D5DB] bg-white px-4 text-sm font-semibold text-[#15243B] hover:bg-[#F9FAFB]"
         >
-          <Icon icon="lucide:user-plus" className="text-lg" />
-          Add Student
+          <Icon icon="lucide:arrow-left" />
+          Back to Details
         </button>
       </div>
 
-      {/* ========================================
-          ERROR
-      ======================================== */}
-
-      {studentError && (
-        <div
-          className="
-            mb-5
-            flex
-            items-start
-            gap-3
-            rounded-lg
-            border
-            border-red-200
-            bg-red-50
-            p-4
-          "
-        >
+      {(formError || error) && (
+        <div className="mb-6 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4">
           <Icon
             icon="lucide:circle-alert"
-            className="
-              mt-0.5
-              shrink-0
-              text-xl
-              text-red-500
-            "
+            className="mt-0.5 shrink-0 text-xl text-red-500"
           />
 
-          <div className="flex-1">
-            <p
-              className="
-                text-sm
-                font-semibold
-                text-red-700
-              "
-            >
-              Failed to load students
+          <div>
+            <p className="text-sm font-semibold text-red-700">
+              Unable to update student
             </p>
 
-            <p
-              className="
-                mt-1
-                text-sm
-                text-red-600
-              "
-            >
-              {studentError}
+            <p className="mt-1 text-sm text-red-600">
+              {formError || error}
             </p>
           </div>
-
-          <button
-            type="button"
-            onClick={handleRetry}
-            className="
-              text-sm
-              font-semibold
-              text-red-700
-              hover:underline
-            "
-          >
-            Retry
-          </button>
         </div>
       )}
 
-      {/* ========================================
-          FILTER CARD
-      ======================================== */}
-
-      <div
-        className="
-          mb-6
-          rounded-xl
-          border
-          border-[#E5E7EB]
-          bg-white
-        "
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-6"
       >
-        <div
-          className="
-            border-b
-            border-[#E5E7EB]
-            px-5
-            py-4
-          "
-        >
-          <div
-            className="
-              flex
-              items-center
-              gap-3
-            "
-          >
-            <div
-              className="
-                flex
-                h-10
-                w-10
-                items-center
-                justify-center
-                rounded-lg
-                bg-[#E8F0FB]
-                text-[#1F5FAE]
-              "
-            >
-              <Icon icon="lucide:list-filter" className="text-xl" />
-            </div>
+        {/* READ-ONLY ACADEMIC PLACEMENT */}
 
+        <div className="overflow-hidden rounded-xl border border-[#E5E7EB] bg-white">
+          <SectionHeader
+            icon="lucide:graduation-cap"
+            title="Academic Placement"
+            description="Academic placement is read-only here. Use Enrollment or Promotion to change it."
+          />
+
+          <div className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              [
+                "Academic Session",
+                relationName(
+                  selectedStudent
+                    ?.sessionId
+                ),
+              ],
+              [
+                "Class",
+                relationName(
+                  selectedStudent
+                    ?.classId
+                ),
+              ],
+              [
+                "Section",
+                relationName(
+                  selectedStudent
+                    ?.sectionId
+                ),
+              ],
+              [
+                "Roll Number",
+                selectedStudent
+                  ?.rollNumber
+                  ?.toString() ??
+                  "—",
+              ],
+            ].map(
+              ([label, value]) => (
+                <div
+                  key={label}
+                  className="rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] px-4 py-3"
+                >
+                  <p className="text-xs font-medium text-[#6B7280]">
+                    {label}
+                  </p>
+
+                  <p className="mt-1 font-semibold text-[#15243B]">
+                    {value}
+                  </p>
+                </div>
+              )
+            )}
+          </div>
+        </div>
+
+        {/* ADMISSION DETAILS */}
+
+        <div className="overflow-hidden rounded-xl border border-[#E5E7EB] bg-white">
+          <SectionHeader
+            icon="lucide:clipboard-list"
+            title="Admission Details"
+            description="Update non-academic admission information."
+          />
+
+          <div className="grid grid-cols-1 gap-5 p-5 md:grid-cols-2 xl:grid-cols-4">
             <div>
-              <h2
-                className="
-                  font-semibold
-                  text-[#15243B]
-                "
-              >
-                Select Class
-              </h2>
-
-              <p
-                className="
-                  text-xs
-                  text-[#6B7280]
-                "
-              >
-                Global Session → Class → Section
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div
-          className="
-            grid
-            grid-cols-1
-            gap-5
-            p-5
-            md:grid-cols-3
-          "
-        >
-          {/* SESSION */}
-
-          <div>
-            <label
-              className="
-                mb-2
-                block
-                text-sm
-                font-semibold
-                text-[#15243B]
-              "
-            >
-              Academic Session
-            </label>
-
-            <div
-              className="
-                flex
-                min-h-11
-                w-full
-                items-center
-                rounded-lg
-                border
-                border-[#D1D5DB]
-                bg-[#F9FAFB]
-                px-3
-                text-sm
-                font-semibold
-                text-[#15243B]
-              "
-            >
-              {sessionLoading
-                ? "Loading session..."
-                : selectedSession?.name || "No session selected"}
-            </div>
-          </div>
-
-          {/* CLASS */}
-
-          <div>
-            <label
-              className="
-                mb-2
-                block
-                text-sm
-                font-semibold
-                text-[#15243B]
-              "
-            >
-              Class
-            </label>
-
-            <select
-              value={classId}
-              onChange={(event) => handleClassChange(event.target.value)}
-              disabled={!selectedSessionId || classLoading}
-              className={inputClassName}
-            >
-              <option value="">
-                {classLoading
-                  ? "Loading classes..."
-                  : !selectedSessionId
-                    ? "Select session from topbar"
-                    : "Select class"}
-              </option>
-
-              {filteredClasses.map((classItem) => (
-                <option key={classItem._id} value={classItem._id}>
-                  {classItem.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* SECTION */}
-
-          <div>
-            <label
-              className="
-                mb-2
-                block
-                text-sm
-                font-semibold
-                text-[#15243B]
-              "
-            >
-              Section
-            </label>
-
-            <select
-              value={sectionId}
-              onChange={(event) => handleSectionChange(event.target.value)}
-              disabled={!classId || sectionLoading}
-              className={inputClassName}
-            >
-              <option value="">
-                {sectionLoading
-                  ? "Loading sections..."
-                  : !classId
-                    ? "Select class first"
-                    : "Select section"}
-              </option>
-
-              {filteredSections.map((section) => (
-                <option key={section._id} value={section._id}>
-                  {section.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* ========================================
-          NO GLOBAL SESSION
-      ======================================== */}
-
-      {!selectedSessionId ? (
-        <div
-          className="
-            flex
-            min-h-[350px]
-            items-center
-            justify-center
-            rounded-xl
-            border
-            border-[#E5E7EB]
-            bg-white
-            p-6
-          "
-        >
-          <div
-            className="
-              max-w-md
-              text-center
-            "
-          >
-            <div
-              className="
-                mx-auto
-                flex
-                h-14
-                w-14
-                items-center
-                justify-center
-                rounded-full
-                bg-[#E8F0FB]
-                text-[#1F5FAE]
-              "
-            >
-              <Icon icon="lucide:calendar-days" className="text-2xl" />
-            </div>
-
-            <h3
-              className="
-                mt-4
-                font-semibold
-                text-[#15243B]
-              "
-            >
-              Select academic session
-            </h3>
-
-            <p
-              className="
-                mt-1
-                text-sm
-                leading-6
-                text-[#6B7280]
-              "
-            >
-              Select an academic session from the topbar first.
-            </p>
-          </div>
-        </div>
-      ) : !classId || !sectionId ? (
-        <div
-          className="
-            flex
-            min-h-[350px]
-            items-center
-            justify-center
-            rounded-xl
-            border
-            border-[#E5E7EB]
-            bg-white
-            p-6
-          "
-        >
-          <div
-            className="
-              max-w-md
-              text-center
-            "
-          >
-            <div
-              className="
-                mx-auto
-                flex
-                h-14
-                w-14
-                items-center
-                justify-center
-                rounded-full
-                bg-[#E8F0FB]
-                text-[#1F5FAE]
-              "
-            >
-              <Icon icon="lucide:school" className="text-2xl" />
-            </div>
-
-            <h3
-              className="
-                mt-4
-                font-semibold
-                text-[#15243B]
-              "
-            >
-              Select class and section
-            </h3>
-
-            <p
-              className="
-                mt-1
-                text-sm
-                leading-6
-                text-[#6B7280]
-              "
-            >
-              Current global session is{" "}
-              <strong>{selectedSession?.name || "-"}</strong>. Select class and
-              section above to view students.
-            </p>
-          </div>
-        </div>
-      ) : initialLoading ? (
-        <div
-          className="
-            flex
-            min-h-[350px]
-            items-center
-            justify-center
-            rounded-xl
-            border
-            border-[#E5E7EB]
-            bg-white
-          "
-        >
-          <div className="text-center">
-            <Icon
-              icon="lucide:loader-circle"
-              className="
-                mx-auto
-                animate-spin
-                text-4xl
-                text-[#1F5FAE]
-              "
-            />
-
-            <p
-              className="
-                mt-3
-                text-sm
-                text-[#6B7280]
-              "
-            >
-              Loading students...
-            </p>
-          </div>
-        </div>
-      ) : (
-        <div
-          className="
-            overflow-hidden
-            rounded-xl
-            border
-            border-[#E5E7EB]
-            bg-white
-          "
-        >
-          {/* CARD HEADER */}
-
-          <div
-            className="
-              flex
-              flex-col
-              gap-4
-              border-b
-              border-[#E5E7EB]
-              p-5
-              lg:flex-row
-              lg:items-center
-              lg:justify-between
-            "
-          >
-            <div>
-              <h2
-                className="
-                  text-lg
-                  font-semibold
-                  text-[#15243B]
-                "
-              >
-                {selectedClass?.name}
-                {" - "}
-                {selectedSection?.name}
-              </h2>
-
-              <p
-                className="
-                  mt-1
-                  text-sm
-                  text-[#6B7280]
-                "
-              >
-                {selectedSession?.name}
-                {" • "}
-                {filteredStudents.length} student
-                {filteredStudents.length !== 1 ? "s" : ""}
-              </p>
-            </div>
-
-            <div
-              className="
-                relative
-                w-full
-                lg:max-w-sm
-              "
-            >
-              <Icon
-                icon="lucide:search"
-                className="
-                  absolute
-                  left-3
-                  top-1/2
-                  -translate-y-1/2
-                  text-lg
-                  text-[#6B7280]
-                "
-              />
+              <label className={labelClassName}>
+                Admission Number
+                <span className="ml-1 text-red-500">*</span>
+              </label>
 
               <input
-                type="text"
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Search students..."
-                className="
-                  min-h-11
-                  w-full
-                  rounded-lg
-                  border
-                  border-[#D1D5DB]
-                  bg-white
-                  pl-10
-                  pr-10
-                  text-sm
-                  text-[#15243B]
-                  outline-none
-                  transition-all
-                  placeholder:text-[#9CA3AF]
-                  focus:border-[#1F5FAE]
-                  focus:ring-1
-                  focus:ring-[#1F5FAE]
-                "
+                value={admissionNumber}
+                onChange={(event) =>
+                  setAdmissionNumber(
+                    event.target.value
+                  )
+                }
+                className={inputClassName}
               />
+            </div>
 
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery("")}
-                  className="
-                    absolute
-                    right-3
-                    top-1/2
-                    -translate-y-1/2
-                    text-[#9CA3AF]
-                    hover:text-[#15243B]
-                  "
-                >
-                  <Icon icon="lucide:x" className="text-lg" />
-                </button>
-              )}
+            <div>
+              <label className={labelClassName}>
+                Admission Date
+              </label>
+
+              <input
+                type="date"
+                value={admissionDate}
+                onChange={(event) =>
+                  setAdmissionDate(
+                    event.target.value
+                  )
+                }
+                className={inputClassName}
+              />
+            </div>
+
+            <div>
+              <label className={labelClassName}>
+                Admission Type
+              </label>
+
+              <select
+                value={admissionType}
+                onChange={(event) =>
+                  setAdmissionType(
+                    event.target
+                      .value as AdmissionType
+                  )
+                }
+                className={inputClassName}
+              >
+                <option value="NEW">New Admission</option>
+                <option value="TRANSFER">Transfer</option>
+                <option value="READMISSION">Re-admission</option>
+              </select>
+            </div>
+
+            <div>
+              <label className={labelClassName}>
+                Admission Category
+              </label>
+
+              <select
+                value={admissionCategory}
+                onChange={(event) =>
+                  setAdmissionCategory(
+                    event.target
+                      .value as AdmissionCategory
+                  )
+                }
+                className={inputClassName}
+              >
+                <option value="REGULAR">Regular</option>
+                <option value="RTE">RTE</option>
+                <option value="EWS">EWS</option>
+                <option value="MANAGEMENT">Management</option>
+                <option value="OTHER">Other</option>
+              </select>
             </div>
           </div>
+        </div>
 
-          {/* ====================================
-              STUDENT TABLE
-          ==================================== */}
+        {/* STUDENT DETAILS */}
 
-          {filteredStudents.length > 0 ? (
-            <div
-              className="
-                overflow-x-auto
-              "
-            >
-              <table
-                className="
-                  w-full
-                  min-w-[980px]
-                  text-left
-                "
-              >
-                <thead
-                  className="
-                    bg-[#F9FAFB]
-                  "
-                >
-                  <tr
-                    className="
-                      border-b
-                      border-[#E5E7EB]
-                    "
-                  >
-                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-[#6B7280]">
-                      Student
-                    </th>
+        <div className="overflow-hidden rounded-xl border border-[#E5E7EB] bg-white">
+          <SectionHeader
+            icon="lucide:user"
+            title="Student Details"
+            description="Update personal and contact information."
+          />
 
-                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-[#6B7280]">
-                      Admission No.
-                    </th>
-
-                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-[#6B7280]">
-                      Roll No.
-                    </th>
-
-                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-[#6B7280]">
-                      Enrollment
-                    </th>
-
-                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-[#6B7280]">
-                      Promotion
-                    </th>
-
-                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-[#6B7280]">
-                      Mobile
-                    </th>
-
-                    <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-[#6B7280]">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-
-                <tbody
-                  className="
-                    divide-y
-                    divide-[#E5E7EB]
-                  "
-                >
-                  {filteredStudents.map((student) => (
-                    <tr
-                      key={student._id}
-                      className="
-                          transition-colors
-                          hover:bg-[#F9FAFB]
-                        "
-                    >
-                      <td className="px-5 py-4">
-                        <div
-                          className="
-                              flex
-                              items-center
-                              gap-3
-                            "
-                        >
-                          <div
-                            className="
-                                flex
-                                h-10
-                                w-10
-                                shrink-0
-                                items-center
-                                justify-center
-                                rounded-full
-                                bg-[#E8F0FB]
-                                text-sm
-                                font-bold
-                                uppercase
-                                text-[#1F5FAE]
-                              "
-                          >
-                            {student.name?.charAt(0) || "S"}
-                          </div>
-
-                          <div
-                            className="
-                                min-w-0
-                              "
-                          >
-                            <p
-                              className="
-                                  truncate
-                                  text-sm
-                                  font-semibold
-                                  text-[#15243B]
-                                "
-                            >
-                              {student.name}
-                            </p>
-
-                            <p
-                              className="
-                                  mt-0.5
-                                  truncate
-                                  text-xs
-                                  text-[#6B7280]
-                                "
-                            >
-                              {student.email || "No email"}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-
-                      <td
-                        className="
-                            px-5
-                            py-4
-                            text-sm
-                            font-medium
-                            text-[#15243B]
-                          "
-                      >
-                        {student.admissionNumber}
-                      </td>
-
-                      <td
-                        className="
-                            px-5
-                            py-4
-                            text-sm
-                            text-[#6B7280]
-                          "
-                      >
-                        {student.rollNumber ?? "-"}
-                      </td>
-
-                      <td
-                        className="
-                            px-5
-                            py-4
-                          "
-                      >
-                        <span
-                          className="
-                              rounded-full
-                              bg-[#F3F4F6]
-                              px-2.5
-                              py-1
-                              text-xs
-                              font-semibold
-                              text-[#374151]
-                            "
-                        >
-                          {student.enrollment?.enrollmentStatus || "-"}
-                        </span>
-                      </td>
-
-                      <td
-                        className="
-                            px-5
-                            py-4
-                          "
-                      >
-                        <span
-                          className="
-                              rounded-full
-                              bg-[#F3F4F6]
-                              px-2.5
-                              py-1
-                              text-xs
-                              font-semibold
-                              text-[#374151]
-                            "
-                        >
-                          {student.enrollment?.promotionStatus || "-"}
-                        </span>
-                      </td>
-
-                      <td
-                        className="
-                            px-5
-                            py-4
-                            text-sm
-                            text-[#6B7280]
-                          "
-                      >
-                        {student.mobile || "-"}
-                      </td>
-
-                      <td
-                        className="
-                            px-5
-                            py-4
-                          "
-                      >
-                        <div
-                          className="
-                              flex
-                              items-center
-                              justify-end
-                              gap-1
-                            "
-                        >
-                          <button
-                            type="button"
-                            onClick={() => handleViewStudent(student)}
-                            title="View Student"
-                            className="
-                                flex
-                                h-9
-                                w-9
-                                items-center
-                                justify-center
-                                rounded-lg
-                                text-[#6B7280]
-                                transition-colors
-                                hover:bg-[#E8F0FB]
-                                hover:text-[#1F5FAE]
-                              "
-                          >
-                            <Icon icon="lucide:eye" className="text-lg" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div
-              className="
-                flex
-                min-h-[320px]
-                items-center
-                justify-center
-                p-6
-              "
-            >
-              <div
-                className="
-                  max-w-sm
-                  text-center
-                "
-              >
-                <div
-                  className="
-                    mx-auto
-                    flex
-                    h-14
-                    w-14
-                    items-center
-                    justify-center
-                    rounded-full
-                    bg-[#F3F4F6]
-                    text-[#6B7280]
-                  "
-                >
-                  <Icon
-                    icon={searchQuery ? "lucide:search-x" : "lucide:users"}
-                    className="text-2xl"
+          <div className="p-5">
+            <div className="mb-6 flex flex-col gap-4 rounded-xl border border-dashed border-[#D1D5DB] bg-[#F9FAFB] p-4 sm:flex-row sm:items-center">
+              <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#E5E7EB] bg-white">
+                {previewSource ? (
+                  <img
+                    src={previewSource}
+                    alt="Student"
+                    className="h-full w-full object-cover"
                   />
-                </div>
+                ) : (
+                  <Icon
+                    icon="lucide:user-round"
+                    className="text-4xl text-[#9CA3AF]"
+                  />
+                )}
+              </div>
 
-                <h3
-                  className="
-                    mt-4
-                    font-semibold
-                    text-[#15243B]
-                  "
-                >
-                  {searchQuery
-                    ? "No students found"
-                    : "No students in this section"}
-                </h3>
-
-                <p
-                  className="
-                    mt-1
-                    text-sm
-                    leading-6
-                    text-[#6B7280]
-                  "
-                >
-                  {searchQuery
-                    ? "No student matches your search."
-                    : "No enrollment records were found for the selected session, class and section."}
+              <div>
+                <p className="text-sm font-semibold text-[#15243B]">
+                  Student Photo
                 </p>
 
-                {!searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => navigate("/school-admin/students/add")}
-                    className="
-                      mt-5
-                      inline-flex
-                      min-h-10
-                      items-center
-                      gap-2
-                      rounded-lg
-                      bg-[#1F5FAE]
-                      px-4
-                      text-sm
-                      font-semibold
-                      text-white
-                      hover:bg-[#174F91]
-                    "
-                  >
-                    <Icon icon="lucide:user-plus" />
-                    Add Student
-                  </button>
+                <p className="mt-1 text-xs text-[#6B7280]">
+                  JPG, PNG or WEBP. Maximum 2 MB.
+                </p>
+
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <label className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-lg bg-[#1F5FAE] px-4 text-sm font-semibold text-white hover:bg-[#174F91]">
+                    <Icon icon="lucide:upload" />
+                    Change Photo
+
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handlePhotoChange}
+                      className="hidden"
+                    />
+                  </label>
+
+                  {photo && (
+                    <button
+                      type="button"
+                      onClick={removeNewPhoto}
+                      className="min-h-10 rounded-lg border border-[#D1D5DB] bg-white px-4 text-sm font-semibold text-[#15243B]"
+                    >
+                      Undo New Photo
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+              <div>
+                <label className={labelClassName}>
+                  Student Name
+                  <span className="ml-1 text-red-500">*</span>
+                </label>
+
+                <input
+                  value={name}
+                  onChange={(event) =>
+                    setName(
+                      event.target.value
+                    )
+                  }
+                  className={inputClassName}
+                />
+              </div>
+
+              <div>
+                <label className={labelClassName}>
+                  Date of Birth
+                </label>
+
+                <input
+                  type="date"
+                  value={dob}
+                  onChange={(event) =>
+                    setDob(
+                      event.target.value
+                    )
+                  }
+                  className={inputClassName}
+                />
+              </div>
+
+              <div>
+                <label className={labelClassName}>
+                  Gender
+                  <span className="ml-1 text-red-500">*</span>
+                </label>
+
+                <select
+                  value={gender}
+                  onChange={(event) =>
+                    setGender(
+                      event.target
+                        .value as
+                          | StudentGender
+                          | ""
+                    )
+                  }
+                  className={inputClassName}
+                >
+                  <option value="">Select gender</option>
+                  <option value="MALE">Male</option>
+                  <option value="FEMALE">Female</option>
+                  <option value="OTHER">Other</option>
+                </select>
+              </div>
+
+              <div>
+                <label className={labelClassName}>
+                  Blood Group
+                </label>
+
+                <select
+                  value={bloodGroup}
+                  onChange={(event) =>
+                    setBloodGroup(
+                      event.target
+                        .value as
+                          | StudentBloodGroup
+                          | ""
+                    )
+                  }
+                  className={inputClassName}
+                >
+                  <option value="">Select blood group</option>
+
+                  {[
+                    "A+",
+                    "A-",
+                    "B+",
+                    "B-",
+                    "AB+",
+                    "AB-",
+                    "O+",
+                    "O-",
+                  ].map((group) => (
+                    <option
+                      key={group}
+                      value={group}
+                    >
+                      {group}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className={labelClassName}>
+                  Religion
+                </label>
+
+                <input
+                  value={religion}
+                  onChange={(event) =>
+                    setReligion(
+                      event.target.value
+                    )
+                  }
+                  className={inputClassName}
+                />
+              </div>
+
+              <div>
+                <label className={labelClassName}>
+                  Category
+                </label>
+
+                <select
+                  value={category}
+                  onChange={(event) =>
+                    setCategory(
+                      event.target
+                        .value as
+                          | StudentCategory
+                          | ""
+                    )
+                  }
+                  className={inputClassName}
+                >
+                  <option value="">Select category</option>
+                  <option value="GENERAL">General</option>
+                  <option value="OBC">OBC</option>
+                  <option value="SC">SC</option>
+                  <option value="ST">ST</option>
+                  <option value="OTHER">Other</option>
+                </select>
+              </div>
+
+              {[
+                [
+                  "Caste",
+                  caste,
+                  setCaste,
+                  "text",
+                ],
+                [
+                  "Mobile",
+                  mobile,
+                  setMobile,
+                  "tel",
+                ],
+                [
+                  "Email",
+                  email,
+                  setEmail,
+                  "email",
+                ],
+              ].map(
+                ([
+                  label,
+                  value,
+                  setter,
+                  type,
+                ]) => (
+                  <div key={label as string}>
+                    <label className={labelClassName}>
+                      {label as string}
+                    </label>
+
+                    <input
+                      type={type as string}
+                      value={value as string}
+                      onChange={(event) =>
+                        (
+                          setter as React.Dispatch<
+                            React.SetStateAction<string>
+                          >
+                        )(
+                          event.target.value
+                        )
+                      }
+                      className={inputClassName}
+                    />
+                  </div>
+                )
+              )}
+
+              <div>
+                <label className={labelClassName}>
+                  Aadhaar Number
+                </label>
+
+                <input
+                  inputMode="numeric"
+                  maxLength={12}
+                  value={aadhaarNumber}
+                  onChange={(event) =>
+                    setAadhaarNumber(
+                      event.target.value
+                        .replace(
+                          /\D/g,
+                          ""
+                        )
+                        .slice(0, 12)
+                    )
+                  }
+                  className={inputClassName}
+                />
+              </div>
+
+              <div>
+                <label className={labelClassName}>
+                  APAAR ID
+                </label>
+
+                <input
+                  inputMode="numeric"
+                  maxLength={12}
+                  value={apaarId}
+                  onChange={(event) =>
+                    setApaarId(
+                      event.target.value
+                        .replace(
+                          /\D/g,
+                          ""
+                        )
+                        .slice(0, 12)
+                    )
+                  }
+                  className={inputClassName}
+                />
+              </div>
+
+              <div>
+                <label className={labelClassName}>
+                  Status
+                </label>
+
+                <select
+                  value={status}
+                  onChange={(event) =>
+                    setStatus(
+                      event.target
+                        .value as StudentStatus
+                    )
+                  }
+                  className={inputClassName}
+                >
+                  <option value="ACTIVE">Active</option>
+                  <option value="INACTIVE">Inactive</option>
+                  <option value="TRANSFERRED">Transferred</option>
+                  <option value="PASSED">Passed</option>
+                  <option value="LEFT">Left</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ADDRESS */}
+
+        {[
+          {
+            title: "Current Address",
+            icon: "lucide:map-pin",
+            address: currentAddress,
+            update: updateCurrentAddress,
+            disabled: false,
+          },
+          {
+            title: "Permanent Address",
+            icon: "lucide:home",
+            address: permanentAddress,
+            update:
+              updatePermanentAddress,
+            disabled: sameAsCurrent,
+          },
+        ].map((item) => (
+          <div
+            key={item.title}
+            className="overflow-hidden rounded-xl border border-[#E5E7EB] bg-white"
+          >
+            <SectionHeader
+              icon={item.icon}
+              title={item.title}
+              description={`Update student's ${item.title.toLowerCase()}.`}
+            />
+
+            <div className="p-5">
+              {item.title ===
+                "Permanent Address" && (
+                <label className="mb-5 inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[#15243B]">
+                  <input
+                    type="checkbox"
+                    checked={sameAsCurrent}
+                    onChange={(event) => {
+                      const checked =
+                        event.target.checked;
+
+                      setSameAsCurrent(
+                        checked
+                      );
+
+                      if (checked) {
+                        setPermanentAddress({
+                          ...currentAddress,
+                        });
+                      }
+                    }}
+                    className="h-4 w-4 accent-[#1F5FAE]"
+                  />
+
+                  Same as Current Address
+                </label>
+              )}
+
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+                {(
+                  [
+                    [
+                      "addressLine",
+                      "Address Line",
+                    ],
+                    ["city", "City"],
+                    [
+                      "district",
+                      "District",
+                    ],
+                    ["state", "State"],
+                    [
+                      "pincode",
+                      "Pincode",
+                    ],
+                    [
+                      "country",
+                      "Country",
+                    ],
+                  ] as const
+                ).map(
+                  ([key, label]) => (
+                    <div
+                      key={key}
+                      className={
+                        key ===
+                        "addressLine"
+                          ? "md:col-span-2 xl:col-span-3"
+                          : ""
+                      }
+                    >
+                      <label className={labelClassName}>
+                        {label}
+                      </label>
+
+                      <input
+                        disabled={
+                          item.disabled
+                        }
+                        value={
+                          item.address[
+                            key
+                          ] ?? ""
+                        }
+                        onChange={(event) =>
+                          item.update(
+                            key,
+                            event.target
+                              .value
+                          )
+                        }
+                        className={inputClassName}
+                      />
+                    </div>
+                  )
                 )}
               </div>
             </div>
-          )}
+          </div>
+        ))}
+
+        {/* PARENTS */}
+
+        {[
+          {
+            title: "Father Details",
+            parent: father,
+            update: updateFather,
+          },
+          {
+            title: "Mother Details",
+            parent: mother,
+            update: updateMother,
+          },
+        ].map((item) => (
+          <div
+            key={item.title}
+            className="overflow-hidden rounded-xl border border-[#E5E7EB] bg-white"
+          >
+            <SectionHeader
+              icon="lucide:user-round"
+              title={item.title}
+              description={`Update student's ${item.title.toLowerCase()}.`}
+            />
+
+            <div className="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
+              {(
+                [
+                  ["name", "Name"],
+                  ["mobile", "Mobile"],
+                  [
+                    "aadhaarNumber",
+                    "Aadhaar Number",
+                  ],
+                  [
+                    "occupation",
+                    "Occupation",
+                  ],
+                ] as const
+              ).map(
+                ([key, label]) => (
+                  <div key={key}>
+                    <label className={labelClassName}>
+                      {label}
+                    </label>
+
+                    <input
+                      inputMode={
+                        key ===
+                        "aadhaarNumber"
+                          ? "numeric"
+                          : undefined
+                      }
+                      maxLength={
+                        key ===
+                        "aadhaarNumber"
+                          ? 12
+                          : undefined
+                      }
+                      value={
+                        item.parent[
+                          key
+                        ] ?? ""
+                      }
+                      onChange={(event) => {
+                        const value =
+                          key ===
+                          "aadhaarNumber"
+                            ? event.target
+                                .value
+                                .replace(
+                                  /\D/g,
+                                  ""
+                                )
+                                .slice(
+                                  0,
+                                  12
+                                )
+                            : event.target
+                                .value;
+
+                        item.update(
+                          key,
+                          value
+                        );
+                      }}
+                      className={inputClassName}
+                    />
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+        ))}
+
+        {/* ACTIONS */}
+
+        <div className="flex flex-col-reverse gap-3 rounded-xl border border-[#E5E7EB] bg-white p-5 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            disabled={loading}
+            onClick={() =>
+              navigate(
+                `/school-admin/students/${studentId}`
+              )
+            }
+            className="min-h-11 rounded-lg border border-[#D1D5DB] bg-white px-5 text-sm font-semibold text-[#15243B] hover:bg-[#F9FAFB] disabled:opacity-50"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#1F5FAE] px-6 text-sm font-semibold text-white shadow-sm hover:bg-[#174F91] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading ? (
+              <>
+                <Icon
+                  icon="lucide:loader-circle"
+                  className="animate-spin text-lg"
+                />
+                Saving Changes...
+              </>
+            ) : (
+              <>
+                <Icon
+                  icon="lucide:save"
+                  className="text-lg"
+                />
+                Save Changes
+              </>
+            )}
+          </button>
         </div>
-      )}
+      </form>
     </div>
   );
 };
 
-export default ClassWiseStudents;
+
+export default EditStudent;
