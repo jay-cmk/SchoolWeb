@@ -606,6 +606,8 @@ export interface Student {
 
   aadhaarNumber?: string;
 
+  apaarId?: string;
+
   photo?: string;
 
 
@@ -692,6 +694,7 @@ export interface CreateStudentData {
 
   aadhaarNumber?: string;
 
+  apaarId?: string;
 
   photo?: File;
 
@@ -760,6 +763,7 @@ export interface UpdateStudentData {
 
   aadhaarNumber?: string;
 
+  apaarId?: string;
 
   photo?: File;
 
@@ -896,6 +900,32 @@ export interface CreateStudentAccountData {
   email: string;
 
   password: string;
+}
+
+
+/* =====================================================
+   CREATED STUDENT ACCOUNT
+===================================================== */
+
+export interface CreatedStudentAccount {
+  id: string;
+
+  name: string;
+
+  admissionNumber: string;
+
+  userId: string;
+
+  email: string;
+
+  role: string;
+
+  schoolId: string;
+}
+
+
+export interface CreateStudentAccountResult {
+  student: CreatedStudentAccount;
 }
 
 

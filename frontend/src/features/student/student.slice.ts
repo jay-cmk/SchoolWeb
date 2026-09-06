@@ -8,14 +8,15 @@
 
 // import {
 //   createStudentApi,
-//   deleteStudentApi,
 //   getStudentByIdApi,
 //   getStudentsApi,
+//   getStudentsByEnrollmentApi,
 //   updateStudentApi,
 // } from "./student.api";
 
 // import type {
 //   CreateStudentData,
+//   StudentEnrollmentFilters,
 //   StudentFilters,
 //   StudentState,
 //   UpdateStudentData,
@@ -28,14 +29,21 @@
 
 // const initialState: StudentState = {
 //   students: [],
+
 //   selectedStudent: null,
+
 //   loading: false,
+
 //   error: null,
 // };
 
 
 // /* =====================================================
 //    GET STUDENTS
+
+//    Current Student master list.
+
+//    GET /students
 // ===================================================== */
 
 // export const getStudents =
@@ -53,7 +61,46 @@
 //       } catch (error: any) {
 //         return rejectWithValue(
 //           error.response?.data?.message ||
+//             error.message ||
 //             "Failed to fetch students"
+//         );
+//       }
+//     }
+//   );
+
+
+// /* =====================================================
+//    GET STUDENTS BY ENROLLMENT
+
+//    GET /students/enrollments
+
+//    IMPORTANT:
+//    Session-wise student list ke liye ye API use hogi.
+
+//    Student ke current sessionId/classId/sectionId
+//    par depend nahi karegi.
+
+//    Isliye promotion ke baad bhi old session ke
+//    students historical list me visible rahenge.
+// ===================================================== */
+
+// export const getStudentsByEnrollment =
+//   createAsyncThunk(
+//     "students/getStudentsByEnrollment",
+
+//     async (
+//       filters: StudentEnrollmentFilters,
+//       { rejectWithValue }
+//     ) => {
+//       try {
+//         return await getStudentsByEnrollmentApi(
+//           filters
+//         );
+//       } catch (error: any) {
+//         return rejectWithValue(
+//           error.response?.data?.message ||
+//             error.message ||
+//             "Failed to fetch students by enrollment"
 //         );
 //       }
 //     }
@@ -79,6 +126,7 @@
 //       } catch (error: any) {
 //         return rejectWithValue(
 //           error.response?.data?.message ||
+//             error.message ||
 //             "Failed to fetch student"
 //         );
 //       }
@@ -105,6 +153,7 @@
 //       } catch (error: any) {
 //         return rejectWithValue(
 //           error.response?.data?.message ||
+//             error.message ||
 //             "Failed to create student"
 //         );
 //       }
@@ -114,6 +163,16 @@
 
 // /* =====================================================
 //    UPDATE STUDENT
+
+//    Normal student/profile update only.
+
+//    Academic movement:
+//    - session
+//    - class
+//    - section
+//    - roll number
+
+//    Enrollment / Promotion APIs handle karengi.
 // ===================================================== */
 
 // export const updateStudent =
@@ -126,6 +185,7 @@
 //         data,
 //       }: {
 //         studentId: string;
+
 //         data: UpdateStudentData;
 //       },
 //       { rejectWithValue }
@@ -138,35 +198,8 @@
 //       } catch (error: any) {
 //         return rejectWithValue(
 //           error.response?.data?.message ||
+//             error.message ||
 //             "Failed to update student"
-//         );
-//       }
-//     }
-//   );
-
-
-// /* =====================================================
-//    DELETE STUDENT
-// ===================================================== */
-
-// export const deleteStudent =
-//   createAsyncThunk(
-//     "students/deleteStudent",
-
-//     async (
-//       studentId: string,
-//       { rejectWithValue }
-//     ) => {
-//       try {
-//         await deleteStudentApi(
-//           studentId
-//         );
-
-//         return studentId;
-//       } catch (error: any) {
-//         return rejectWithValue(
-//           error.response?.data?.message ||
-//             "Failed to delete student"
 //         );
 //       }
 //     }
@@ -195,6 +228,11 @@
 //           state.error =
 //             null;
 //         },
+
+//       clearStudents:
+//         (state) => {
+//           state.students = [];
+//         },
 //     },
 
 //     extraReducers:
@@ -209,6 +247,7 @@
 //             getStudents.pending,
 //             (state) => {
 //               state.loading = true;
+
 //               state.error = null;
 //             }
 //           )
@@ -218,11 +257,6 @@
 //             (state, action) => {
 //               state.loading = false;
 
-//               /*
-//                * IMPORTANT:
-//                * students Redux state ko kabhi
-//                * undefined nahi hone dena.
-//                */
 //               state.students =
 //                 Array.isArray(
 //                   action.payload
@@ -247,6 +281,49 @@
 
 
 //         /* =============================================
+//            GET STUDENTS BY ENROLLMENT
+//         ============================================= */
+
+//         builder
+//           .addCase(
+//             getStudentsByEnrollment.pending,
+//             (state) => {
+//               state.loading = true;
+
+//               state.error = null;
+//             }
+//           )
+
+//           .addCase(
+//             getStudentsByEnrollment.fulfilled,
+//             (state, action) => {
+//               state.loading = false;
+
+//               const students =
+//                 action.payload?.students;
+
+//               state.students =
+//                 Array.isArray(students)
+//                   ? students
+//                   : [];
+//             }
+//           )
+
+//           .addCase(
+//             getStudentsByEnrollment.rejected,
+//             (state, action) => {
+//               state.loading = false;
+
+//               state.students = [];
+
+//               state.error =
+//                 (action.payload as string) ||
+//                 "Failed to fetch students by enrollment";
+//             }
+//           );
+
+
+//         /* =============================================
 //            GET STUDENT BY ID
 //         ============================================= */
 
@@ -255,6 +332,7 @@
 //             getStudentById.pending,
 //             (state) => {
 //               state.loading = true;
+
 //               state.error = null;
 //             }
 //           )
@@ -290,6 +368,7 @@
 //             createStudent.pending,
 //             (state) => {
 //               state.loading = true;
+
 //               state.error = null;
 //             }
 //           )
@@ -328,6 +407,7 @@
 //             updateStudent.pending,
 //             (state) => {
 //               state.loading = true;
+
 //               state.error = null;
 //             }
 //           )
@@ -344,6 +424,7 @@
 //                 return;
 //               }
 
+
 //               const index =
 //                 state.students.findIndex(
 //                   (student) =>
@@ -351,10 +432,42 @@
 //                     updatedStudent._id
 //                 );
 
+
 //               if (index !== -1) {
-//                 state.students[index] =
-//                   updatedStudent;
+//                 /*
+//                  * Student list enrollment-based ho
+//                  * sakti hai.
+//                  *
+//                  * Isliye existing academic placement
+//                  * information preserve kar rahe hain.
+//                  */
+
+//                 const existingStudent =
+//                   state.students[index];
+
+//                 if (existingStudent) {
+//                   state.students[index] = {
+//                     ...existingStudent,
+//                     ...updatedStudent,
+
+//                     sessionId:
+//                       existingStudent.sessionId,
+
+//                     classId:
+//                       existingStudent.classId,
+
+//                     sectionId:
+//                       existingStudent.sectionId,
+
+//                     rollNumber:
+//                       existingStudent.rollNumber,
+
+//                     enrollment:
+//                       existingStudent.enrollment,
+//                   };
+//                 }
 //               }
+
 
 //               if (
 //                 state.selectedStudent?._id ===
@@ -376,60 +489,6 @@
 //                 "Failed to update student";
 //             }
 //           );
-
-
-//         /* =============================================
-//            DELETE STUDENT
-//         ============================================= */
-
-//         builder
-//           .addCase(
-//             deleteStudent.pending,
-//             (state) => {
-//               state.loading = true;
-//               state.error = null;
-//             }
-//           )
-
-//           .addCase(
-//             deleteStudent.fulfilled,
-//             (state, action) => {
-//               state.loading = false;
-
-//               const studentId =
-//                 action.payload;
-
-//               if (!studentId) {
-//                 return;
-//               }
-
-//               state.students =
-//                 state.students.filter(
-//                   (student) =>
-//                     student._id !==
-//                     studentId
-//                 );
-
-//               if (
-//                 state.selectedStudent?._id ===
-//                 studentId
-//               ) {
-//                 state.selectedStudent =
-//                   null;
-//               }
-//             }
-//           )
-
-//           .addCase(
-//             deleteStudent.rejected,
-//             (state, action) => {
-//               state.loading = false;
-
-//               state.error =
-//                 (action.payload as string) ||
-//                 "Failed to delete student";
-//             }
-//           );
 //       },
 //   });
 
@@ -441,6 +500,7 @@
 // export const {
 //   clearSelectedStudent,
 //   clearStudentError,
+//   clearStudents,
 // } = studentSlice.actions;
 
 
@@ -451,17 +511,31 @@
 // export default studentSlice.reducer;
 
 
+
+
+
+
+
+
+
+
+
 import {
   createAsyncThunk,
   createSlice,
 } from "@reduxjs/toolkit";
 
 import {
+  createStudentAccountApi,
   createStudentApi,
   getStudentByIdApi,
   getStudentsApi,
   getStudentsByEnrollmentApi,
   updateStudentApi,
+} from "./student.api";
+
+import type {
+  CreateStudentAccountData,
 } from "./student.api";
 
 import type {
@@ -605,6 +679,44 @@ export const createStudent =
           error.response?.data?.message ||
             error.message ||
             "Failed to create student"
+        );
+      }
+    }
+  );
+
+
+/* =====================================================
+   CREATE STUDENT LOGIN ACCOUNT
+
+   Student create hone ke baad returned studentId
+   ke saath ye thunk dispatch hoga.
+===================================================== */
+
+export const createStudentAccount =
+  createAsyncThunk(
+    "students/createStudentAccount",
+
+    async (
+      {
+        studentId,
+        data,
+      }: {
+        studentId: string;
+
+        data: CreateStudentAccountData;
+      },
+      { rejectWithValue }
+    ) => {
+      try {
+        return await createStudentAccountApi(
+          studentId,
+          data
+        );
+      } catch (error: any) {
+        return rejectWithValue(
+          error.response?.data?.message ||
+            error.message ||
+            "Failed to create student login account"
         );
       }
     }
@@ -844,6 +956,39 @@ const studentSlice =
               state.error =
                 (action.payload as string) ||
                 "Failed to create student";
+            }
+          );
+
+
+        /* =============================================
+           CREATE STUDENT LOGIN ACCOUNT
+        ============================================= */
+
+        builder
+          .addCase(
+            createStudentAccount.pending,
+            (state) => {
+              state.loading = true;
+
+              state.error = null;
+            }
+          )
+
+          .addCase(
+            createStudentAccount.fulfilled,
+            (state) => {
+              state.loading = false;
+            }
+          )
+
+          .addCase(
+            createStudentAccount.rejected,
+            (state, action) => {
+              state.loading = false;
+
+              state.error =
+                (action.payload as string) ||
+                "Failed to create student login account";
             }
           );
 

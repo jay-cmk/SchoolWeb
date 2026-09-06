@@ -1,24 +1,18 @@
-
-
 // import {
 //   Routes,
 //   Route,
 //   Navigate,
 // } from "react-router-dom";
 
-
 // import Login
 //   from "../pages/auth/Login";
-
 
 // import ProtectedRoute
 //   from "./ProtectedRoute";
 
-
 // import {
 //   UserRole,
 // } from "../types/auth.types";
-
 
 // // ============================================
 // // SUPER ADMIN
@@ -27,22 +21,17 @@
 // import SuperAdminLayout
 //   from "../components/layout/SuperAdminLayout";
 
-
 // import SuperAdminDashboard
 //   from "../pages/superAdmin/SuperAdminDashboard";
-
 
 // import Schools
 //   from "../pages/superAdmin/Schools";
 
-
 // import SchoolDetails
 //   from "../pages/superAdmin/SchoolDetails";
 
-
 // import AddSchool
 //   from "../pages/superAdmin/AddSchool";
-
 
 // // ============================================
 // // SCHOOL ADMIN LAYOUT
@@ -51,10 +40,8 @@
 // import SchoolAdminLayout
 //   from "../components/layout/SchoolAdminLayout";
 
-
 // import SchoolAdminDashboard
 //   from "../pages/schoolAdmin/Dashboard";
-
 
 // // ============================================
 // // ACADEMIC
@@ -63,26 +50,20 @@
 // import Sessions
 //   from "../pages/schoolAdmin/academic/sessions/Sessions";
 
-
 // import Classes
 //   from "../pages/schoolAdmin/academic/classes/Classes";
-
 
 // import Sections
 //   from "../pages/schoolAdmin/academic/sections/Sections";
 
-
 // import Subjects
 //   from "../pages/schoolAdmin/academic/subjects/Subjects";
-
 
 // import SubjectAssignments
 //   from "../pages/schoolAdmin/academic/subjectAssignments/SubjectAssignments";
 
-
 // import AcademicSessionDetails
 //   from "../pages/schoolAdmin/academic/sessions/Sessions";
-
 
 // // ============================================
 // // TEACHERS
@@ -91,7 +72,6 @@
 // import Teachers
 //   from "../pages/schoolAdmin/teachers/Teachers";
 
-
 // // ============================================
 // // ATTENDANCE
 // // ============================================
@@ -99,22 +79,17 @@
 // import MarkAttendance
 //   from "../pages/schoolAdmin/Attendance/MarkAttendance";
 
-
 // import DailyAttendance
 //   from "../pages/schoolAdmin/Attendance/DailyAttendance";
-
 
 // import MonthlyAttendance
 //   from "../pages/schoolAdmin/Attendance/MonthlyAttendance";
 
-
 // import UpdateAttendance
 //   from "../pages/schoolAdmin/Attendance/UpdateAttendance";
 
-
 // import StudentAttendanceDetails
 //   from "../pages/schoolAdmin/Attendance/StudentAttendanceDetails";
-
 
 // // ============================================
 // // TIMETABLE
@@ -123,14 +98,11 @@
 // import WeeklyClassTimetable
 //   from "../pages/schoolAdmin/timetable/WeeklyClassTimetable";
 
-
 // import DailyTimetable
 //   from "../pages/schoolAdmin/timetable/DailyTimetable";
 
-
 // import TeacherTimetable
 //   from "../pages/schoolAdmin/timetable/TeacherTimetable";
-
 
 // // ============================================
 // // HOMEWORK
@@ -139,19 +111,15 @@
 // import HomeworkList
 //   from "../pages/schoolAdmin/homework/HomeworkList";
 
-
 // import AddHomework
 //   from "../pages/schoolAdmin/homework/AddHomework";
-
 
 // import HomeworkDetails
 //   from "../pages/schoolAdmin/homework/HomeworkDetails";
 
-
 // import StudentSubmissions
 //   from "../pages/schoolAdmin/homework/StudentSubmissions";
 // import EditHomework from "../pages/schoolAdmin/homework/EditHomework";
-
 
 // // ============================================
 // // APP ROUTES
@@ -173,7 +141,6 @@
 //           <Login />
 //         }
 //       />
-
 
 //       {/* ========================================
 //           SUPER ADMIN
@@ -200,7 +167,6 @@
 //           }
 //         />
 
-
 //         {/* SCHOOLS */}
 
 //         <Route
@@ -210,7 +176,6 @@
 //           }
 //         />
 
-
 //         {/* ADD SCHOOL */}
 
 //         <Route
@@ -219,7 +184,6 @@
 //             <AddSchool />
 //           }
 //         />
-
 
 //         {/* SCHOOL DETAILS */}
 
@@ -231,7 +195,6 @@
 //         />
 
 //       </Route>
-
 
 //       {/* ========================================
 //           SCHOOL ADMIN
@@ -260,7 +223,6 @@
 //           }
 //         />
 
-
 //         {/* ======================================
 //             ACADEMIC SESSION
 //         ====================================== */}
@@ -272,14 +234,12 @@
 //           }
 //         />
 
-
 //         <Route
 //           path="/school-admin/academic/sessions/:sessionId"
 //           element={
 //             <AcademicSessionDetails />
 //           }
 //         />
-
 
 //         {/* ======================================
 //             CLASSES
@@ -292,7 +252,6 @@
 //           }
 //         />
 
-
 //         {/* ======================================
 //             SECTIONS
 //         ====================================== */}
@@ -303,7 +262,6 @@
 //             <Sections />
 //           }
 //         />
-
 
 //         {/* ======================================
 //             SUBJECTS
@@ -316,7 +274,6 @@
 //           }
 //         />
 
-
 //         {/* ======================================
 //             SUBJECT ASSIGNMENTS
 //         ====================================== */}
@@ -327,7 +284,6 @@
 //             <SubjectAssignments />
 //           }
 //         />
-
 
 //         {/* ======================================
 //             TEACHERS
@@ -340,11 +296,9 @@
 //           }
 //         />
 
-
 //         {/* ======================================
 //             ATTENDANCE
 //         ====================================== */}
-
 
 //         {/* MARK ATTENDANCE */}
 
@@ -355,7 +309,6 @@
 //           }
 //         />
 
-
 //         {/* DAILY ATTENDANCE */}
 
 //         <Route
@@ -364,7 +317,6 @@
 //             <DailyAttendance />
 //           }
 //         />
-
 
 //         {/* MONTHLY ATTENDANCE */}
 
@@ -375,7 +327,6 @@
 //           }
 //         />
 
-
 //         {/* UPDATE ATTENDANCE */}
 
 //         <Route
@@ -384,7 +335,6 @@
 //             <UpdateAttendance />
 //           }
 //         />
-
 
 //         {/* STUDENT ATTENDANCE DETAILS */}
 
@@ -395,11 +345,9 @@
 //           }
 //         />
 
-
 //         {/* ======================================
 //             TIMETABLE
 //         ====================================== */}
-
 
 //         {/* DEFAULT TIMETABLE ROUTE */}
 
@@ -413,7 +361,6 @@
 //           }
 //         />
 
-
 //         {/* WEEKLY TIMETABLE */}
 
 //         <Route
@@ -422,7 +369,6 @@
 //             <WeeklyClassTimetable />
 //           }
 //         />
-
 
 //         {/* DAILY TIMETABLE */}
 
@@ -433,7 +379,6 @@
 //           }
 //         />
 
-
 //         {/* TEACHER TIMETABLE */}
 
 //         <Route
@@ -443,11 +388,9 @@
 //           }
 //         />
 
-
 //         {/* ======================================
 //             HOMEWORK
 //         ====================================== */}
-
 
 //         {/* HOMEWORK LIST */}
 
@@ -458,7 +401,6 @@
 //           }
 //         />
 
-
 //         {/* ADD HOMEWORK */}
 
 //         <Route
@@ -468,7 +410,6 @@
 //           }
 //         />
 
-
 //         {/* HOMEWORK DETAILS */}
 
 //         <Route
@@ -477,7 +418,6 @@
 //             <HomeworkDetails />
 //           }
 //         />
-
 
 //         {/* STUDENT SUBMISSIONS */}
 
@@ -493,9 +433,7 @@
 //   element={<EditHomework />}
 // />
 
-
 //       </Route>
-
 
 //       {/* ========================================
 //           UNKNOWN URL
@@ -515,184 +453,126 @@
 //   );
 // };
 
-
 // export default AppRoutes;
-
 
 // src/routes/AppRoutes.tsx
 
-import {
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
-import Login
-  from "../pages/auth/Login";
+import Login from "../pages/auth/Login";
 
-import ProtectedRoute
-  from "./ProtectedRoute";
+import ProtectedRoute from "./ProtectedRoute";
 
-import {
-  UserRole,
-} from "../types/auth.types";
-
+import { UserRole } from "../types/auth.types";
 
 // ============================================
 // SUPER ADMIN
 // ============================================
 
-import SuperAdminLayout
-  from "../components/layout/SuperAdminLayout";
+import SuperAdminLayout from "../components/layout/SuperAdminLayout";
 
-import SuperAdminDashboard
-  from "../pages/superAdmin/SuperAdminDashboard";
+import SuperAdminDashboard from "../pages/superAdmin/SuperAdminDashboard";
 
-import Schools
-  from "../pages/superAdmin/Schools";
+import Schools from "../pages/superAdmin/Schools";
 
-import SchoolDetails
-  from "../pages/superAdmin/SchoolDetails";
+import SchoolDetails from "../pages/superAdmin/SchoolDetails";
 
-import AddSchool
-  from "../pages/superAdmin/AddSchool";
-
+import AddSchool from "../pages/superAdmin/AddSchool";
 
 // ============================================
 // SCHOOL ADMIN LAYOUT
 // ============================================
 
-import SchoolAdminLayout
-  from "../components/layout/SchoolAdminLayout";
+import SchoolAdminLayout from "../components/layout/SchoolAdminLayout";
 
-import SchoolAdminDashboard
-  from "../pages/schoolAdmin/Dashboard";
-
+import SchoolAdminDashboard from "../pages/schoolAdmin/Dashboard";
 
 // ============================================
 // ACADEMIC
 // ============================================
 
-import Sessions
-  from "../pages/schoolAdmin/academic/sessions/Sessions";
+import Sessions from "../pages/schoolAdmin/academic/sessions/Sessions";
 
-import Classes
-  from "../pages/schoolAdmin/academic/classes/Classes";
+import Classes from "../pages/schoolAdmin/academic/classes/Classes";
 
-import Sections
-  from "../pages/schoolAdmin/academic/sections/Sections";
+import Sections from "../pages/schoolAdmin/academic/sections/Sections";
 
-import Subjects
-  from "../pages/schoolAdmin/academic/subjects/Subjects";
+import Subjects from "../pages/schoolAdmin/academic/subjects/Subjects";
 
-import SubjectAssignments
-  from "../pages/schoolAdmin/academic/subjectAssignments/SubjectAssignments";
+import SubjectAssignments from "../pages/schoolAdmin/academic/subjectAssignments/SubjectAssignments";
 
-import AcademicSessionDetails
-  from "../pages/schoolAdmin/academic/sessions/Sessions";
-
+import AcademicSessionDetails from "../pages/schoolAdmin/academic/sessions/Sessions";
 
 // ============================================
 // STUDENTS
 // ============================================
 
-import StudentList
-  from "../pages/schoolAdmin/students/StudentList";
+import StudentList from "../pages/schoolAdmin/students/StudentList";
 
-import AddStudent
-  from "../pages/schoolAdmin/students/AddStudent";
+import AddStudent from "../pages/schoolAdmin/students/AddStudent";
 
-import ClassWiseStudents
-  from "../pages/schoolAdmin/students/ClassWiseStudents";
+import ClassWiseStudents from "../pages/schoolAdmin/students/ClassWiseStudents";
 
-import StudentDetails
-  from "../pages/schoolAdmin/students/StudentDetails";
-
+import StudentDetails from "../pages/schoolAdmin/students/StudentDetails";
 
 // ============================================
 // TEACHERS
 // ============================================
 
-import Teachers
-  from "../pages/schoolAdmin/teachers/Teachers";
-
+import Teachers from "../pages/schoolAdmin/teachers/Teachers";
 
 // ============================================
 // ATTENDANCE
 // ============================================
 
-import MarkAttendance
-  from "../pages/schoolAdmin/Attendance/MarkAttendance";
+import MarkAttendance from "../pages/schoolAdmin/Attendance/MarkAttendance";
 
-import DailyAttendance
-  from "../pages/schoolAdmin/Attendance/DailyAttendance";
+import DailyAttendance from "../pages/schoolAdmin/Attendance/DailyAttendance";
 
-import MonthlyAttendance
-  from "../pages/schoolAdmin/Attendance/MonthlyAttendance";
+import MonthlyAttendance from "../pages/schoolAdmin/Attendance/MonthlyAttendance";
 
-import UpdateAttendance
-  from "../pages/schoolAdmin/Attendance/UpdateAttendance";
+import UpdateAttendance from "../pages/schoolAdmin/Attendance/UpdateAttendance";
 
-import StudentAttendanceDetails
-  from "../pages/schoolAdmin/Attendance/StudentAttendanceDetails";
-
+import StudentAttendanceDetails from "../pages/schoolAdmin/Attendance/StudentAttendanceDetails";
 
 // ============================================
 // TIMETABLE
 // ============================================
 
-import WeeklyClassTimetable
-  from "../pages/schoolAdmin/timetable/WeeklyClassTimetable";
+import WeeklyClassTimetable from "../pages/schoolAdmin/timetable/WeeklyClassTimetable";
 
-import DailyTimetable
-  from "../pages/schoolAdmin/timetable/DailyTimetable";
+import DailyTimetable from "../pages/schoolAdmin/timetable/DailyTimetable";
 
-import TeacherTimetable
-  from "../pages/schoolAdmin/timetable/TeacherTimetable";
-
+import TeacherTimetable from "../pages/schoolAdmin/timetable/TeacherTimetable";
 
 // ============================================
 // HOMEWORK
 // ============================================
 
-import HomeworkList
-  from "../pages/schoolAdmin/homework/HomeworkList";
+import HomeworkList from "../pages/schoolAdmin/homework/HomeworkList";
 
-import AddHomework
-  from "../pages/schoolAdmin/homework/AddHomework";
+import AddHomework from "../pages/schoolAdmin/homework/AddHomework";
 
-import HomeworkDetails
-  from "../pages/schoolAdmin/homework/HomeworkDetails";
+import HomeworkDetails from "../pages/schoolAdmin/homework/HomeworkDetails";
 
-import StudentSubmissions
-  from "../pages/schoolAdmin/homework/StudentSubmissions";
+import StudentSubmissions from "../pages/schoolAdmin/homework/StudentSubmissions";
 
-import EditHomework
-  from "../pages/schoolAdmin/homework/EditHomework";
+import EditHomework from "../pages/schoolAdmin/homework/EditHomework";
 import BulkPromotion from "../pages/schoolAdmin/students/BulkPromotion";
-
+import EditStudent from "../pages/schoolAdmin/students/EditStudent";
 
 // ============================================
 // APP ROUTES
 // ============================================
 
 const AppRoutes = () => {
-
   return (
-
     <Routes>
-
       {/* ========================================
           LOGIN
       ======================================== */}
 
-      <Route
-        path="/login"
-        element={
-          <Login />
-        }
-      />
-
+      <Route path="/login" element={<Login />} />
 
       {/* ========================================
           SUPER ADMIN
@@ -700,57 +580,33 @@ const AppRoutes = () => {
 
       <Route
         element={
-          <ProtectedRoute
-            allowedRoles={[
-              UserRole.SUPER_ADMIN,
-            ]}
-          >
+          <ProtectedRoute allowedRoles={[UserRole.SUPER_ADMIN]}>
             <SuperAdminLayout />
           </ProtectedRoute>
         }
       >
-
         {/* DASHBOARD */}
 
         <Route
           path="/super-admin/dashboard"
-          element={
-            <SuperAdminDashboard />
-          }
+          element={<SuperAdminDashboard />}
         />
-
 
         {/* SCHOOLS */}
 
-        <Route
-          path="/super-admin/schools"
-          element={
-            <Schools />
-          }
-        />
-
+        <Route path="/super-admin/schools" element={<Schools />} />
 
         {/* ADD SCHOOL */}
 
-        <Route
-          path="/super-admin/schools/add"
-          element={
-            <AddSchool />
-          }
-        />
-
+        <Route path="/super-admin/schools/add" element={<AddSchool />} />
 
         {/* SCHOOL DETAILS */}
 
         <Route
           path="/super-admin/schools/details"
-          element={
-            <SchoolDetails />
-          }
+          element={<SchoolDetails />}
         />
-
       </Route>
-
 
       {/* ========================================
           SCHOOL ADMIN
@@ -758,333 +614,157 @@ const AppRoutes = () => {
 
       <Route
         element={
-          <ProtectedRoute
-            allowedRoles={[
-              UserRole.SCHOOL_ADMIN,
-            ]}
-          >
+          <ProtectedRoute allowedRoles={[UserRole.SCHOOL_ADMIN]}>
             <SchoolAdminLayout />
           </ProtectedRoute>
         }
       >
-
         {/* ======================================
             DASHBOARD
         ====================================== */}
-
         <Route
           path="/school-admin/dashboard"
-          element={
-            <SchoolAdminDashboard />
-          }
+          element={<SchoolAdminDashboard />}
         />
-
-
         {/* ======================================
             ACADEMIC SESSION
         ====================================== */}
-
-        <Route
-          path="/school-admin/academic/sessions"
-          element={
-            <Sessions />
-          }
-        />
-
-
+        <Route path="/school-admin/academic/sessions" element={<Sessions />} />
         <Route
           path="/school-admin/academic/sessions/:sessionId"
-          element={
-            <AcademicSessionDetails />
-          }
+          element={<AcademicSessionDetails />}
         />
-
-
         {/* ======================================
             CLASSES
         ====================================== */}
-
-        <Route
-          path="/school-admin/academic/classes"
-          element={
-            <Classes />
-          }
-        />
-
-
+        <Route path="/school-admin/academic/classes" element={<Classes />} />
         {/* ======================================
             SECTIONS
         ====================================== */}
-
-        <Route
-          path="/school-admin/academic/sections"
-          element={
-            <Sections />
-          }
-        />
-
-
+        <Route path="/school-admin/academic/sections" element={<Sections />} />
         {/* ======================================
             SUBJECTS
         ====================================== */}
-
-        <Route
-          path="/school-admin/academic/subjects"
-          element={
-            <Subjects />
-          }
-        />
-
-
+        <Route path="/school-admin/academic/subjects" element={<Subjects />} />
         {/* ======================================
             SUBJECT ASSIGNMENTS
         ====================================== */}
-
         <Route
           path="/school-admin/academic/subject-assignments"
-          element={
-            <SubjectAssignments />
-          }
+          element={<SubjectAssignments />}
         />
-
-
         {/* ======================================
             STUDENTS
         ====================================== */}
-
         {/* ALL STUDENTS */}
-
-        <Route
-          path="/school-admin/students"
-          element={
-            <StudentList />
-          }
-        />
-
-
+        <Route path="/school-admin/students" element={<StudentList />} />
         {/* ADD STUDENT */}
-
-        <Route
-          path="/school-admin/students/add"
-          element={
-            <AddStudent />
-          }
-        />
-
-
+        <Route path="/school-admin/students/add" element={<AddStudent />} />
         {/* CLASS-WISE STUDENTS */}
-
         <Route
           path="/school-admin/students/class-wise"
-          element={
-            <ClassWiseStudents />
-          }
+          element={<ClassWiseStudents />}
         />
-
-
+        <Route
+          path="/school-admin/students/:studentId/edit"
+          element={<EditStudent />}
+        />
         {/* STUDENT DETAILS */}
-
         <Route
           path="/school-admin/students/:studentId"
-          element={
-            <StudentDetails />
-          }
+          element={<StudentDetails />}
         />
-
-
         {/* ======================================
             TEACHERS
         ====================================== */}
-
-        <Route
-          path="/school-admin/teachers"
-          element={
-            <Teachers />
-          }
-        />
-
-
+        <Route path="/school-admin/teachers" element={<Teachers />} />
         {/* ======================================
             ATTENDANCE
         ====================================== */}
-
         {/* MARK ATTENDANCE */}
-
         <Route
           path="/school-admin/attendance/mark"
-          element={
-            <MarkAttendance />
-          }
+          element={<MarkAttendance />}
         />
-
-
         {/* DAILY ATTENDANCE */}
-
         <Route
           path="/school-admin/attendance/daily"
-          element={
-            <DailyAttendance />
-          }
+          element={<DailyAttendance />}
         />
-
-
         {/* MONTHLY ATTENDANCE */}
-
         <Route
           path="/school-admin/attendance/monthly"
-          element={
-            <MonthlyAttendance />
-          }
+          element={<MonthlyAttendance />}
         />
-
-
         {/* UPDATE ATTENDANCE */}
-
         <Route
           path="/school-admin/attendance/update"
-          element={
-            <UpdateAttendance />
-          }
+          element={<UpdateAttendance />}
         />
-
-
         {/* STUDENT ATTENDANCE DETAILS */}
-
         <Route
           path="/school-admin/attendance/student/:studentId"
-          element={
-            <StudentAttendanceDetails />
-          }
+          element={<StudentAttendanceDetails />}
         />
-
-
         {/* ======================================
             TIMETABLE
         ====================================== */}
-
         {/* DEFAULT TIMETABLE ROUTE */}
-
         <Route
           path="/school-admin/timetable"
-          element={
-            <Navigate
-              to="/school-admin/timetable/weekly"
-              replace
-            />
-          }
+          element={<Navigate to="/school-admin/timetable/weekly" replace />}
         />
-
-
         {/* WEEKLY TIMETABLE */}
-
         <Route
           path="/school-admin/timetable/weekly"
-          element={
-            <WeeklyClassTimetable />
-          }
+          element={<WeeklyClassTimetable />}
         />
-
-
         {/* DAILY TIMETABLE */}
-
         <Route
           path="/school-admin/timetable/daily"
-          element={
-            <DailyTimetable />
-          }
+          element={<DailyTimetable />}
         />
-
-
         {/* TEACHER TIMETABLE */}
-
         <Route
           path="/school-admin/timetable/teacher"
-          element={
-            <TeacherTimetable />
-          }
+          element={<TeacherTimetable />}
         />
-
-
         {/* ======================================
             HOMEWORK
         ====================================== */}
-
         {/* HOMEWORK LIST */}
-
-        <Route
-          path="/school-admin/homework"
-          element={
-            <HomeworkList />
-          }
-        />
-
-attendance/daily
+        <Route path="/school-admin/homework" element={<HomeworkList />} />
+        attendance/daily
         {/* ADD HOMEWORK */}
-
-        <Route
-          path="/school-admin/homework/add"
-          element={
-            <AddHomework />
-          }
-        />
-
-
+        <Route path="/school-admin/homework/add" element={<AddHomework />} />
         {/* HOMEWORK DETAILS */}
-
         <Route
           path="/school-admin/homework/:homeworkId"
-          element={
-            <HomeworkDetails />
-          }
+          element={<HomeworkDetails />}
         />
-
-
         {/* STUDENT SUBMISSIONS */}
-
         <Route
           path="/school-admin/homework/:homeworkId/submissions"
-          element={
-            <StudentSubmissions />
-          }
+          element={<StudentSubmissions />}
         />
-
-
         {/* EDIT HOMEWORK */}
-
         <Route
           path="/school-admin/homework/:homeworkId/edit"
-          element={
-            <EditHomework />
-          }
+          element={<EditHomework />}
         />
-
         <Route
-  path="/school-admin/students/bulk-promotion"
-  element={<BulkPromotion />}
-/>
-
+          path="/school-admin/students/bulk-promotion"
+          element={<BulkPromotion />}
+        />
       </Route>
-
 
       {/* ========================================
           UNKNOWN URL
       ======================================== */}
 
-      <Route
-        path="*"
-        element={
-          <Navigate
-            to="/login"
-            replace
-          />
-        }
-      />
-
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
-
   );
-
 };
-
 
 export default AppRoutes;
