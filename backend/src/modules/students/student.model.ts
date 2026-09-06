@@ -359,6 +359,7 @@
 
 
 
+
 import mongoose, {
   Document,
   Schema,
@@ -910,7 +911,10 @@ studentSchema.index(
 
 // ============================================
 // UNIQUE ROLL NUMBER
-// SCHOOL + SESSION + CLASS + SECTION
+// SCHOOL + SESSION + CLASS
+//
+// Roll number poori class me unique rahega.
+// Sections ke beech reset nahi hoga.
 // ============================================
 
 studentSchema.index(
@@ -918,7 +922,6 @@ studentSchema.index(
     schoolId: 1,
     sessionId: 1,
     classId: 1,
-    sectionId: 1,
     rollNumber: 1,
   },
   {
@@ -969,3 +972,4 @@ const Student: Model<IStudentDocument> =
 export { Student };
 
 export default Student;
+

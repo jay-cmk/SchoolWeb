@@ -659,7 +659,7 @@ export interface Student {
 export interface CreateStudentData {
   name: string;
 
-  admissionNumber: string;
+  admissionNumber?: string;
 
 
   sessionId: string;
