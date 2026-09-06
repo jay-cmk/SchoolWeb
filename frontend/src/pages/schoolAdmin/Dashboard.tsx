@@ -1203,346 +1203,2787 @@
 
 
 
+// Dashboard.tsx
 
-// Dashboard.tsx - Fixed Layout
-import React, { useState } from 'react';
-import { Icon } from '@iconify/react';
+// import React, {
+//   useEffect,
+//   useMemo,
+//   useState,
+// } from "react";
 
-import StatCard from './StatCard';
-import StudentStats from './StudentStatus';              // ✅ सही
-import AttendanceOverview from './AttendanceOverviewProps';  // ✅ सही
-import FeeOverview from './FeeOverview';
-import UpcomingEvents from './UpcomingOverview';          // ✅ सही
-import RecentActivities from './RecentActivities';
-import ImportantNotices from './ImportantNotices';
-import QuickActionModal from './QuickActionModel';      // ✅ सही
+// import {
+//   Icon,
+// } from "@iconify/react";
+
+// import {
+//   useDispatch,
+//   useSelector,
+// } from "react-redux";
+
+// // import type {
+// //   AppDispatch,
+// //   RootState,
+// // } from "../../../store/store";
 
 
 
-// Types
+
+
+
+
+// import StatCard from "./StatCard";
+
+// import StudentStats from "./StudentStatus";
+
+// import AttendanceOverview from "./AttendanceOverviewProps";
+
+// import FeeOverview from "./FeeOverview";
+
+// import UpcomingEvents from "./UpcomingOverview";
+
+// import RecentActivities from "./RecentActivities";
+
+// import ImportantNotices from "./ImportantNotices";
+
+// import QuickActionModal from "./QuickActionModel";
+// import type { RootState,AppDispatch } from "../../app/store";
+// import { getSchoolAdminDashboard } from "../../features/schoolAdminDashboard/schoolAdminDashboard.slice";
+
+
+// // ============================================
+// // TYPES
+// // ============================================
+
+// interface EventItem {
+//   id: string;
+
+//   month: string;
+
+//   day: string;
+
+//   title: string;
+
+//   details: string;
+
+//   type:
+//     | "primary"
+//     | "accent";
+// }
+
+
+// interface ActivityItem {
+//   id: string;
+
+//   type:
+//     | "admission"
+//     | "fee"
+//     | "teacher"
+//     | "homework";
+
+//   title: string;
+
+//   detail: string;
+
+//   time: string;
+// }
+
+
+// interface NoticeItem {
+//   id: string;
+
+//   title: string;
+
+//   tag: string;
+
+//   tagType:
+//     | "action"
+//     | "academic"
+//     | "tomorrow";
+
+//   content: string;
+// }
+
+
+// // ============================================
+// // COMPONENT
+// // ============================================
+
+// const SchoolAdminDashboard:
+//   React.FC = () => {
+
+//     const dispatch =
+//       useDispatch<AppDispatch>();
+
+
+//     // ============================================
+//     // REDUX DASHBOARD DATA
+//     // ============================================
+
+//     const {
+//       dashboard,
+//       loading,
+//       error,
+//     } = useSelector(
+//       (
+//         state: RootState
+//       ) =>
+//         state.schoolAdminDashboard
+//     );
+
+
+//     // ============================================
+//     // LOCAL STATES
+//     // ============================================
+
+//     const [
+//       searchQuery,
+//       setSearchQuery,
+//     ] = useState("");
+
+
+//     const [
+//       selectedAcademicYear,
+//       setSelectedAcademicYear,
+//     ] = useState("");
+
+
+//     const [
+//       isQuickActionModalOpen,
+//       setIsQuickActionModalOpen,
+//     ] = useState(false);
+
+
+//     const [
+//       isExporting,
+//       setIsExporting,
+//     ] = useState(false);
+
+
+//     // ============================================
+//     // TEMPORARY ACTIVITY DATA
+//     //
+//     // Activity API abhi nahi bani hai.
+//     // Isko later real activity log API se replace karenge.
+//     // ============================================
+
+//     const [
+//       activities,
+//       setActivities,
+//     ] = useState<ActivityItem[]>([
+//       {
+//         id: "1",
+
+//         type:
+//           "teacher",
+
+//         title:
+//           "Teacher management",
+
+//         detail:
+//           "Teacher activity will appear here",
+
+//         time:
+//           "Recently",
+//       },
+
+//       {
+//         id: "2",
+
+//         type:
+//           "homework",
+
+//         title:
+//           "Homework management",
+
+//         detail:
+//           "Published homework activity will appear here",
+
+//         time:
+//           "Recently",
+//       },
+//     ]);
+
+
+//     // ============================================
+//     // TEMPORARY EVENTS
+//     //
+//     // Event module abhi available nahi hai.
+//     // ============================================
+
+//     const [
+//       events,
+//       setEvents,
+//     ] = useState<EventItem[]>([]);
+
+
+//     // ============================================
+//     // TEMPORARY NOTICES
+//     //
+//     // Notice module complete hone ke baad
+//     // API se load karenge.
+//     // ============================================
+
+//     const [
+//       notices,
+//     ] = useState<NoticeItem[]>([]);
+
+
+//     // ============================================
+//     // FETCH DASHBOARD
+//     // ============================================
+
+//     useEffect(() => {
+
+//       dispatch(
+//         getSchoolAdminDashboard()
+//       );
+
+//     }, [
+//       dispatch,
+//     ]);
+
+
+//     // ============================================
+//     // CURRENT SESSION SYNC
+//     // ============================================
+
+//     useEffect(() => {
+
+//       if (
+//         dashboard
+//           ?.currentSession
+//           ?.name
+//       ) {
+
+//         setSelectedAcademicYear(
+//           dashboard
+//             .currentSession
+//             .name
+//         );
+
+//       }
+
+//     }, [
+//       dashboard
+//         ?.currentSession
+//         ?.name,
+//     ]);
+
+
+//     // ============================================
+//     // DATE
+//     // ============================================
+
+//     const todayDate =
+//       useMemo(
+//         () => {
+
+//           return new Date()
+//             .toLocaleDateString(
+//               "en-IN",
+//               {
+//                 weekday:
+//                   "long",
+
+//                 day:
+//                   "numeric",
+
+//                 month:
+//                   "long",
+
+//                 year:
+//                   "numeric",
+//               }
+//             );
+
+//         },
+//         []
+//       );
+
+
+//     // ============================================
+//     // GREETING
+//     // ============================================
+
+//     const greeting =
+//       useMemo(
+//         () => {
+
+//           const hour =
+//             new Date()
+//               .getHours();
+
+
+//           if (
+//             hour <
+//             12
+//           ) {
+
+//             return "Good morning";
+
+//           }
+
+
+//           if (
+//             hour <
+//             17
+//           ) {
+
+//             return "Good afternoon";
+
+//           }
+
+
+//           return "Good evening";
+
+//         },
+//         []
+//       );
+
+
+//     // ============================================
+//     // DASHBOARD VALUES
+//     // ============================================
+
+//     const statistics =
+//       dashboard
+//         ?.statistics;
+
+
+//     const attendance =
+//       statistics
+//         ?.attendance;
+
+
+//     const totalStudents =
+//       statistics
+//         ?.totalStudents ??
+//       0;
+
+
+//     const totalTeachers =
+//       statistics
+//         ?.totalTeachers ??
+//       0;
+
+
+//     const totalStaff =
+//       statistics
+//         ?.totalStaff ??
+//       0;
+
+
+//     const totalClasses =
+//       statistics
+//         ?.totalClasses ??
+//       0;
+
+
+//     const present =
+//       attendance
+//         ?.present ??
+//       0;
+
+
+//     const absent =
+//       attendance
+//         ?.absent ??
+//       0;
+
+
+//     const leave =
+//       attendance
+//         ?.leave ??
+//       0;
+
+
+//     const halfDay =
+//       attendance
+//         ?.halfDay ??
+//       0;
+
+
+//     const totalAttendanceMarked =
+//       attendance
+//         ?.totalMarked ??
+//       0;
+
+
+//     const attendancePercentage =
+//       attendance
+//         ?.percentage ??
+//       0;
+
+
+//     const pendingHomework =
+//       statistics
+//         ?.pendingHomework ??
+//       0;
+
+
+//     const pendingFees =
+//       statistics
+//         ?.pendingFees ??
+//       0;
+
+
+//     const upcomingExams =
+//       statistics
+//         ?.upcomingExams ??
+//       0;
+
+
+//     // ============================================
+//     // HANDLERS
+//     // ============================================
+
+//     const handleSearchChange =
+//       (
+//         e:
+//           React.ChangeEvent<HTMLInputElement>
+//       ) => {
+
+//         setSearchQuery(
+//           e.target.value
+//         );
+//       };
+
+
+//     const handleExportReport =
+//       () => {
+
+//         setIsExporting(
+//           true
+//         );
+
+
+//         setTimeout(
+//           () => {
+
+//             setIsExporting(
+//               false
+//             );
+
+
+//             alert(
+//               "Operational snapshot report export will be connected later."
+//             );
+
+//           },
+//           1000
+//         );
+//       };
+
+
+//     const handleQuickActionClick =
+//       () => {
+
+//         setIsQuickActionModalOpen(
+//           true
+//         );
+//       };
+
+
+//     const handleAcademicYearSelect =
+//       (
+//         year:
+//           string
+//       ) => {
+
+//         setSelectedAcademicYear(
+//           year
+//         );
+//       };
+
+
+//     const handleQuickActionSubmit =
+//       (
+//         data: {
+//           type:
+//             string;
+
+//           title:
+//             string;
+
+//           detail:
+//             string;
+//         }
+//       ) => {
+
+//         const allowedTypes:
+//           ActivityItem["type"][] = [
+//             "admission",
+//             "fee",
+//             "teacher",
+//             "homework",
+//           ];
+
+
+//         const activityType:
+//           ActivityItem["type"] =
+//           allowedTypes.includes(
+//             data.type as ActivityItem["type"]
+//           )
+//             ? (
+//                 data.type as ActivityItem["type"]
+//               )
+//             : "homework";
+
+
+//         const newActivity:
+//           ActivityItem = {
+
+//           id:
+//             Date.now()
+//               .toString(),
+
+//           type:
+//             activityType,
+
+//           title:
+//             data.title,
+
+//           detail:
+//             data.detail,
+
+//           time:
+//             "Just now",
+//         };
+
+
+//         setActivities(
+//           (
+//             previous
+//           ) => [
+//             newActivity,
+//             ...previous,
+//           ]
+//         );
+//       };
+
+
+//     const handleAddEvent =
+//       () => {
+
+//         const title =
+//           prompt(
+//             "Enter event title:"
+//           );
+
+
+//         if (!title) {
+//           return;
+//         }
+
+
+//         const details =
+//           prompt(
+//             "Enter event details (e.g., Auditorium · 10:00 AM):"
+//           ) ||
+//           "TBD";
+
+
+//         const day =
+//           prompt(
+//             "Enter day (DD):"
+//           ) ||
+//           "25";
+
+
+//         const month =
+//           prompt(
+//             "Enter month (MMM):"
+//           ) ||
+//           new Date()
+//             .toLocaleString(
+//               "en-US",
+//               {
+//                 month:
+//                   "short",
+//               }
+//             )
+//             .toUpperCase();
+
+
+//         const newEvent:
+//           EventItem = {
+
+//           id:
+//             Date.now()
+//               .toString(),
+
+//           month:
+//             month
+//               .toUpperCase(),
+
+//           day,
+
+//           title,
+
+//           details,
+
+//           type:
+//             Math.random() >
+//             0.5
+//               ? "primary"
+//               : "accent",
+//         };
+
+
+//         setEvents(
+//           (
+//             previous
+//           ) => [
+//             ...previous,
+//             newEvent,
+//           ]
+//         );
+//       };
+
+
+//     // ============================================
+//     // FILTER ACTIVITIES
+//     // ============================================
+
+//     const filteredActivities =
+//       useMemo(
+//         () => {
+
+//           const query =
+//             searchQuery
+//               .trim()
+//               .toLowerCase();
+
+
+//           if (!query) {
+//             return activities;
+//           }
+
+
+//           return activities.filter(
+//             (
+//               activity
+//             ) =>
+
+//               activity.title
+//                 .toLowerCase()
+//                 .includes(
+//                   query
+//                 ) ||
+
+//               activity.detail
+//                 .toLowerCase()
+//                 .includes(
+//                   query
+//                 )
+//           );
+
+//         },
+//         [
+//           activities,
+//           searchQuery,
+//         ]
+//       );
+
+
+//     // ============================================
+//     // LOADING STATE
+//     // ============================================
+
+//     if (
+//       loading &&
+//       !dashboard
+//     ) {
+
+//       return (
+//         <div
+//           className="
+//             flex
+//             min-h-[70vh]
+//             w-full
+//             items-center
+//             justify-center
+//             bg-[#F7F9FC]
+//           "
+//         >
+//           <div
+//             className="
+//               flex
+//               flex-col
+//               items-center
+//               gap-3
+//             "
+//           >
+//             <Icon
+//               icon="lucide:loader-2"
+//               className="
+//                 animate-spin
+//                 text-4xl
+//                 text-[#1F5FAE]
+//               "
+//             />
+
+//             <p
+//               className="
+//                 text-sm
+//                 font-medium
+//                 text-[#6B7280]
+//               "
+//             >
+//               Loading dashboard...
+//             </p>
+//           </div>
+//         </div>
+//       );
+//     }
+
+
+//     // ============================================
+//     // ERROR STATE
+//     // ============================================
+
+//     if (
+//       error &&
+//       !dashboard
+//     ) {
+
+//       return (
+//         <div
+//           className="
+//             flex
+//             min-h-[70vh]
+//             w-full
+//             items-center
+//             justify-center
+//             bg-[#F7F9FC]
+//             p-5
+//           "
+//         >
+//           <div
+//             className="
+//               w-full
+//               max-w-md
+//               rounded-xl
+//               border
+//               border-red-200
+//               bg-white
+//               p-6
+//               text-center
+//               shadow-sm
+//             "
+//           >
+//             <Icon
+//               icon="lucide:circle-alert"
+//               className="
+//                 mx-auto
+//                 text-4xl
+//                 text-red-500
+//               "
+//             />
+
+//             <h2
+//               className="
+//                 mt-3
+//                 text-lg
+//                 font-bold
+//                 text-[#15243B]
+//               "
+//             >
+//               Dashboard load nahi hua
+//             </h2>
+
+//             <p
+//               className="
+//                 mt-2
+//                 text-sm
+//                 text-[#6B7280]
+//               "
+//             >
+//               {error}
+//             </p>
+
+//             <button
+//               onClick={() =>
+//                 dispatch(
+//                   getSchoolAdminDashboard()
+//                 )
+//               }
+//               className="
+//                 mt-5
+//                 inline-flex
+//                 min-h-10
+//                 items-center
+//                 justify-center
+//                 rounded-lg
+//                 bg-[#1F5FAE]
+//                 px-4
+//                 text-sm
+//                 font-semibold
+//                 text-white
+//                 hover:bg-[#174d90]
+//               "
+//             >
+//               <Icon
+//                 icon="lucide:refresh-cw"
+//                 className="mr-2"
+//               />
+
+//               Retry
+//             </button>
+//           </div>
+//         </div>
+//       );
+//     }
+
+
+//     // ============================================
+//     // UI
+//     // ============================================
+
+//     return (
+//       <div
+//         className="
+//           w-full
+//           bg-[#F7F9FC]
+//         "
+//       >
+//         <div
+//           className="
+//             p-5
+//             lg:p-8
+//           "
+//         >
+
+//           {/* ============================================
+//               WELCOME SECTION
+//           ============================================ */}
+
+//           <section
+//             className="
+//               mb-7
+//               flex
+//               flex-col
+//               justify-between
+//               gap-4
+//               md:flex-row
+//               md:items-end
+//             "
+//           >
+
+//             <div>
+
+//               <p
+//                 className="
+//                   text-sm
+//                   font-semibold
+//                   text-[#1F5FAE]
+//                 "
+//               >
+//                 {todayDate}
+//               </p>
+
+
+//               <h1
+//                 className="
+//                   mt-1
+//                   text-2xl
+//                   font-bold
+//                   text-[#15243B]
+//                 "
+//               >
+//                 {greeting},{" "}
+
+//                 {dashboard
+//                   ?.admin
+//                   ?.name ??
+//                   "School Admin"}
+//               </h1>
+
+
+//               <p
+//                 className="
+//                   mt-1
+//                   text-sm
+//                   text-[#6B7280]
+//                 "
+//               >
+//                 Here is the operational
+//                 snapshot for{" "}
+
+//                 <span
+//                   className="
+//                     font-semibold
+//                     text-[#15243B]
+//                   "
+//                 >
+//                   {dashboard
+//                     ?.school
+//                     ?.name ??
+//                     "your school"}
+//                 </span>
+
+//                 .
+//               </p>
+
+
+//               {dashboard
+//                 ?.currentSession
+//                 ?.name && (
+
+//                 <p
+//                   className="
+//                     mt-1
+//                     text-xs
+//                     font-medium
+//                     text-[#6B7280]
+//                   "
+//                 >
+//                   Current Academic Session:{" "}
+
+//                   <span
+//                     className="
+//                       text-[#1F5FAE]
+//                     "
+//                   >
+//                     {
+//                       dashboard
+//                         .currentSession
+//                         .name
+//                     }
+//                   </span>
+//                 </p>
+//               )}
+
+//             </div>
+
+
+//             <div
+//               className="
+//                 flex
+//                 gap-3
+//               "
+//             >
+
+//               <button
+//                 onClick={
+//                   handleExportReport
+//                 }
+//                 disabled={
+//                   isExporting
+//                 }
+//                 className="
+//                   flex
+//                   min-h-11
+//                   items-center
+//                   justify-center
+//                   rounded-lg
+//                   border
+//                   border-[#E5E7EB]
+//                   bg-white
+//                   px-4
+//                   text-sm
+//                   font-semibold
+//                   text-[#15243B]
+//                   transition-all
+//                   hover:bg-[#F9FAFB]
+//                   disabled:opacity-50
+//                 "
+//               >
+
+//                 {isExporting ? (
+//                   <>
+//                     <Icon
+//                       icon="lucide:loader-2"
+//                       className="
+//                         mr-2
+//                         animate-spin
+//                         text-lg
+//                       "
+//                     />
+
+//                     Exporting...
+//                   </>
+//                 ) : (
+//                   <>
+//                     <Icon
+//                       icon="lucide:download"
+//                       className="
+//                         mr-2
+//                         text-lg
+//                       "
+//                     />
+
+//                     Export report
+//                   </>
+//                 )}
+
+//               </button>
+
+
+//               <button
+//                 onClick={
+//                   handleQuickActionClick
+//                 }
+//                 className="
+//                   flex
+//                   min-h-11
+//                   items-center
+//                   justify-center
+//                   rounded-lg
+//                   bg-[#1F5FAE]
+//                   px-4
+//                   text-sm
+//                   font-semibold
+//                   text-white
+//                   shadow-md
+//                   transition-all
+//                   hover:bg-[#1F5FAE]/90
+//                   hover:shadow-lg
+//                 "
+//               >
+//                 <Icon
+//                   icon="lucide:plus"
+//                   className="
+//                     mr-2
+//                     text-lg
+//                   "
+//                 />
+
+//                 Quick action
+//               </button>
+
+//             </div>
+//           </section>
+
+
+//           {/* ============================================
+//               STATS
+//           ============================================ */}
+
+//           <section
+//             className="
+//               grid
+//               grid-cols-1
+//               gap-4
+//               sm:grid-cols-2
+//               xl:grid-cols-4
+//             "
+//           >
+
+//             <StatCard
+//               icon="lucide:graduation-cap"
+//               trend={
+//                 totalStudents >
+//                 0
+//                   ? "Active"
+//                   : "Pending"
+//               }
+//               trendType={
+//                 totalStudents >
+//                 0
+//                   ? "positive"
+//                   : "neutral"
+//               }
+//               label="Total Students"
+//               value={
+//                 totalStudents
+//                   .toLocaleString(
+//                     "en-IN"
+//                   )
+//               }
+//               subtext={
+//                 totalStudents >
+//                 0
+//                   ? "Active enrolled students"
+//                   : "Student module integration pending"
+//               }
+//             />
+
+
+//             <StatCard
+//               icon="lucide:school"
+//               trend="Active"
+//               trendType="positive"
+//               label="Total Teachers"
+//               value={
+//                 totalTeachers
+//                   .toLocaleString(
+//                     "en-IN"
+//                   )
+//               }
+//               subtext="Active teachers in school"
+//             />
+
+
+//             <StatCard
+//               icon="lucide:briefcase-business"
+//               trend={
+//                 totalStaff >
+//                 0
+//                   ? "Active"
+//                   : "Pending"
+//               }
+//               trendType="neutral"
+//               label="Total Staff"
+//               value={
+//                 totalStaff
+//                   .toLocaleString(
+//                     "en-IN"
+//                   )
+//               }
+//               subtext={
+//                 totalStaff >
+//                 0
+//                   ? "Administration & support"
+//                   : "Staff module integration pending"
+//               }
+//             />
+
+
+//             <StatCard
+//               icon="lucide:building-2"
+//               trend={
+//                 dashboard
+//                   ?.currentSession
+//                   ?.name ??
+//                 "Current"
+//               }
+//               trendType="neutral"
+//               label="Total Classes"
+//               value={
+//                 totalClasses
+//                   .toLocaleString(
+//                     "en-IN"
+//                   )
+//               }
+//               subtext="Active classes in current session"
+//             />
+
+
+//             <StatCard
+//               icon="lucide:calendar-check"
+//               trend={`${attendancePercentage}%`}
+//               trendType={
+//                 attendancePercentage >=
+//                 75
+//                   ? "positive"
+//                   : "accent"
+//               }
+//               label="Today’s Attendance"
+//               value={
+//                 present
+//                   .toLocaleString(
+//                     "en-IN"
+//                   )
+//               }
+//               subtext={
+//                 `${totalAttendanceMarked.toLocaleString(
+//                   "en-IN"
+//                 )} attendance records marked today`
+//               }
+//             />
+
+
+//             <StatCard
+//               icon="lucide:receipt-text"
+//               trend="Pending"
+//               trendType="accent"
+//               label="Pending Fees"
+//               value={
+//                 pendingFees >
+//                 0
+//                   ? `₹${pendingFees.toLocaleString(
+//                       "en-IN"
+//                     )}`
+//                   : "₹0"
+//               }
+//               subtext="Fees module integration pending"
+//             />
+
+
+//             <StatCard
+//               icon="lucide:clipboard-pen-line"
+//               trend={
+//                 upcomingExams >
+//                 0
+//                   ? "Scheduled"
+//                   : "Pending"
+//               }
+//               trendType="neutral"
+//               label="Upcoming Exams"
+//               value={
+//                 upcomingExams
+//                   .toLocaleString(
+//                     "en-IN"
+//                   )
+//               }
+//               subtext="Examination module integration pending"
+//             />
+
+
+//             <StatCard
+//               icon="lucide:book-marked"
+//               trend={
+//                 pendingHomework >
+//                 0
+//                   ? "Published"
+//                   : "Clear"
+//               }
+//               trendType={
+//                 pendingHomework >
+//                 0
+//                   ? "neutral"
+//                   : "positive"
+//               }
+//               label="Pending Homework"
+//               value={
+//                 pendingHomework
+//                   .toLocaleString(
+//                     "en-IN"
+//                   )
+//               }
+//               subtext="Published homework currently pending"
+//             />
+
+//           </section>
+
+
+//           {/* ============================================
+//               STUDENTS + ATTENDANCE
+//           ============================================ */}
+
+//           <section
+//             className="
+//               mt-7
+//               grid
+//               grid-cols-1
+//               gap-6
+//               xl:grid-cols-3
+//             "
+//           >
+
+//             <StudentStats
+//               selectedYear={
+//                 selectedAcademicYear
+//               }
+//               onYearChange={
+//                 handleAcademicYearSelect
+//               }
+//             />
+
+
+//             <AttendanceOverview
+//               present={
+//                 present
+//               }
+//               absent={
+//                 absent
+//               }
+//               onLeave={
+//                 leave +
+//                 halfDay
+//               }
+//             />
+
+//           </section>
+
+
+//           {/* ============================================
+//               FEES + EVENTS
+//           ============================================ */}
+
+//           <section
+//             className="
+//               mt-7
+//               grid
+//               grid-cols-1
+//               gap-6
+//               xl:grid-cols-3
+//             "
+//           >
+
+//             <FeeOverview
+//               total="₹0"
+//               collected="₹0"
+//               pending={
+//                 pendingFees >
+//                 0
+//                   ? `₹${pendingFees.toLocaleString(
+//                       "en-IN"
+//                     )}`
+//                   : "₹0"
+//               }
+//               percentage={
+//                 0
+//               }
+//             />
+
+
+//             <UpcomingEvents
+//               events={
+//                 events
+//               }
+//               onAddEvent={
+//                 handleAddEvent
+//               }
+//             />
+
+//           </section>
+
+
+//           {/* ============================================
+//               ACTIVITIES + NOTICES
+//           ============================================ */}
+
+//           <section
+//             className="
+//               mt-7
+//               grid
+//               grid-cols-1
+//               gap-6
+//               xl:grid-cols-5
+//             "
+//           >
+
+//             <RecentActivities
+//               activities={
+//                 filteredActivities
+//               }
+//               onViewAll={() =>
+//                 alert(
+//                   "Activity log module will be connected later."
+//                 )
+//               }
+//             />
+
+
+//             <ImportantNotices
+//               notices={
+//                 notices
+//               }
+//             />
+
+//           </section>
+
+//         </div>
+
+
+//         {/* ============================================
+//             QUICK ACTION MODAL
+//         ============================================ */}
+
+//         <QuickActionModal
+//           isOpen={
+//             isQuickActionModalOpen
+//           }
+
+//           onClose={() =>
+//             setIsQuickActionModalOpen(
+//               false
+//             )
+//           }
+
+//           onSubmit={
+//             handleQuickActionSubmit
+//           }
+//         />
+
+//       </div>
+//     );
+//   };
+
+
+// export default SchoolAdminDashboard;
+
+
+
+
+
+
+
+
+// Dashboard.tsx
+
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
+import {
+  Icon,
+} from "@iconify/react";
+
+import {
+  useDispatch,
+  useSelector,
+} from "react-redux";
+
+// import type {
+//   AppDispatch,
+//   RootState,
+// } from "../../../store/store";
+
+
+
+
+
+
+
+import StatCard from "./StatCard";
+
+import StudentStats from "./StudentStatus";
+
+import AttendanceOverview from "./AttendanceOverviewProps";
+
+import FeeOverview from "./FeeOverview";
+
+import UpcomingEvents from "./UpcomingOverview";
+
+import RecentActivities from "./RecentActivities";
+
+import ImportantNotices from "./ImportantNotices";
+
+import QuickActionModal from "./QuickActionModel";
+import type { RootState,AppDispatch } from "../../app/store";
+import {
+  clearSchoolAdminDashboard,
+  getSchoolAdminDashboard,
+} from "../../features/schoolAdminDashboard/schoolAdminDashboard.slice";
+
+
+// ============================================
+// TYPES
+// ============================================
+
 interface EventItem {
   id: string;
+
   month: string;
+
   day: string;
+
   title: string;
+
   details: string;
-  type: 'primary' | 'accent';
+
+  type:
+    | "primary"
+    | "accent";
 }
+
 
 interface ActivityItem {
   id: string;
-  type: 'admission' | 'fee' | 'teacher' | 'homework';
+
+  type:
+    | "admission"
+    | "fee"
+    | "teacher"
+    | "homework";
+
   title: string;
+
   detail: string;
+
   time: string;
 }
 
+
 interface NoticeItem {
   id: string;
+
   title: string;
+
   tag: string;
-  tagType: 'action' | 'academic' | 'tomorrow';
+
+  tagType:
+    | "action"
+    | "academic"
+    | "tomorrow";
+
   content: string;
 }
 
-const SchoolAdminDashboard: React.FC = () => {
-  // State variables
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedAcademicYear, setSelectedAcademicYear] = useState('2025–26');
-  const [isQuickActionModalOpen, setIsQuickActionModalOpen] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
 
-  // Dynamic Data States
-  const [activities, setActivities] = useState<ActivityItem[]>([
-    {
-      id: '1',
-      type: 'admission',
-      title: 'Student admission',
-      detail: 'Aarav Sharma admitted to Class 4B',
-      time: '15 min ago',
-    },
-    {
-      id: '2',
-      type: 'fee',
-      title: 'Fee payment',
-      detail: '₹32,500 received from N. Iyer, Class 8A',
-      time: '42 min ago',
-    },
-    {
-      id: '3',
-      type: 'teacher',
-      title: 'Teacher addition',
-      detail: 'Kavita Rao joined Mathematics Department',
-      time: '1 hr ago',
-    },
-    {
-      id: '4',
-      type: 'homework',
-      title: 'Homework posted',
-      detail: 'Science worksheet assigned to Class 7C',
-      time: '2 hrs ago',
-    },
-  ]);
+// ============================================
+// COMPONENT
+// ============================================
 
-  const [events, setEvents] = useState<EventItem[]>([
-    {
-      id: '1',
-      month: 'FEB',
-      day: '18',
-      title: 'Inter-house Debate Finals',
-      details: 'Auditorium · 10:30 AM',
-      type: 'primary',
-    },
-    {
-      id: '2',
-      month: 'FEB',
-      day: '21',
-      title: 'Parent–Teacher Conference',
-      details: 'Senior Block · 9:00 AM',
-      type: 'accent',
-    },
-    {
-      id: '3',
-      month: 'FEB',
-      day: '24',
-      title: 'Term 2 Examination Begins',
-      details: 'Classes 6–12 · 8:30 AM',
-      type: 'primary',
-    },
-  ]);
+const SchoolAdminDashboard:
+  React.FC = () => {
 
-  const [notices, setNotices] = useState<NoticeItem[]>([
-    {
-      id: '1',
-      title: 'Transport route update',
-      tag: 'Action needed',
-      tagType: 'action',
-      content: 'Route 3 pickup timing changes take effect Wednesday, 18 February.',
-    },
-    {
-      id: '2',
-      title: 'Exam timetable published',
-      tag: 'Academic',
-      tagType: 'academic',
-      content: 'Term 2 schedule for Classes 6–12 has been shared with families.',
-    },
-    {
-      id: '3',
-      title: 'Staff briefing',
-      tag: 'Tomorrow',
-      tagType: 'tomorrow',
-      content: 'Department heads meet in the conference room at 3:30 PM.',
-    },
-  ]);
+    const dispatch =
+      useDispatch<AppDispatch>();
 
-  // Event Handlers
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value);
 
-  const handleExportReport = () => {
-    setIsExporting(true);
-    setTimeout(() => {
-      setIsExporting(false);
-      alert('Operational snapshot report exported successfully as PDF!');
-    }, 1500);
-  };
+    // ============================================
+    // REDUX DASHBOARD DATA
+    // ============================================
 
-  const handleQuickActionClick = () => {
-    setIsQuickActionModalOpen(true);
-  };
+    const {
+      dashboard,
+      loading,
+      error,
+    } = useSelector(
+      (
+        state: RootState
+      ) =>
+        state.schoolAdminDashboard
+    );
 
-  const handleAcademicYearSelect = (year: string) => {
-    setSelectedAcademicYear(year);
-  };
 
-  const handleQuickActionSubmit = (data: { type: string; title: string; detail: string }) => {
-    const newActivity: ActivityItem = {
-      id: Date.now().toString(),
-      type: data.type as any,
-      title: data.title,
-      detail: data.detail,
-      time: 'Just now',
-    };
-    setActivities([newActivity, ...activities]);
-  };
+    const selectedSessionId =
+      useSelector(
+        (
+          state: RootState
+        ) =>
+          state.sessionSelection
+            .selectedSessionId
+      );
 
-  const handleAddEvent = () => {
-    const title = prompt('Enter event title:');
-    if (!title) return;
-    const details = prompt('Enter event details (e.g., Auditorium · 10:00 AM):') || 'TBD';
-    const day = prompt('Enter day (DD):') || '25';
-    const month = prompt('Enter month (MMM):') || 'FEB';
 
-    const newEvent: EventItem = {
-      id: Date.now().toString(),
-      month: month.toUpperCase(),
-      day,
-      title,
-      details,
-      type: Math.random() > 0.5 ? 'primary' : 'accent',
-    };
-    setEvents([...events, newEvent]);
-  };
+    // ============================================
+    // LOCAL STATES
+    // ============================================
 
-  // Filter activities based on search query
-  const filteredActivities = activities.filter(
-    (act) =>
-      act.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      act.detail.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+    const [
+      searchQuery,
+    ] = useState("");
 
-  return (
-    <div className="w-full bg-[#F7F9FC]">
-      <div className="p-5 lg:p-8">
-        {/* Welcome & Action Section */}
-        <section className="mb-7 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-          <div>
-            <p className="text-sm font-semibold text-[#1F5FAE]">Monday, 16 February 2026</p>
-            <h1 className="mt-1 text-2xl font-bold text-[#15243B]">Good morning, Dr. Mehta</h1>
-            <p className="mt-1 text-sm text-[#6B7280]">Here is the operational snapshot for Riverside Academy.</p>
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={handleExportReport}
-              disabled={isExporting}
-              className="flex min-h-11 items-center justify-center rounded-lg border border-[#E5E7EB] bg-white px-4 text-sm font-semibold text-[#15243B] hover:bg-[#F9FAFB] disabled:opacity-50 transition-all"
+
+    const [
+      isQuickActionModalOpen,
+      setIsQuickActionModalOpen,
+    ] = useState(false);
+
+
+    const [
+      isExporting,
+      setIsExporting,
+    ] = useState(false);
+
+
+    // ============================================
+    // TEMPORARY ACTIVITY DATA
+    //
+    // Activity API abhi nahi bani hai.
+    // Isko later real activity log API se replace karenge.
+    // ============================================
+
+    const [
+      activities,
+      setActivities,
+    ] = useState<ActivityItem[]>([
+      {
+        id: "1",
+
+        type:
+          "teacher",
+
+        title:
+          "Teacher management",
+
+        detail:
+          "Teacher activity will appear here",
+
+        time:
+          "Recently",
+      },
+
+      {
+        id: "2",
+
+        type:
+          "homework",
+
+        title:
+          "Homework management",
+
+        detail:
+          "Published homework activity will appear here",
+
+        time:
+          "Recently",
+      },
+    ]);
+
+
+    // ============================================
+    // TEMPORARY EVENTS
+    //
+    // Event module abhi available nahi hai.
+    // ============================================
+
+    const [
+      events,
+      setEvents,
+    ] = useState<EventItem[]>([]);
+
+
+    // ============================================
+    // TEMPORARY NOTICES
+    //
+    // Notice module complete hone ke baad
+    // API se load karenge.
+    // ============================================
+
+    const [
+      notices,
+    ] = useState<NoticeItem[]>([]);
+
+
+    // ============================================
+    // FETCH DASHBOARD
+    // ============================================
+
+    useEffect(() => {
+
+      if (!selectedSessionId) {
+
+        dispatch(
+          clearSchoolAdminDashboard()
+        );
+
+        return;
+      }
+
+      dispatch(
+        getSchoolAdminDashboard(
+          selectedSessionId
+        )
+      );
+
+    }, [
+      dispatch,
+      selectedSessionId,
+    ]);
+
+
+    // ============================================
+    // DATE
+    // ============================================
+
+    const todayDate =
+      useMemo(
+        () => {
+
+          return new Date()
+            .toLocaleDateString(
+              "en-IN",
+              {
+                weekday:
+                  "long",
+
+                day:
+                  "numeric",
+
+                month:
+                  "long",
+
+                year:
+                  "numeric",
+              }
+            );
+
+        },
+        []
+      );
+
+
+    // ============================================
+    // GREETING
+    // ============================================
+
+    const greeting =
+      useMemo(
+        () => {
+
+          const hour =
+            new Date()
+              .getHours();
+
+
+          if (
+            hour <
+            12
+          ) {
+
+            return "Good morning";
+
+          }
+
+
+          if (
+            hour <
+            17
+          ) {
+
+            return "Good afternoon";
+
+          }
+
+
+          return "Good evening";
+
+        },
+        []
+      );
+
+
+    // ============================================
+    // DASHBOARD VALUES
+    // ============================================
+
+    const statistics =
+      dashboard
+        ?.statistics;
+
+
+    const attendance =
+      statistics
+        ?.attendance;
+
+
+    const totalStudents =
+      statistics
+        ?.totalStudents ??
+      0;
+
+
+    const totalTeachers =
+      statistics
+        ?.totalTeachers ??
+      0;
+
+
+    const totalStaff =
+      statistics
+        ?.totalStaff ??
+      0;
+
+
+    const totalClasses =
+      statistics
+        ?.totalClasses ??
+      0;
+
+
+    const present =
+      attendance
+        ?.present ??
+      0;
+
+
+    const absent =
+      attendance
+        ?.absent ??
+      0;
+
+
+    const leave =
+      attendance
+        ?.leave ??
+      0;
+
+
+    const halfDay =
+      attendance
+        ?.halfDay ??
+      0;
+
+
+    const totalAttendanceMarked =
+      attendance
+        ?.totalMarked ??
+      0;
+
+
+    const attendancePercentage =
+      attendance
+        ?.percentage ??
+      0;
+
+
+    const pendingHomework =
+      statistics
+        ?.pendingHomework ??
+      0;
+
+
+    const pendingFees =
+      statistics
+        ?.pendingFees ??
+      0;
+
+
+    const upcomingExams =
+      statistics
+        ?.upcomingExams ??
+      0;
+
+
+    // ============================================
+    // HANDLERS
+    // ============================================
+
+    const handleExportReport =
+      () => {
+
+        setIsExporting(
+          true
+        );
+
+
+        setTimeout(
+          () => {
+
+            setIsExporting(
+              false
+            );
+
+
+            alert(
+              "Operational snapshot report export will be connected later."
+            );
+
+          },
+          1000
+        );
+      };
+
+
+    const handleQuickActionClick =
+      () => {
+
+        setIsQuickActionModalOpen(
+          true
+        );
+      };
+
+
+    const handleQuickActionSubmit =
+      (
+        data: {
+          type:
+            string;
+
+          title:
+            string;
+
+          detail:
+            string;
+        }
+      ) => {
+
+        const allowedTypes:
+          ActivityItem["type"][] = [
+            "admission",
+            "fee",
+            "teacher",
+            "homework",
+          ];
+
+
+        const activityType:
+          ActivityItem["type"] =
+          allowedTypes.includes(
+            data.type as ActivityItem["type"]
+          )
+            ? (
+                data.type as ActivityItem["type"]
+              )
+            : "homework";
+
+
+        const newActivity:
+          ActivityItem = {
+
+          id:
+            Date.now()
+              .toString(),
+
+          type:
+            activityType,
+
+          title:
+            data.title,
+
+          detail:
+            data.detail,
+
+          time:
+            "Just now",
+        };
+
+
+        setActivities(
+          (
+            previous
+          ) => [
+            newActivity,
+            ...previous,
+          ]
+        );
+      };
+
+
+    const handleAddEvent =
+      () => {
+
+        const title =
+          prompt(
+            "Enter event title:"
+          );
+
+
+        if (!title) {
+          return;
+        }
+
+
+        const details =
+          prompt(
+            "Enter event details (e.g., Auditorium · 10:00 AM):"
+          ) ||
+          "TBD";
+
+
+        const day =
+          prompt(
+            "Enter day (DD):"
+          ) ||
+          "25";
+
+
+        const month =
+          prompt(
+            "Enter month (MMM):"
+          ) ||
+          new Date()
+            .toLocaleString(
+              "en-US",
+              {
+                month:
+                  "short",
+              }
+            )
+            .toUpperCase();
+
+
+        const newEvent:
+          EventItem = {
+
+          id:
+            Date.now()
+              .toString(),
+
+          month:
+            month
+              .toUpperCase(),
+
+          day,
+
+          title,
+
+          details,
+
+          type:
+            Math.random() >
+            0.5
+              ? "primary"
+              : "accent",
+        };
+
+
+        setEvents(
+          (
+            previous
+          ) => [
+            ...previous,
+            newEvent,
+          ]
+        );
+      };
+
+
+    // ============================================
+    // FILTER ACTIVITIES
+    // ============================================
+
+    const filteredActivities =
+      useMemo(
+        () => {
+
+          const query =
+            searchQuery
+              .trim()
+              .toLowerCase();
+
+
+          if (!query) {
+            return activities;
+          }
+
+
+          return activities.filter(
+            (
+              activity
+            ) =>
+
+              activity.title
+                .toLowerCase()
+                .includes(
+                  query
+                ) ||
+
+              activity.detail
+                .toLowerCase()
+                .includes(
+                  query
+                )
+          );
+
+        },
+        [
+          activities,
+          searchQuery,
+        ]
+      );
+
+
+    // ============================================
+    // LOADING STATE
+    // ============================================
+
+    if (
+      loading &&
+      !dashboard
+    ) {
+
+      return (
+        <div
+          className="
+            flex
+            min-h-[70vh]
+            w-full
+            items-center
+            justify-center
+            bg-[#F7F9FC]
+          "
+        >
+          <div
+            className="
+              flex
+              flex-col
+              items-center
+              gap-3
+            "
+          >
+            <Icon
+              icon="lucide:loader-2"
+              className="
+                animate-spin
+                text-4xl
+                text-[#1F5FAE]
+              "
+            />
+
+            <p
+              className="
+                text-sm
+                font-medium
+                text-[#6B7280]
+              "
             >
-              {isExporting ? (
-                <>
-                  <Icon icon="lucide:loader-2" className="mr-2 text-lg animate-spin" />
-                  Exporting...
-                </>
-              ) : (
-                <>
-                  <Icon icon="lucide:download" className="mr-2 text-lg" />
-                  Export report
-                </>
+              Loading dashboard...
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+
+    // ============================================
+    // ERROR STATE
+    // ============================================
+
+    if (
+      error &&
+      !dashboard
+    ) {
+
+      return (
+        <div
+          className="
+            flex
+            min-h-[70vh]
+            w-full
+            items-center
+            justify-center
+            bg-[#F7F9FC]
+            p-5
+          "
+        >
+          <div
+            className="
+              w-full
+              max-w-md
+              rounded-xl
+              border
+              border-red-200
+              bg-white
+              p-6
+              text-center
+              shadow-sm
+            "
+          >
+            <Icon
+              icon="lucide:circle-alert"
+              className="
+                mx-auto
+                text-4xl
+                text-red-500
+              "
+            />
+
+            <h2
+              className="
+                mt-3
+                text-lg
+                font-bold
+                text-[#15243B]
+              "
+            >
+              Dashboard load nahi hua
+            </h2>
+
+            <p
+              className="
+                mt-2
+                text-sm
+                text-[#6B7280]
+              "
+            >
+              {error}
+            </p>
+
+            <button
+              onClick={() => {
+                if (
+                  selectedSessionId
+                ) {
+                  dispatch(
+                    getSchoolAdminDashboard(
+                      selectedSessionId
+                    )
+                  );
+                }
+              }}
+              className="
+                mt-5
+                inline-flex
+                min-h-10
+                items-center
+                justify-center
+                rounded-lg
+                bg-[#1F5FAE]
+                px-4
+                text-sm
+                font-semibold
+                text-white
+                hover:bg-[#174d90]
+              "
+            >
+              <Icon
+                icon="lucide:refresh-cw"
+                className="mr-2"
+              />
+
+              Retry
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+
+    // ============================================
+    // UI
+    // ============================================
+
+    return (
+      <div
+        className="
+          w-full
+          bg-[#F7F9FC]
+        "
+      >
+        <div
+          className="
+            p-5
+            lg:p-8
+          "
+        >
+
+          {/* ============================================
+              WELCOME SECTION
+          ============================================ */}
+
+          <section
+            className="
+              mb-7
+              flex
+              flex-col
+              justify-between
+              gap-4
+              md:flex-row
+              md:items-end
+            "
+          >
+
+            <div>
+
+              <p
+                className="
+                  text-sm
+                  font-semibold
+                  text-[#1F5FAE]
+                "
+              >
+                {todayDate}
+              </p>
+
+
+              <h1
+                className="
+                  mt-1
+                  text-2xl
+                  font-bold
+                  text-[#15243B]
+                "
+              >
+                {greeting},{" "}
+
+                {dashboard
+                  ?.admin
+                  ?.name ??
+                  "School Admin"}
+              </h1>
+
+
+              <p
+                className="
+                  mt-1
+                  text-sm
+                  text-[#6B7280]
+                "
+              >
+                Here is the operational
+                snapshot for{" "}
+
+                <span
+                  className="
+                    font-semibold
+                    text-[#15243B]
+                  "
+                >
+                  {dashboard
+                    ?.school
+                    ?.name ??
+                    "your school"}
+                </span>
+
+                .
+              </p>
+
+
+              {dashboard
+                ?.currentSession
+                ?.name && (
+
+                <p
+                  className="
+                    mt-1
+                    text-xs
+                    font-medium
+                    text-[#6B7280]
+                  "
+                >
+                  Current Academic Session:{" "}
+
+                  <span
+                    className="
+                      text-[#1F5FAE]
+                    "
+                  >
+                    {
+                      dashboard
+                        .currentSession
+                        .name
+                    }
+                  </span>
+                </p>
               )}
-            </button>
-            <button
-              onClick={handleQuickActionClick}
-              className="flex min-h-11 items-center justify-center rounded-lg bg-[#1F5FAE] px-4 text-sm font-semibold text-white shadow-md hover:bg-[#1F5FAE]/90 transition-all hover:shadow-lg"
+
+            </div>
+
+
+            <div
+              className="
+                flex
+                gap-3
+              "
             >
-              <Icon icon="lucide:plus" className="mr-2 text-lg" />
-              Quick action
-            </button>
-          </div>
-        </section>
 
-        {/* Stats Grid */}
-        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <StatCard
-            icon="lucide:graduation-cap"
-            trend="+4.8%"
-            trendType="positive"
-            label="Total Students"
-            value="1,248"
-            subtext="57 new admissions this term"
-          />
-          <StatCard
-            icon="lucide:school"
-            trend="Active"
-            trendType="positive"
-            label="Total Teachers"
-            value="86"
-            subtext="4 joining this month"
-          />
-          <StatCard
-            icon="lucide:briefcase-business"
-            trend="+2"
-            trendType="neutral"
-            label="Total Staff"
-            value="42"
-            subtext="Administration & support"
-          />
-          <StatCard
-            icon="lucide:building-2"
-            trend="1–12"
-            trendType="neutral"
-            label="Total Classes"
-            value="48"
-            subtext="Across 12 grade levels"
-          />
-          <StatCard
-            icon="lucide:calendar-check"
-            trend="94.2%"
-            trendType="positive"
-            label="Today’s Attendance"
-            value="1,176"
-            subtext="Of 1,248 enrolled students"
-          />
-          <StatCard
-            icon="lucide:receipt-text"
-            trend="Review"
-            trendType="accent"
-            label="Pending Fees"
-            value="₹8.46L"
-            subtext="118 family accounts pending"
-          />
-          <StatCard
-            icon="lucide:clipboard-pen-line"
-            trend="4 scheduled"
-            trendType="positive"
-            label="Upcoming Exams"
-            value="12"
-            subtext="Beginning 24 February"
-          />
-          <StatCard
-            icon="lucide:book-marked"
-            trend="7 classes"
-            trendType="neutral"
-            label="Pending Homework"
-            value="31"
-            subtext="Submissions due today"
-          />
-        </section>
+              <button
+                onClick={
+                  handleExportReport
+                }
+                disabled={
+                  isExporting
+                }
+                className="
+                  flex
+                  min-h-11
+                  items-center
+                  justify-center
+                  rounded-lg
+                  border
+                  border-[#E5E7EB]
+                  bg-white
+                  px-4
+                  text-sm
+                  font-semibold
+                  text-[#15243B]
+                  transition-all
+                  hover:bg-[#F9FAFB]
+                  disabled:opacity-50
+                "
+              >
 
-        {/* Charts & Attendance Section */}
-        <section className="mt-7 grid grid-cols-1 gap-6 xl:grid-cols-3">
-          <StudentStats
-            selectedYear={selectedAcademicYear}
-            onYearChange={handleAcademicYearSelect}
-          />
-          <AttendanceOverview
-            present={1176}
-            absent={52}
-            onLeave={20}
-          />
-        </section>
+                {isExporting ? (
+                  <>
+                    <Icon
+                      icon="lucide:loader-2"
+                      className="
+                        mr-2
+                        animate-spin
+                        text-lg
+                      "
+                    />
 
-        {/* Fees & Events Section */}
-        <section className="mt-7 grid grid-cols-1 gap-6 xl:grid-cols-3">
-          <FeeOverview
-            total="₹42.80L"
-            collected="₹34.34L"
-            pending="₹8.46L"
-            percentage={80.2}
-          />
-          <UpcomingEvents
-            events={events}
-            onAddEvent={handleAddEvent}
-          />
-        </section>
+                    Exporting...
+                  </>
+                ) : (
+                  <>
+                    <Icon
+                      icon="lucide:download"
+                      className="
+                        mr-2
+                        text-lg
+                      "
+                    />
 
-        {/* Activities & Notices Section */}
-        <section className="mt-7 grid grid-cols-1 gap-6 xl:grid-cols-5">
-          <RecentActivities
-            activities={filteredActivities}
-            onViewAll={() => alert('Navigating to all activities...')}
-          />
-          <ImportantNotices
-            notices={notices}
-          />
-        </section>
+                    Export report
+                  </>
+                )}
+
+              </button>
+
+
+              <button
+                onClick={
+                  handleQuickActionClick
+                }
+                className="
+                  flex
+                  min-h-11
+                  items-center
+                  justify-center
+                  rounded-lg
+                  bg-[#1F5FAE]
+                  px-4
+                  text-sm
+                  font-semibold
+                  text-white
+                  shadow-md
+                  transition-all
+                  hover:bg-[#1F5FAE]/90
+                  hover:shadow-lg
+                "
+              >
+                <Icon
+                  icon="lucide:plus"
+                  className="
+                    mr-2
+                    text-lg
+                  "
+                />
+
+                Quick action
+              </button>
+
+            </div>
+          </section>
+
+
+          {/* ============================================
+              STATS
+          ============================================ */}
+
+          <section
+            className="
+              grid
+              grid-cols-1
+              gap-4
+              sm:grid-cols-2
+              xl:grid-cols-4
+            "
+          >
+
+            <StatCard
+              icon="lucide:graduation-cap"
+              trend={
+                totalStudents >
+                0
+                  ? "Active"
+                  : "Pending"
+              }
+              trendType={
+                totalStudents >
+                0
+                  ? "positive"
+                  : "neutral"
+              }
+              label="Total Students"
+              value={
+                totalStudents
+                  .toLocaleString(
+                    "en-IN"
+                  )
+              }
+              subtext={
+                totalStudents >
+                0
+                  ? "Active enrolled students"
+                  : "Student module integration pending"
+              }
+            />
+
+
+            <StatCard
+              icon="lucide:school"
+              trend="Active"
+              trendType="positive"
+              label="Total Teachers"
+              value={
+                totalTeachers
+                  .toLocaleString(
+                    "en-IN"
+                  )
+              }
+              subtext="Active teachers in school"
+            />
+
+
+            <StatCard
+              icon="lucide:briefcase-business"
+              trend={
+                totalStaff >
+                0
+                  ? "Active"
+                  : "Pending"
+              }
+              trendType="neutral"
+              label="Total Staff"
+              value={
+                totalStaff
+                  .toLocaleString(
+                    "en-IN"
+                  )
+              }
+              subtext={
+                totalStaff >
+                0
+                  ? "Administration & support"
+                  : "Staff module integration pending"
+              }
+            />
+
+
+            <StatCard
+              icon="lucide:building-2"
+              trend={
+                dashboard
+                  ?.currentSession
+                  ?.name ??
+                "Current"
+              }
+              trendType="neutral"
+              label="Total Classes"
+              value={
+                totalClasses
+                  .toLocaleString(
+                    "en-IN"
+                  )
+              }
+              subtext="Active classes in current session"
+            />
+
+
+            <StatCard
+              icon="lucide:calendar-check"
+              trend={`${attendancePercentage}%`}
+              trendType={
+                attendancePercentage >=
+                75
+                  ? "positive"
+                  : "accent"
+              }
+              label="Today’s Attendance"
+              value={
+                present
+                  .toLocaleString(
+                    "en-IN"
+                  )
+              }
+              subtext={
+                `${totalAttendanceMarked.toLocaleString(
+                  "en-IN"
+                )} attendance records marked today`
+              }
+            />
+
+
+            <StatCard
+              icon="lucide:receipt-text"
+              trend="Pending"
+              trendType="accent"
+              label="Pending Fees"
+              value={
+                pendingFees >
+                0
+                  ? `₹${pendingFees.toLocaleString(
+                      "en-IN"
+                    )}`
+                  : "₹0"
+              }
+              subtext="Fees module integration pending"
+            />
+
+
+            <StatCard
+              icon="lucide:clipboard-pen-line"
+              trend={
+                upcomingExams >
+                0
+                  ? "Scheduled"
+                  : "Pending"
+              }
+              trendType="neutral"
+              label="Upcoming Exams"
+              value={
+                upcomingExams
+                  .toLocaleString(
+                    "en-IN"
+                  )
+              }
+              subtext="Examination module integration pending"
+            />
+
+
+            <StatCard
+              icon="lucide:book-marked"
+              trend={
+                pendingHomework >
+                0
+                  ? "Published"
+                  : "Clear"
+              }
+              trendType={
+                pendingHomework >
+                0
+                  ? "neutral"
+                  : "positive"
+              }
+              label="Pending Homework"
+              value={
+                pendingHomework
+                  .toLocaleString(
+                    "en-IN"
+                  )
+              }
+              subtext="Published homework currently pending"
+            />
+
+          </section>
+
+
+          {/* ============================================
+              STUDENTS + ATTENDANCE
+          ============================================ */}
+
+          <section
+            className="
+              mt-7
+              grid
+              grid-cols-1
+              gap-6
+              xl:grid-cols-3
+            "
+          >
+
+            <StudentStats
+              sessionName={
+                dashboard
+                  ?.currentSession
+                  ?.name ??
+                ""
+              }
+              totalStudents={
+                totalStudents
+              }
+              maleStudents={
+                statistics
+                  ?.studentStatistics
+                  ?.male ??
+                0
+              }
+              femaleStudents={
+                statistics
+                  ?.studentStatistics
+                  ?.female ??
+                0
+              }
+              classWiseStudents={
+                statistics
+                  ?.studentStatistics
+                  ?.classWise ??
+                []
+              }
+            />
+
+
+            <AttendanceOverview
+              present={
+                present
+              }
+              absent={
+                absent
+              }
+              onLeave={
+                leave +
+                halfDay
+              }
+            />
+
+          </section>
+
+
+          {/* ============================================
+              FEES + EVENTS
+          ============================================ */}
+
+          <section
+            className="
+              mt-7
+              grid
+              grid-cols-1
+              gap-6
+              xl:grid-cols-3
+            "
+          >
+
+            <FeeOverview
+              total="₹0"
+              collected="₹0"
+              pending={
+                pendingFees >
+                0
+                  ? `₹${pendingFees.toLocaleString(
+                      "en-IN"
+                    )}`
+                  : "₹0"
+              }
+              percentage={
+                0
+              }
+            />
+
+
+            <UpcomingEvents
+              events={
+                events
+              }
+              onAddEvent={
+                handleAddEvent
+              }
+            />
+
+          </section>
+
+
+          {/* ============================================
+              ACTIVITIES + NOTICES
+          ============================================ */}
+
+          <section
+            className="
+              mt-7
+              grid
+              grid-cols-1
+              gap-6
+              xl:grid-cols-5
+            "
+          >
+
+            <RecentActivities
+              activities={
+                filteredActivities
+              }
+              onViewAll={() =>
+                alert(
+                  "Activity log module will be connected later."
+                )
+              }
+            />
+
+
+            <ImportantNotices
+              notices={
+                notices
+              }
+            />
+
+          </section>
+
+        </div>
+
+
+        {/* ============================================
+            QUICK ACTION MODAL
+        ============================================ */}
+
+        <QuickActionModal
+          isOpen={
+            isQuickActionModalOpen
+          }
+
+          onClose={() =>
+            setIsQuickActionModalOpen(
+              false
+            )
+          }
+
+          onSubmit={
+            handleQuickActionSubmit
+          }
+        />
+
       </div>
+    );
+  };
 
-      {/* Quick Action Modal */}
-      <QuickActionModal
-        isOpen={isQuickActionModalOpen}
-        onClose={() => setIsQuickActionModalOpen(false)}
-        onSubmit={handleQuickActionSubmit}
-      />
-    </div>
-  );
-};
 
 export default SchoolAdminDashboard;

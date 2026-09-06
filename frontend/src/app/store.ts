@@ -7,17 +7,74 @@ import schoolAdminReducer
   from "../features/schoolAdmins/schoolAdmin.slice";
   import sessionReducer
   from "../features/academic/sessions/session.slice";
+  import classReducer from '../features/academic/classes/class.slice';
+import sectionReducer
+  from "../features/academic/sections/section.slice";
+
+import subjectReducer
+  from "../features/academic/subjects/subject.slice";  
+import teacherReducer
+  from "../features/teachers/teacher.slice";  
+
+import subjectAssignmentReducer
+  from "../features/academic/subjectAssignments/subjectAssignment.slice";  
+
+ import attendanceReducer
+  from "../features/attendance/attendance.slice"; 
+
+  import timetableReducer
+  from "../features/timetable/timetable.slice";
+
+import homeworkReducer from "../features/homework/homework.slice";  
+
+import homeworkSubmissionReducer
+  from "../features/homework/homeworkSubmission.slice";
+
+import schoolAdminDashboardReducer
+  from "../features/schoolAdminDashboard/schoolAdminDashboard.slice";  
+
+import studentReducer from "../features/student/student.slice";
+
+import studentPromotionReducer from "../features/student/studentPromotion.slice";
+import sessionSelectionReducer from
+  "../features/academic/sessions/sessionSelection.slice";
 
 
 export const store = configureStore({
   reducer: {
-    auth: authReducer,
-    schools: schoolReducer,
-    superAdmin: superAdminReducer,
-    schoolAdmins:
+  auth: authReducer,
+  schools: schoolReducer,
+  superAdmin: superAdminReducer,
+  schoolAdmins:
       schoolAdminReducer,
-  sessions: sessionReducer,    
+  sessions: sessionReducer,  
+  classes: classReducer,  
+
+  sections: sectionReducer,
+  subjects: subjectReducer,
+  teachers: teacherReducer,
+  
+  subjectAssignments:
+        subjectAssignmentReducer,
+  attendance:
+    attendanceReducer,  
+    
+  timetable:
+        timetableReducer,  
+    
+   homework: homeworkReducer, 
+   
+   homeworkSubmission: homeworkSubmissionReducer, 
+
+   schoolAdminDashboard:
+  schoolAdminDashboardReducer,
+  students: studentReducer,
+
+  studentPromotion: studentPromotionReducer,
+  sessionSelection:
+  sessionSelectionReducer,
   },
+
 });
 
 export type RootState =
