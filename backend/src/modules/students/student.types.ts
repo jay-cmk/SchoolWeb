@@ -1,87 +1,44 @@
-// import { Types } from "mongoose";
-// import {
-//   StudentGender,
-//   StudentStatus,
-//   IStudentAddress
-// } from "./student.interface";
-
-// export interface ICreateStudentRequest {
-//   sessionId: Types.ObjectId;
-
-//   classId: Types.ObjectId;
-
-//   sectionId: Types.ObjectId;
-
-//   admissionNumber: string;
-
-//   rollNumber?: number;
-
-//   name: string;
-
-//   dob?: Date;
-
-//   gender: StudentGender;
-
-//   mobile?: string;
-
-//   email?: string;
-
-//   address?: IStudentAddress;
-
-//   admissionDate?: Date;
-// }
-
-// export interface IUpdateStudentRequest {
-//   sessionId?: Types.ObjectId;
-
-//   classId?: Types.ObjectId;
-
-//   sectionId?: Types.ObjectId;
-
-//   rollNumber?: number;
-
-//   name?: string;
-
-//   dob?: Date;
-
-//   gender?: StudentGender;
-
-//   mobile?: string;
-
-//   email?: string;
-
-//   address?: IStudentAddress;
-
-//   status?: StudentStatus;
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 import type {
+  AdmissionCategory,
+  AdmissionType,
+  IStudentAddress,
+  IStudentParentDetails,
+  StudentBloodGroup,
+  StudentCategory,
   StudentGender,
   StudentStatus,
-  IStudentAddress,
 } from "./student.interface";
 
+
 export interface ICreateStudentRequest {
+  // ============================================
+  // ACADEMIC DETAILS
+  // ============================================
+
   sessionId: string;
+
   classId: string;
+
   sectionId: string;
+
+  // ============================================
+  // ADMISSION DETAILS
+  // ============================================
 
   admissionNumber: string;
 
   rollNumber?: number;
+
+  admissionType?: AdmissionType;
+
+  admissionCategory?: AdmissionCategory;
+
+  admissionDate?: string | Date;
+
+  // ============================================
+  // BASIC DETAILS
+  // ============================================
 
   name: string;
 
@@ -89,24 +46,78 @@ export interface ICreateStudentRequest {
 
   gender: StudentGender;
 
+  bloodGroup?: StudentBloodGroup;
+
+  religion?: string;
+
+  category?: StudentCategory;
+
+  caste?: string;
+
+  aadhaarNumber?: string;
+
+  photo?: string;
+
+  // ============================================
+  // CONTACT DETAILS
+  // ============================================
+
   mobile?: string;
+
   email?: string;
 
+  // ============================================
+  // ADDRESS
+  // ============================================
+
+  // Old API compatibility
   address?: IStudentAddress;
 
-  admissionDate?: string | Date;
+  currentAddress?: IStudentAddress;
 
+  permanentAddress?: IStudentAddress;
+
+  // ============================================
+  // PARENT DETAILS
+  // ============================================
+
+  father?: IStudentParentDetails;
+
+  mother?: IStudentParentDetails;
+
+  // Existing Parent module relation
   parentId?: string;
 }
 
+
 export interface IUpdateStudentRequest {
+  // ============================================
+  // ACADEMIC DETAILS
+  // ============================================
+
   sessionId?: string;
+
   classId?: string;
+
   sectionId?: string;
+
+  // ============================================
+  // ADMISSION DETAILS
+  // ============================================
 
   admissionNumber?: string;
 
   rollNumber?: number;
+
+  admissionType?: AdmissionType;
+
+  admissionCategory?: AdmissionCategory;
+
+  admissionDate?: string | Date;
+
+  // ============================================
+  // BASIC DETAILS
+  // ============================================
 
   name?: string;
 
@@ -114,32 +125,73 @@ export interface IUpdateStudentRequest {
 
   gender?: StudentGender;
 
+  bloodGroup?: StudentBloodGroup;
+
+  religion?: string;
+
+  category?: StudentCategory;
+
+  caste?: string;
+
+  aadhaarNumber?: string;
+
+  photo?: string;
+
+  // ============================================
+  // CONTACT DETAILS
+  // ============================================
+
   mobile?: string;
+
   email?: string;
+
+  // ============================================
+  // ADDRESS
+  // ============================================
 
   address?: IStudentAddress;
 
-  admissionDate?: string | Date;
+  currentAddress?: IStudentAddress;
+
+  permanentAddress?: IStudentAddress;
+
+  // ============================================
+  // PARENT DETAILS
+  // ============================================
+
+  father?: IStudentParentDetails;
+
+  mother?: IStudentParentDetails;
 
   parentId?: string | null;
+
+  // ============================================
+  // STATUS
+  // ============================================
 
   status?: StudentStatus;
 }
 
+
 export interface IStudentQuery {
   page?: number | string;
+
   limit?: number | string;
 
   search?: string;
 
   sessionId?: string;
+
   classId?: string;
+
   sectionId?: string;
 
   status?: StudentStatus | string;
 }
 
+
 export interface ICreateStudentAccountRequest {
   email: string;
+
   password: string;
 }

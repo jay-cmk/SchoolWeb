@@ -1,20 +1,8 @@
-
-
-
-
-
-
-// import React, {
-//   useEffect,
-//   useState,
-// } from "react";
+// import React, { useEffect, useState } from "react";
 
 // import { Icon } from "@iconify/react";
 
-// import {
-//   useNavigate,
-// } from "react-router-dom";
-
+// import { useLocation, useNavigate } from "react-router-dom";
 
 // interface SidebarProps {
 //   isOpen: boolean;
@@ -23,45 +11,30 @@
 
 //   currentTab: string;
 
-//   setCurrentTab:
-//     (tab: string) => void;
+//   setCurrentTab: (tab: string) => void;
 // }
 
-
-// const Sidebar: React.FC<
-//   SidebarProps
-// > = ({
+// const Sidebar: React.FC<SidebarProps> = ({
 //   isOpen,
 //   onClose,
 //   currentTab,
 //   setCurrentTab,
 // }) => {
+//   const navigate = useNavigate();
 
-//   const navigate =
-//     useNavigate();
-
+//   const location = useLocation();
 
 //   // ============================================
-//   // COLLAPSIBLE STATE
+//   // COLLAPSIBLE STATES
 //   // ============================================
 
-//   const [
-//     isAcademicOpen,
-//     setIsAcademicOpen,
-//   ] = useState(false);
+//   const [isAcademicOpen, setIsAcademicOpen] = useState(false);
 
+//   const [isStudentsOpen, setIsStudentsOpen] = useState(false);
 
-//   const [
-//     isAttendanceOpen,
-//     setIsAttendanceOpen,
-//   ] = useState(false);
+//   const [isAttendanceOpen, setIsAttendanceOpen] = useState(false);
 
-
-//   const [
-//     isTimetableOpen,
-//     setIsTimetableOpen,
-//   ] = useState(false);
-
+//   const [isTimetableOpen, setIsTimetableOpen] = useState(false);
 
 //   // ============================================
 //   // DASHBOARD
@@ -69,20 +42,15 @@
 
 //   const dashboardItems = [
 //     {
-//       id:
-//         "dashboard",
+//       id: "dashboard",
 
-//       label:
-//         "Dashboard",
+//       label: "Dashboard",
 
-//       icon:
-//         "lucide:layout-dashboard",
+//       icon: "lucide:layout-dashboard",
 
-//       path:
-//         "/school-admin/dashboard",
+//       path: "/school-admin/dashboard",
 //     },
 //   ];
-
 
 //   // ============================================
 //   // ACADEMIC ITEMS
@@ -90,76 +58,91 @@
 
 //   const academicItems = [
 //     {
-//       id:
-//         "sessions",
+//       id: "sessions",
 
-//       label:
-//         "Sessions",
+//       label: "Sessions",
 
-//       icon:
-//         "lucide:calendar-range",
+//       icon: "lucide:calendar-range",
 
-//       path:
-//         "/school-admin/academic/sessions",
+//       path: "/school-admin/academic/sessions",
 //     },
 
 //     {
-//       id:
-//         "classes",
+//       id: "classes",
 
-//       label:
-//         "Classes",
+//       label: "Classes",
 
-//       icon:
-//         "lucide:building-2",
+//       icon: "lucide:building-2",
 
-//       path:
-//         "/school-admin/academic/classes",
+//       path: "/school-admin/academic/classes",
 //     },
 
 //     {
-//       id:
-//         "sections",
+//       id: "sections",
 
-//       label:
-//         "Sections",
+//       label: "Sections",
 
-//       icon:
-//         "lucide:layers",
+//       icon: "lucide:layers",
 
-//       path:
-//         "/school-admin/academic/sections",
+//       path: "/school-admin/academic/sections",
 //     },
 
 //     {
-//       id:
-//         "subjects",
+//       id: "subjects",
 
-//       label:
-//         "Subjects",
+//       label: "Subjects",
 
-//       icon:
-//         "lucide:book-open",
+//       icon: "lucide:book-open",
 
-//       path:
-//         "/school-admin/academic/subjects",
+//       path: "/school-admin/academic/subjects",
 //     },
 
 //     {
-//       id:
-//         "assignment",
+//       id: "assignment",
 
-//       label:
-//         "Assignment",
+//       label: "Assignment",
 
-//       icon:
-//         "lucide:graduation-cap",
+//       icon: "lucide:graduation-cap",
 
-//       path:
-//         "/school-admin/academic/subject-assignments",
+//       path: "/school-admin/academic/subject-assignments",
 //     },
 //   ];
 
+//   // ============================================
+//   // STUDENT ITEMS
+//   // ============================================
+
+//   const studentItems = [
+//     {
+//       id: "all-students",
+
+//       label: "All Students",
+
+//       icon: "lucide:users",
+
+//       path: "/school-admin/students",
+//     },
+
+//     {
+//       id: "add-student",
+
+//       label: "Add Student",
+
+//       icon: "lucide:user-plus",
+
+//       path: "/school-admin/students/add",
+//     },
+
+//     {
+//       id: "class-wise-students",
+
+//       label: "Class-wise Students",
+
+//       icon: "lucide:school",
+
+//       path: "/school-admin/students/class-wise",
+//     },
+//   ];
 
 //   // ============================================
 //   // ATTENDANCE ITEMS
@@ -167,48 +150,35 @@
 
 //   const attendanceItems = [
 //     {
-//       id:
-//         "mark-attendance",
+//       id: "mark-attendance",
 
-//       label:
-//         "Mark Attendance",
+//       label: "Mark Attendance",
 
-//       icon:
-//         "lucide:user-check",
+//       icon: "lucide:user-check",
 
-//       path:
-//         "/school-admin/attendance/mark",
+//       path: "/school-admin/attendance/mark",
 //     },
 
 //     {
-//       id:
-//         "daily-attendance",
+//       id: "daily-attendance",
 
-//       label:
-//         "Daily Attendance",
+//       label: "Daily Attendance",
 
-//       icon:
-//         "lucide:calendar-days",
+//       icon: "lucide:calendar-days",
 
-//       path:
-//         "/school-admin/attendance/daily",
+//       path: "/school-admin/attendance/daily",
 //     },
 
 //     {
-//       id:
-//         "monthly-attendance",
+//       id: "monthly-attendance",
 
-//       label:
-//         "Monthly Attendance",
+//       label: "Monthly Attendance",
 
-//       icon:
-//         "lucide:calendar-range",
+//       icon: "lucide:calendar-range",
 
-//       path:
-//         "/school-admin/attendance/monthly",
+//       path: "/school-admin/attendance/monthly",
 //     },
 //   ];
-
 
 //   // ============================================
 //   // TIMETABLE ITEMS
@@ -216,48 +186,35 @@
 
 //   const timetableItems = [
 //     {
-//       id:
-//         "weekly-timetable",
+//       id: "weekly-timetable",
 
-//       label:
-//         "Weekly Timetable",
+//       label: "Weekly Timetable",
 
-//       icon:
-//         "lucide:calendar-range",
+//       icon: "lucide:calendar-range",
 
-//       path:
-//         "/school-admin/timetable/weekly",
+//       path: "/school-admin/timetable/weekly",
 //     },
 
 //     {
-//       id:
-//         "daily-timetable",
+//       id: "daily-timetable",
 
-//       label:
-//         "Daily Timetable",
+//       label: "Daily Timetable",
 
-//       icon:
-//         "lucide:calendar-days",
+//       icon: "lucide:calendar-days",
 
-//       path:
-//         "/school-admin/timetable/daily",
+//       path: "/school-admin/timetable/daily",
 //     },
 
 //     {
-//       id:
-//         "teacher-timetable",
+//       id: "teacher-timetable",
 
-//       label:
-//         "Teacher Timetable",
+//       label: "Teacher Timetable",
 
-//       icon:
-//         "lucide:user-round",
+//       icon: "lucide:user-round",
 
-//       path:
-//         "/school-admin/timetable/teacher",
+//       path: "/school-admin/timetable/teacher",
 //     },
 //   ];
-
 
 //   // ============================================
 //   // OTHER ITEMS
@@ -265,276 +222,220 @@
 
 //   const otherItems = [
 //     {
-//       id:
-//         "students",
+//       id: "teachers",
 
-//       label:
-//         "Students",
+//       label: "Teachers",
 
-//       icon:
-//         "lucide:users",
+//       icon: "lucide:graduation-cap",
 
-//       path:
-//         "/school-admin/students",
+//       path: "/school-admin/teachers",
 //     },
 
 //     {
-//       id:
-//         "teachers",
+//       id: "homework",
 
-//       label:
-//         "Teachers",
+//       label: "Homework",
 
-//       icon:
-//         "lucide:graduation-cap",
+//       icon: "lucide:clipboard-list",
 
-//       path:
-//         "/school-admin/teachers",
+//       path: "/school-admin/homework",
 //     },
 
 //     {
-//       id:
-//         "homework",
+//       id: "exams",
 
-//       label:
-//         "Homework",
+//       label: "Exams",
 
-//       icon:
-//         "lucide:clipboard-list",
+//       icon: "lucide:file-text",
 
-//       path:
-//         "/school-admin/homework",
+//       path: "/school-admin/exams",
 //     },
 
 //     {
-//       id:
-//         "exams",
+//       id: "results",
 
-//       label:
-//         "Exams",
+//       label: "Results",
 
-//       icon:
-//         "lucide:file-text",
+//       icon: "lucide:chart-bar",
 
-//       path:
-//         "/school-admin/exams",
+//       path: "/school-admin/results",
 //     },
 
 //     {
-//       id:
-//         "results",
+//       id: "fees",
 
-//       label:
-//         "Results",
+//       label: "Fees",
 
-//       icon:
-//         "lucide:chart-bar",
+//       icon: "lucide:credit-card",
 
-//       path:
-//         "/school-admin/results",
+//       path: "/school-admin/fees",
 //     },
 
 //     {
-//       id:
-//         "fees",
+//       id: "notices",
 
-//       label:
-//         "Fees",
+//       label: "Notices",
 
-//       icon:
-//         "lucide:credit-card",
+//       icon: "lucide:megaphone",
 
-//       path:
-//         "/school-admin/fees",
+//       path: "/school-admin/notices",
 //     },
 
 //     {
-//       id:
-//         "notices",
+//       id: "parents",
 
-//       label:
-//         "Notices",
+//       label: "Parents",
 
-//       icon:
-//         "lucide:megaphone",
+//       icon: "lucide:heart",
 
-//       path:
-//         "/school-admin/notices",
+//       path: "/school-admin/parents",
 //     },
 
 //     {
-//       id:
-//         "parents",
+//       id: "staff",
 
-//       label:
-//         "Parents",
+//       label: "Staff",
 
-//       icon:
-//         "lucide:heart",
+//       icon: "lucide:briefcase-business",
 
-//       path:
-//         "/school-admin/parents",
+//       path: "/school-admin/staff",
 //     },
 
 //     {
-//       id:
-//         "staff",
+//       id: "reports",
 
-//       label:
-//         "Staff",
+//       label: "Reports",
 
-//       icon:
-//         "lucide:briefcase-business",
+//       icon: "lucide:chart-bar",
 
-//       path:
-//         "/school-admin/staff",
+//       path: "/school-admin/reports",
 //     },
 
 //     {
-//       id:
-//         "reports",
+//       id: "settings",
 
-//       label:
-//         "Reports",
+//       label: "Settings",
 
-//       icon:
-//         "lucide:chart-bar",
+//       icon: "lucide:settings",
 
-//       path:
-//         "/school-admin/reports",
-//     },
-
-//     {
-//       id:
-//         "settings",
-
-//       label:
-//         "Settings",
-
-//       icon:
-//         "lucide:settings",
-
-//       path:
-//         "/school-admin/settings",
+//       path: "/school-admin/settings",
 //     },
 //   ];
-
 
 //   // ============================================
 //   // NAVIGATION
 //   // ============================================
 
-//   const handleNavigation = (
-//     id: string,
-//     path: string
-//   ) => {
+//   const handleNavigation = (id: string, path: string) => {
+//     setCurrentTab(id);
 
-//     setCurrentTab(
-//       id
-//     );
-
-//     navigate(
-//       path
-//     );
+//     navigate(path);
 
 //     onClose();
 //   };
-
 
 //   // ============================================
 //   // ACTIVE GROUP CHECK
 //   // ============================================
 
-//   const isAcademicActive =
-//     academicItems.some(
-//       (item) =>
-//         item.id ===
-//         currentTab
-//     );
+//   const isAcademicActive = location.pathname.startsWith(
+//     "/school-admin/academic",
+//   );
 
+//   const isStudentsActive = location.pathname.startsWith(
+//     "/school-admin/students",
+//   );
 
-//   const isAttendanceActive =
-//     attendanceItems.some(
-//       (item) =>
-//         item.id ===
-//         currentTab
-//     );
+//   const isAttendanceActive = location.pathname.startsWith(
+//     "/school-admin/attendance",
+//   );
 
+//   const isTimetableActive = location.pathname.startsWith(
+//     "/school-admin/timetable",
+//   );
 
-//   const isTimetableActive =
-//     timetableItems.some(
-//       (item) =>
-//         item.id ===
-//         currentTab
-//     );
+//   // ============================================
+//   // HOMEWORK ACTIVE
+//   // ============================================
 
+//   const isHomeworkActive = location.pathname.startsWith(
+//     "/school-admin/homework",
+//   );
 
 //   // ============================================
 //   // AUTO OPEN ACADEMIC
 //   // ============================================
 
 //   useEffect(() => {
-
-//     if (
-//       isAcademicActive
-//     ) {
-
-//       setIsAcademicOpen(
-//         true
-//       );
-
+//     if (isAcademicActive) {
+//       setIsAcademicOpen(true);
 //     }
+//   }, [isAcademicActive]);
 
-//   }, [
-//     isAcademicActive,
-//   ]);
+//   // ============================================
+//   // AUTO OPEN STUDENTS
+//   // ============================================
 
+//   useEffect(() => {
+//     if (isStudentsActive) {
+//       setIsStudentsOpen(true);
+//     }
+//   }, [isStudentsActive]);
 
 //   // ============================================
 //   // AUTO OPEN ATTENDANCE
 //   // ============================================
 
 //   useEffect(() => {
-
-//     if (
-//       isAttendanceActive
-//     ) {
-
-//       setIsAttendanceOpen(
-//         true
-//       );
-
+//     if (isAttendanceActive) {
+//       setIsAttendanceOpen(true);
 //     }
-
-//   }, [
-//     isAttendanceActive,
-//   ]);
-
+//   }, [isAttendanceActive]);
 
 //   // ============================================
 //   // AUTO OPEN TIMETABLE
 //   // ============================================
 
 //   useEffect(() => {
+//     if (isTimetableActive) {
+//       setIsTimetableOpen(true);
+//     }
+//   }, [isTimetableActive]);
 
-//     if (
-//       isTimetableActive
-//     ) {
+//   // ============================================
+//   // SYNC CURRENT TAB WITH STUDENT ROUTES
+//   // ============================================
 
-//       setIsTimetableOpen(
-//         true
-//       );
+//   useEffect(() => {
+//     if (location.pathname === "/school-admin/students") {
+//       setCurrentTab("all-students");
 
+//       return;
 //     }
 
-//   }, [
-//     isTimetableActive,
-//   ]);
+//     if (location.pathname.startsWith("/school-admin/students/add")) {
+//       setCurrentTab("add-student");
 
+//       return;
+//     }
+
+//     if (location.pathname.startsWith("/school-admin/students/class-wise")) {
+//       setCurrentTab("class-wise-students");
+//     }
+//   }, [location.pathname, setCurrentTab]);
+
+//   // ============================================
+//   // KEEP HOMEWORK ACTIVE ON CHILD ROUTES
+//   // ============================================
+
+//   useEffect(() => {
+//     if (isHomeworkActive) {
+//       setCurrentTab("homework");
+//     }
+//   }, [isHomeworkActive, setCurrentTab]);
 
 //   return (
 //     <>
-
 //       {/* ========================================
 //           MOBILE OVERLAY
 //       ======================================== */}
@@ -549,12 +450,9 @@
 
 //             lg:hidden
 //           "
-//           onClick={
-//             onClose
-//           }
+//           onClick={onClose}
 //         />
 //       )}
-
 
 //       {/* ========================================
 //           SIDEBAR
@@ -584,14 +482,9 @@
 //           lg:h-full
 //           lg:translate-x-0
 
-//           ${
-//             isOpen
-//               ? "translate-x-0"
-//               : "-translate-x-full"
-//           }
+//           ${isOpen ? "translate-x-0" : "-translate-x-full"}
 //         `}
 //       >
-
 //         {/* ======================================
 //             HEADER
 //         ====================================== */}
@@ -610,7 +503,6 @@
 //             py-5
 //           "
 //         >
-
 //           <div
 //             className="
 //               flex
@@ -618,7 +510,6 @@
 //               gap-3
 //             "
 //           >
-
 //             <div
 //               className="
 //                 flex
@@ -636,19 +527,15 @@
 //                 shadow-md
 //               "
 //             >
-
 //               <Icon
 //                 icon="lucide:graduation-cap"
 //                 className="
 //                   text-2xl
 //                 "
 //               />
-
 //             </div>
 
-
 //             <div>
-
 //               <p
 //                 className="
 //                   text-base
@@ -659,7 +546,6 @@
 //                 Riverside Academy
 //               </p>
 
-
 //               <p
 //                 className="
 //                   text-xs
@@ -668,19 +554,15 @@
 //               >
 //                 School ERP · 2025–26
 //               </p>
-
 //             </div>
-
 //           </div>
-
 
 //           <button
 //             type="button"
-//             onClick={
-//               onClose
-//             }
+//             onClick={onClose}
 //             className="
 //               p-1
+
 //               text-[#6B7280]
 
 //               hover:text-[#15243B]
@@ -688,18 +570,14 @@
 //               lg:hidden
 //             "
 //           >
-
 //             <Icon
 //               icon="lucide:x"
 //               className="
 //                 text-xl
 //               "
 //             />
-
 //           </button>
-
 //         </div>
-
 
 //         {/* ======================================
 //             NAVIGATION
@@ -725,7 +603,6 @@
 //             [&::-webkit-scrollbar-thumb]:bg-[#D1D5DB]
 //           "
 //         >
-
 //           <p
 //             className="
 //               px-3
@@ -742,40 +619,25 @@
 //             Operations
 //           </p>
 
-
 //           <div
 //             className="
 //               space-y-1
 //               text-sm
 //             "
 //           >
-
 //             {/* ==================================
 //                 DASHBOARD
 //             ================================== */}
 
-//             {dashboardItems.map(
-//               (item) => {
+//             {dashboardItems.map((item) => {
+//               const isActive = currentTab === item.id;
 
-//                 const isActive =
-//                   currentTab ===
-//                   item.id;
-
-
-//                 return (
-
-//                   <button
-//                     key={
-//                       item.id
-//                     }
-//                     type="button"
-//                     onClick={() =>
-//                       handleNavigation(
-//                         item.id,
-//                         item.path
-//                       )
-//                     }
-//                     className={`
+//               return (
+//                 <button
+//                   key={item.id}
+//                   type="button"
+//                   onClick={() => handleNavigation(item.id, item.path)}
+//                   className={`
 //                       flex
 //                       min-h-11
 //                       w-full
@@ -805,46 +667,27 @@
 //                             `
 //                       }
 //                     `}
-//                   >
-
-//                     <Icon
-//                       icon={
-//                         item.icon
-//                       }
-//                       className="
+//                 >
+//                   <Icon
+//                     icon={item.icon}
+//                     className="
 //                         text-lg
 //                       "
-//                     />
+//                   />
 
-
-//                     {
-//                       item.label
-//                     }
-
-//                   </button>
-
-//                 );
-
-//               }
-//             )}
-
+//                   {item.label}
+//                 </button>
+//               );
+//             })}
 
 //             {/* ==================================
 //                 ACADEMIC
 //             ================================== */}
 
 //             <div>
-
 //               <button
 //                 type="button"
-//                 onClick={() =>
-//                   setIsAcademicOpen(
-//                     (
-//                       previous
-//                     ) =>
-//                       !previous
-//                   )
-//                 }
+//                 onClick={() => setIsAcademicOpen((previous) => !previous)}
 //                 className={`
 //                   flex
 //                   min-h-11
@@ -862,8 +705,7 @@
 //                   duration-200
 
 //                   ${
-//                     isAcademicActive ||
-//                     isAcademicOpen
+//                     isAcademicActive || isAcademicOpen
 //                       ? `
 //                           bg-[#E8F0FB]
 //                           text-[#1F5FAE]
@@ -877,14 +719,12 @@
 //                   }
 //                 `}
 //               >
-
 //                 <Icon
 //                   icon="lucide:book-open"
 //                   className="
 //                     text-lg
 //                   "
 //                 />
-
 
 //                 <span
 //                   className="
@@ -895,7 +735,6 @@
 //                   Academic
 //                 </span>
 
-
 //                 <Icon
 //                   icon={
 //                     isAcademicOpen
@@ -906,12 +745,9 @@
 //                     text-sm
 //                   "
 //                 />
-
 //               </button>
 
-
 //               {isAcademicOpen && (
-
 //                 <div
 //                   className="
 //                     ml-4
@@ -925,29 +761,15 @@
 //                     pl-2
 //                   "
 //                 >
+//                   {academicItems.map((item) => {
+//                     const isActive = currentTab === item.id;
 
-//                   {academicItems.map(
-//                     (item) => {
-
-//                       const isActive =
-//                         currentTab ===
-//                         item.id;
-
-
-//                       return (
-
-//                         <button
-//                           key={
-//                             item.id
-//                           }
-//                           type="button"
-//                           onClick={() =>
-//                             handleNavigation(
-//                               item.id,
-//                               item.path
-//                             )
-//                           }
-//                           className={`
+//                     return (
+//                       <button
+//                         key={item.id}
+//                         type="button"
+//                         onClick={() => handleNavigation(item.id, item.path)}
+//                         className={`
 //                             flex
 //                             min-h-10
 //                             w-full
@@ -978,70 +800,173 @@
 //                                   `
 //                             }
 //                           `}
-//                         >
-
-//                           <Icon
-//                             icon={
-//                               item.icon
-//                             }
-//                             className="
+//                       >
+//                         <Icon
+//                           icon={item.icon}
+//                           className="
 //                               text-base
 //                             "
-//                           />
+//                         />
 
-
-//                           {
-//                             item.label
-//                           }
-
-//                         </button>
-
-//                       );
-
-//                     }
-//                   )}
-
+//                         {item.label}
+//                       </button>
+//                     );
+//                   })}
 //                 </div>
-
 //               )}
-
 //             </div>
 
+//             {/* ==================================
+//                 STUDENTS
+//             ================================== */}
+
+//             <div>
+//               <button
+//                 type="button"
+//                 onClick={() => setIsStudentsOpen((previous) => !previous)}
+//                 className={`
+//                   flex
+//                   min-h-11
+//                   w-full
+//                   items-center
+//                   gap-3
+
+//                   rounded-lg
+
+//                   px-3
+
+//                   font-semibold
+
+//                   transition-all
+//                   duration-200
+
+//                   ${
+//                     isStudentsActive || isStudentsOpen
+//                       ? `
+//                           bg-[#E8F0FB]
+//                           text-[#1F5FAE]
+//                         `
+//                       : `
+//                           text-[#6B7280]
+
+//                           hover:bg-[#F9FAFB]
+//                           hover:text-[#15243B]
+//                         `
+//                   }
+//                 `}
+//               >
+//                 <Icon
+//                   icon="lucide:users"
+//                   className="
+//                     text-lg
+//                   "
+//                 />
+
+//                 <span
+//                   className="
+//                     flex-1
+//                     text-left
+//                   "
+//                 >
+//                   Students
+//                 </span>
+
+//                 <Icon
+//                   icon={
+//                     isStudentsOpen
+//                       ? "lucide:chevron-down"
+//                       : "lucide:chevron-right"
+//                   }
+//                   className="
+//                     text-sm
+//                   "
+//                 />
+//               </button>
+
+//               {isStudentsOpen && (
+//                 <div
+//                   className="
+//                     ml-4
+//                     mt-1
+
+//                     space-y-1
+
+//                     border-l-2
+//                     border-[#E5E7EB]
+
+//                     pl-2
+//                   "
+//                 >
+//                   {studentItems.map((item) => {
+//                     const isActive = currentTab === item.id;
+
+//                     return (
+//                       <button
+//                         key={item.id}
+//                         type="button"
+//                         onClick={() => handleNavigation(item.id, item.path)}
+//                         className={`
+//                             flex
+//                             min-h-10
+//                             w-full
+//                             items-center
+//                             gap-3
+
+//                             rounded-lg
+
+//                             px-3
+
+//                             text-sm
+//                             font-medium
+
+//                             transition-all
+//                             duration-200
+
+//                             ${
+//                               isActive
+//                                 ? `
+//                                     bg-[#E8F0FB]
+//                                     text-[#1F5FAE]
+//                                   `
+//                                 : `
+//                                     text-[#6B7280]
+
+//                                     hover:bg-[#F9FAFB]
+//                                     hover:text-[#15243B]
+//                                   `
+//                             }
+//                           `}
+//                       >
+//                         <Icon
+//                           icon={item.icon}
+//                           className="
+//                               text-base
+//                             "
+//                         />
+
+//                         {item.label}
+//                       </button>
+//                     );
+//                   })}
+//                 </div>
+//               )}
+//             </div>
 
 //             {/* ==================================
-//                 STUDENTS + TEACHERS
+//                 TEACHERS
 //             ================================== */}
 
 //             {otherItems
-//               .filter(
-//                 (item) =>
-//                   item.id ===
-//                     "students" ||
-//                   item.id ===
-//                     "teachers"
-//               )
-//               .map(
-//                 (item) => {
+//               .filter((item) => item.id === "teachers")
+//               .map((item) => {
+//                 const isActive = currentTab === item.id;
 
-//                   const isActive =
-//                     currentTab ===
-//                     item.id;
-
-
-//                   return (
-
-//                     <button
-//                       key={
-//                         item.id
-//                       }
-//                       type="button"
-//                       onClick={() =>
-//                         handleNavigation(
-//                           item.id,
-//                           item.path
-//                         )
-//                       }
-//                       className={`
+//                 return (
+//                   <button
+//                     key={item.id}
+//                     type="button"
+//                     onClick={() => handleNavigation(item.id, item.path)}
+//                     className={`
 //                         flex
 //                         min-h-11
 //                         w-full
@@ -1071,46 +996,27 @@
 //                               `
 //                         }
 //                       `}
-//                     >
-
-//                       <Icon
-//                         icon={
-//                           item.icon
-//                         }
-//                         className="
+//                   >
+//                     <Icon
+//                       icon={item.icon}
+//                       className="
 //                           text-lg
 //                         "
-//                       />
+//                     />
 
-
-//                       {
-//                         item.label
-//                       }
-
-//                     </button>
-
-//                   );
-
-//                 }
-//               )}
-
+//                     {item.label}
+//                   </button>
+//                 );
+//               })}
 
 //             {/* ==================================
 //                 ATTENDANCE
 //             ================================== */}
 
 //             <div>
-
 //               <button
 //                 type="button"
-//                 onClick={() =>
-//                   setIsAttendanceOpen(
-//                     (
-//                       previous
-//                     ) =>
-//                       !previous
-//                   )
-//                 }
+//                 onClick={() => setIsAttendanceOpen((previous) => !previous)}
 //                 className={`
 //                   flex
 //                   min-h-11
@@ -1128,8 +1034,7 @@
 //                   duration-200
 
 //                   ${
-//                     isAttendanceActive ||
-//                     isAttendanceOpen
+//                     isAttendanceActive || isAttendanceOpen
 //                       ? `
 //                           bg-[#E8F0FB]
 //                           text-[#1F5FAE]
@@ -1143,14 +1048,12 @@
 //                   }
 //                 `}
 //               >
-
 //                 <Icon
 //                   icon="lucide:calendar-check"
 //                   className="
 //                     text-lg
 //                   "
 //                 />
-
 
 //                 <span
 //                   className="
@@ -1161,7 +1064,6 @@
 //                   Attendance
 //                 </span>
 
-
 //                 <Icon
 //                   icon={
 //                     isAttendanceOpen
@@ -1172,14 +1074,9 @@
 //                     text-sm
 //                   "
 //                 />
-
 //               </button>
 
-
-//               {/* ATTENDANCE SUB ITEMS */}
-
 //               {isAttendanceOpen && (
-
 //                 <div
 //                   className="
 //                     ml-4
@@ -1193,29 +1090,15 @@
 //                     pl-2
 //                   "
 //                 >
+//                   {attendanceItems.map((item) => {
+//                     const isActive = currentTab === item.id;
 
-//                   {attendanceItems.map(
-//                     (item) => {
-
-//                       const isActive =
-//                         currentTab ===
-//                         item.id;
-
-
-//                       return (
-
-//                         <button
-//                           key={
-//                             item.id
-//                           }
-//                           type="button"
-//                           onClick={() =>
-//                             handleNavigation(
-//                               item.id,
-//                               item.path
-//                             )
-//                           }
-//                           className={`
+//                     return (
+//                       <button
+//                         key={item.id}
+//                         type="button"
+//                         onClick={() => handleNavigation(item.id, item.path)}
+//                         className={`
 //                             flex
 //                             min-h-10
 //                             w-full
@@ -1246,52 +1129,30 @@
 //                                   `
 //                             }
 //                           `}
-//                         >
-
-//                           <Icon
-//                             icon={
-//                               item.icon
-//                             }
-//                             className="
+//                       >
+//                         <Icon
+//                           icon={item.icon}
+//                           className="
 //                               text-base
 //                             "
-//                           />
+//                         />
 
-
-//                           {
-//                             item.label
-//                           }
-
-//                         </button>
-
-//                       );
-
-//                     }
-//                   )}
-
+//                         {item.label}
+//                       </button>
+//                     );
+//                   })}
 //                 </div>
-
 //               )}
-
 //             </div>
-
 
 //             {/* ==================================
 //                 TIMETABLE
 //             ================================== */}
 
 //             <div>
-
 //               <button
 //                 type="button"
-//                 onClick={() =>
-//                   setIsTimetableOpen(
-//                     (
-//                       previous
-//                     ) =>
-//                       !previous
-//                   )
-//                 }
+//                 onClick={() => setIsTimetableOpen((previous) => !previous)}
 //                 className={`
 //                   flex
 //                   min-h-11
@@ -1309,8 +1170,7 @@
 //                   duration-200
 
 //                   ${
-//                     isTimetableActive ||
-//                     isTimetableOpen
+//                     isTimetableActive || isTimetableOpen
 //                       ? `
 //                           bg-[#E8F0FB]
 //                           text-[#1F5FAE]
@@ -1324,14 +1184,12 @@
 //                   }
 //                 `}
 //               >
-
 //                 <Icon
 //                   icon="lucide:calendar-clock"
 //                   className="
 //                     text-lg
 //                   "
 //                 />
-
 
 //                 <span
 //                   className="
@@ -1341,7 +1199,6 @@
 //                 >
 //                   Timetable
 //                 </span>
-
 
 //                 <Icon
 //                   icon={
@@ -1353,14 +1210,9 @@
 //                     text-sm
 //                   "
 //                 />
-
 //               </button>
 
-
-//               {/* TIMETABLE SUB ITEMS */}
-
 //               {isTimetableOpen && (
-
 //                 <div
 //                   className="
 //                     ml-4
@@ -1374,29 +1226,15 @@
 //                     pl-2
 //                   "
 //                 >
+//                   {timetableItems.map((item) => {
+//                     const isActive = currentTab === item.id;
 
-//                   {timetableItems.map(
-//                     (item) => {
-
-//                       const isActive =
-//                         currentTab ===
-//                         item.id;
-
-
-//                       return (
-
-//                         <button
-//                           key={
-//                             item.id
-//                           }
-//                           type="button"
-//                           onClick={() =>
-//                             handleNavigation(
-//                               item.id,
-//                               item.path
-//                             )
-//                           }
-//                           className={`
+//                     return (
+//                       <button
+//                         key={item.id}
+//                         type="button"
+//                         onClick={() => handleNavigation(item.id, item.path)}
+//                         className={`
 //                             flex
 //                             min-h-10
 //                             w-full
@@ -1427,70 +1265,37 @@
 //                                   `
 //                             }
 //                           `}
-//                         >
-
-//                           <Icon
-//                             icon={
-//                               item.icon
-//                             }
-//                             className="
+//                       >
+//                         <Icon
+//                           icon={item.icon}
+//                           className="
 //                               text-base
 //                             "
-//                           />
+//                         />
 
-
-//                           {
-//                             item.label
-//                           }
-
-//                         </button>
-
-//                       );
-
-//                     }
-//                   )}
-
+//                         {item.label}
+//                       </button>
+//                     );
+//                   })}
 //                 </div>
-
 //               )}
-
 //             </div>
 
-
 //             {/* ==================================
-//                 REMAINING ITEMS
+//                 HOMEWORK
 //             ================================== */}
 
 //             {otherItems
-//               .filter(
-//                 (item) =>
-//                   item.id !==
-//                     "students" &&
-//                   item.id !==
-//                     "teachers"
-//               )
-//               .map(
-//                 (item) => {
+//               .filter((item) => item.id === "homework")
+//               .map((item) => {
+//                 const isActive = isHomeworkActive || currentTab === item.id;
 
-//                   const isActive =
-//                     currentTab ===
-//                     item.id;
-
-
-//                   return (
-
-//                     <button
-//                       key={
-//                         item.id
-//                       }
-//                       type="button"
-//                       onClick={() =>
-//                         handleNavigation(
-//                           item.id,
-//                           item.path
-//                         )
-//                       }
-//                       className={`
+//                 return (
+//                   <button
+//                     key={item.id}
+//                     type="button"
+//                     onClick={() => handleNavigation(item.id, item.path)}
+//                     className={`
 //                         flex
 //                         min-h-11
 //                         w-full
@@ -1520,33 +1325,79 @@
 //                               `
 //                         }
 //                       `}
-//                     >
-
-//                       <Icon
-//                         icon={
-//                           item.icon
-//                         }
-//                         className="
+//                   >
+//                     <Icon
+//                       icon={item.icon}
+//                       className="
 //                           text-lg
 //                         "
-//                       />
+//                     />
 
+//                     {item.label}
+//                   </button>
+//                 );
+//               })}
 
-//                       {
-//                         item.label
-//                       }
+//             {/* ==================================
+//                 REMAINING ITEMS
+//             ================================== */}
 
-//                     </button>
+//             {otherItems
+//               .filter(
+//                 (item) => item.id !== "teachers" && item.id !== "homework",
+//               )
+//               .map((item) => {
+//                 const isActive = currentTab === item.id;
 
-//                   );
+//                 return (
+//                   <button
+//                     key={item.id}
+//                     type="button"
+//                     onClick={() => handleNavigation(item.id, item.path)}
+//                     className={`
+//                         flex
+//                         min-h-11
+//                         w-full
+//                         items-center
+//                         gap-3
 
-//                 }
-//               )}
+//                         rounded-lg
 
+//                         px-3
+
+//                         font-semibold
+
+//                         transition-all
+//                         duration-200
+
+//                         ${
+//                           isActive
+//                             ? `
+//                                 bg-[#E8F0FB]
+//                                 text-[#1F5FAE]
+//                               `
+//                             : `
+//                                 text-[#6B7280]
+
+//                                 hover:bg-[#F9FAFB]
+//                                 hover:text-[#15243B]
+//                               `
+//                         }
+//                       `}
+//                   >
+//                     <Icon
+//                       icon={item.icon}
+//                       className="
+//                           text-lg
+//                         "
+//                     />
+
+//                     {item.label}
+//                   </button>
+//                 );
+//               })}
 //           </div>
-
 //         </nav>
-
 
 //         {/* ======================================
 //             FOOTER
@@ -1566,15 +1417,9 @@
 //             text-sm
 //           "
 //         >
-
 //           <button
 //             type="button"
-//             onClick={() =>
-//               handleNavigation(
-//                 "help",
-//                 "/help"
-//               )
-//             }
+//             onClick={() => handleNavigation("help", "/help")}
 //             className="
 //               flex
 //               min-h-11
@@ -1594,28 +1439,18 @@
 //               hover:text-[#15243B]
 //             "
 //           >
-
 //             <Icon
 //               icon="lucide:circle-help"
 //               className="
 //                 text-lg
 //               "
 //             />
-
-
 //             Help & Support
-
 //           </button>
-
 
 //           <button
 //             type="button"
-//             onClick={() =>
-//               handleNavigation(
-//                 "profile",
-//                 "/profile"
-//               )
-//             }
+//             onClick={() => handleNavigation("profile", "/profile")}
 //             className="
 //               flex
 //               min-h-11
@@ -1635,36 +1470,23 @@
 //               hover:text-[#15243B]
 //             "
 //           >
-
 //             <Icon
 //               icon="lucide:user"
 //               className="
 //                 text-lg
 //               "
 //             />
-
-
 //             Admin Profile
-
 //           </button>
-
 
 //           <button
 //             type="button"
 //             onClick={() => {
+//               localStorage.removeItem("accessToken");
 
-//               localStorage.removeItem(
-//                 "accessToken"
-//               );
+//               localStorage.removeItem("user");
 
-//               localStorage.removeItem(
-//                 "user"
-//               );
-
-//               navigate(
-//                 "/login"
-//               );
-
+//               navigate("/login");
 //             }}
 //             className="
 //               flex
@@ -1684,50 +1506,27 @@
 //               hover:bg-[#FEF2F2]
 //             "
 //           >
-
 //             <Icon
 //               icon="lucide:log-out"
 //               className="
 //                 text-lg
 //               "
 //             />
-
-
 //             Logout
-
 //           </button>
-
 //         </div>
-
 //       </aside>
-
 //     </>
 //   );
 // };
 
-
 // export default Sidebar;
 
-
-
-
-
-
-
-
-
-import React, {
-  useEffect,
-  useState,
-} from "react";
+import React, { useEffect, useState } from "react";
 
 import { Icon } from "@iconify/react";
 
-import {
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
-
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -1736,48 +1535,30 @@ interface SidebarProps {
 
   currentTab: string;
 
-  setCurrentTab:
-    (tab: string) => void;
+  setCurrentTab: (tab: string) => void;
 }
 
-
-const Sidebar: React.FC<
-  SidebarProps
-> = ({
+const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
   onClose,
   currentTab,
   setCurrentTab,
 }) => {
+  const navigate = useNavigate();
 
-  const navigate =
-    useNavigate();
-
-  const location =
-    useLocation();
-
+  const location = useLocation();
 
   // ============================================
   // COLLAPSIBLE STATES
   // ============================================
 
-  const [
-    isAcademicOpen,
-    setIsAcademicOpen,
-  ] = useState(false);
+  const [isAcademicOpen, setIsAcademicOpen] = useState(false);
 
+  const [isStudentsOpen, setIsStudentsOpen] = useState(false);
 
-  const [
-    isAttendanceOpen,
-    setIsAttendanceOpen,
-  ] = useState(false);
+  const [isAttendanceOpen, setIsAttendanceOpen] = useState(false);
 
-
-  const [
-    isTimetableOpen,
-    setIsTimetableOpen,
-  ] = useState(false);
-
+  const [isTimetableOpen, setIsTimetableOpen] = useState(false);
 
   // ============================================
   // DASHBOARD
@@ -1789,14 +1570,11 @@ const Sidebar: React.FC<
 
       label: "Dashboard",
 
-      icon:
-        "lucide:layout-dashboard",
+      icon: "lucide:layout-dashboard",
 
-      path:
-        "/school-admin/dashboard",
+      path: "/school-admin/dashboard",
     },
   ];
-
 
   // ============================================
   // ACADEMIC ITEMS
@@ -1808,11 +1586,9 @@ const Sidebar: React.FC<
 
       label: "Sessions",
 
-      icon:
-        "lucide:calendar-range",
+      icon: "lucide:calendar-range",
 
-      path:
-        "/school-admin/academic/sessions",
+      path: "/school-admin/academic/sessions",
     },
 
     {
@@ -1820,11 +1596,9 @@ const Sidebar: React.FC<
 
       label: "Classes",
 
-      icon:
-        "lucide:building-2",
+      icon: "lucide:building-2",
 
-      path:
-        "/school-admin/academic/classes",
+      path: "/school-admin/academic/classes",
     },
 
     {
@@ -1832,11 +1606,9 @@ const Sidebar: React.FC<
 
       label: "Sections",
 
-      icon:
-        "lucide:layers",
+      icon: "lucide:layers",
 
-      path:
-        "/school-admin/academic/sections",
+      path: "/school-admin/academic/sections",
     },
 
     {
@@ -1844,11 +1616,9 @@ const Sidebar: React.FC<
 
       label: "Subjects",
 
-      icon:
-        "lucide:book-open",
+      icon: "lucide:book-open",
 
-      path:
-        "/school-admin/academic/subjects",
+      path: "/school-admin/academic/subjects",
     },
 
     {
@@ -1856,14 +1626,57 @@ const Sidebar: React.FC<
 
       label: "Assignment",
 
-      icon:
-        "lucide:graduation-cap",
+      icon: "lucide:graduation-cap",
 
-      path:
-        "/school-admin/academic/subject-assignments",
+      path: "/school-admin/academic/subject-assignments",
     },
   ];
 
+  // ============================================
+  // STUDENT ITEMS
+  // ============================================
+
+  const studentItems = [
+    {
+      id: "all-students",
+
+      label: "All Students",
+
+      icon: "lucide:users",
+
+      path: "/school-admin/students",
+    },
+
+    {
+      id: "add-student",
+
+      label: "Add Student",
+
+      icon: "lucide:user-plus",
+
+      path: "/school-admin/students/add",
+    },
+
+    {
+      id: "class-wise-students",
+
+      label: "Class-wise Students",
+
+      icon: "lucide:school",
+
+      path: "/school-admin/students/class-wise",
+    },
+
+    {
+      id: "bulk-promotion",
+
+      label: "Bulk Promotion",
+
+      icon: "lucide:arrow-up-right",
+
+      path: "/school-admin/students/bulk-promotion",
+    },
+  ];
 
   // ============================================
   // ATTENDANCE ITEMS
@@ -1873,45 +1686,33 @@ const Sidebar: React.FC<
     {
       id: "mark-attendance",
 
-      label:
-        "Mark Attendance",
+      label: "Mark Attendance",
 
-      icon:
-        "lucide:user-check",
+      icon: "lucide:user-check",
 
-      path:
-        "/school-admin/attendance/mark",
+      path: "/school-admin/attendance/mark",
     },
 
     {
-      id:
-        "daily-attendance",
+      id: "daily-attendance",
 
-      label:
-        "Daily Attendance",
+      label: "Daily Attendance",
 
-      icon:
-        "lucide:calendar-days",
+      icon: "lucide:calendar-days",
 
-      path:
-        "/school-admin/attendance/daily",
+      path: "/school-admin/attendance/daily",
     },
 
     {
-      id:
-        "monthly-attendance",
+      id: "monthly-attendance",
 
-      label:
-        "Monthly Attendance",
+      label: "Monthly Attendance",
 
-      icon:
-        "lucide:calendar-range",
+      icon: "lucide:calendar-range",
 
-      path:
-        "/school-admin/attendance/monthly",
+      path: "/school-admin/attendance/monthly",
     },
   ];
-
 
   // ============================================
   // TIMETABLE ITEMS
@@ -1919,48 +1720,35 @@ const Sidebar: React.FC<
 
   const timetableItems = [
     {
-      id:
-        "weekly-timetable",
+      id: "weekly-timetable",
 
-      label:
-        "Weekly Timetable",
+      label: "Weekly Timetable",
 
-      icon:
-        "lucide:calendar-range",
+      icon: "lucide:calendar-range",
 
-      path:
-        "/school-admin/timetable/weekly",
+      path: "/school-admin/timetable/weekly",
     },
 
     {
-      id:
-        "daily-timetable",
+      id: "daily-timetable",
 
-      label:
-        "Daily Timetable",
+      label: "Daily Timetable",
 
-      icon:
-        "lucide:calendar-days",
+      icon: "lucide:calendar-days",
 
-      path:
-        "/school-admin/timetable/daily",
+      path: "/school-admin/timetable/daily",
     },
 
     {
-      id:
-        "teacher-timetable",
+      id: "teacher-timetable",
 
-      label:
-        "Teacher Timetable",
+      label: "Teacher Timetable",
 
-      icon:
-        "lucide:user-round",
+      icon: "lucide:user-round",
 
-      path:
-        "/school-admin/timetable/teacher",
+      path: "/school-admin/timetable/teacher",
     },
   ];
-
 
   // ============================================
   // OTHER ITEMS
@@ -1968,27 +1756,13 @@ const Sidebar: React.FC<
 
   const otherItems = [
     {
-      id: "students",
-
-      label: "Students",
-
-      icon:
-        "lucide:users",
-
-      path:
-        "/school-admin/students",
-    },
-
-    {
       id: "teachers",
 
       label: "Teachers",
 
-      icon:
-        "lucide:graduation-cap",
+      icon: "lucide:graduation-cap",
 
-      path:
-        "/school-admin/teachers",
+      path: "/school-admin/teachers",
     },
 
     {
@@ -1996,11 +1770,9 @@ const Sidebar: React.FC<
 
       label: "Homework",
 
-      icon:
-        "lucide:clipboard-list",
+      icon: "lucide:clipboard-list",
 
-      path:
-        "/school-admin/homework",
+      path: "/school-admin/homework",
     },
 
     {
@@ -2008,11 +1780,9 @@ const Sidebar: React.FC<
 
       label: "Exams",
 
-      icon:
-        "lucide:file-text",
+      icon: "lucide:file-text",
 
-      path:
-        "/school-admin/exams",
+      path: "/school-admin/exams",
     },
 
     {
@@ -2020,11 +1790,9 @@ const Sidebar: React.FC<
 
       label: "Results",
 
-      icon:
-        "lucide:chart-bar",
+      icon: "lucide:chart-bar",
 
-      path:
-        "/school-admin/results",
+      path: "/school-admin/results",
     },
 
     {
@@ -2032,11 +1800,9 @@ const Sidebar: React.FC<
 
       label: "Fees",
 
-      icon:
-        "lucide:credit-card",
+      icon: "lucide:credit-card",
 
-      path:
-        "/school-admin/fees",
+      path: "/school-admin/fees",
     },
 
     {
@@ -2044,11 +1810,9 @@ const Sidebar: React.FC<
 
       label: "Notices",
 
-      icon:
-        "lucide:megaphone",
+      icon: "lucide:megaphone",
 
-      path:
-        "/school-admin/notices",
+      path: "/school-admin/notices",
     },
 
     {
@@ -2056,11 +1820,9 @@ const Sidebar: React.FC<
 
       label: "Parents",
 
-      icon:
-        "lucide:heart",
+      icon: "lucide:heart",
 
-      path:
-        "/school-admin/parents",
+      path: "/school-admin/parents",
     },
 
     {
@@ -2068,11 +1830,9 @@ const Sidebar: React.FC<
 
       label: "Staff",
 
-      icon:
-        "lucide:briefcase-business",
+      icon: "lucide:briefcase-business",
 
-      path:
-        "/school-admin/staff",
+      path: "/school-admin/staff",
     },
 
     {
@@ -2080,11 +1840,9 @@ const Sidebar: React.FC<
 
       label: "Reports",
 
-      icon:
-        "lucide:chart-bar",
+      icon: "lucide:chart-bar",
 
-      path:
-        "/school-admin/reports",
+      path: "/school-admin/reports",
     },
 
     {
@@ -2092,24 +1850,17 @@ const Sidebar: React.FC<
 
       label: "Settings",
 
-      icon:
-        "lucide:settings",
+      icon: "lucide:settings",
 
-      path:
-        "/school-admin/settings",
+      path: "/school-admin/settings",
     },
   ];
-
 
   // ============================================
   // NAVIGATION
   // ============================================
 
-  const handleNavigation = (
-    id: string,
-    path: string
-  ) => {
-
+  const handleNavigation = (id: string, path: string) => {
     setCurrentTab(id);
 
     navigate(path);
@@ -2117,116 +1868,121 @@ const Sidebar: React.FC<
     onClose();
   };
 
-
   // ============================================
   // ACTIVE GROUP CHECK
   // ============================================
 
-  const isAcademicActive =
-    academicItems.some(
-      (item) =>
-        item.id === currentTab
-    );
+  const isAcademicActive = location.pathname.startsWith(
+    "/school-admin/academic",
+  );
 
+  const isStudentsActive = location.pathname.startsWith(
+    "/school-admin/students",
+  );
 
-  const isAttendanceActive =
-    attendanceItems.some(
-      (item) =>
-        item.id === currentTab
-    );
+  const isAttendanceActive = location.pathname.startsWith(
+    "/school-admin/attendance",
+  );
 
-
-  const isTimetableActive =
-    timetableItems.some(
-      (item) =>
-        item.id === currentTab
-    );
-
+  const isTimetableActive = location.pathname.startsWith(
+    "/school-admin/timetable",
+  );
 
   // ============================================
   // HOMEWORK ACTIVE
   // ============================================
 
-  const isHomeworkActive =
-    location.pathname.startsWith(
-      "/school-admin/homework"
-    );
-
+  const isHomeworkActive = location.pathname.startsWith(
+    "/school-admin/homework",
+  );
 
   // ============================================
   // AUTO OPEN ACADEMIC
   // ============================================
 
   useEffect(() => {
-
     if (isAcademicActive) {
-
       setIsAcademicOpen(true);
-
     }
-
   }, [isAcademicActive]);
 
+  // ============================================
+  // AUTO OPEN STUDENTS
+  // ============================================
+
+  useEffect(() => {
+    if (isStudentsActive) {
+      setIsStudentsOpen(true);
+    }
+  }, [isStudentsActive]);
 
   // ============================================
   // AUTO OPEN ATTENDANCE
   // ============================================
 
   useEffect(() => {
-
     if (isAttendanceActive) {
-
       setIsAttendanceOpen(true);
-
     }
-
   }, [isAttendanceActive]);
-
 
   // ============================================
   // AUTO OPEN TIMETABLE
   // ============================================
 
   useEffect(() => {
-
     if (isTimetableActive) {
-
       setIsTimetableOpen(true);
-
     }
-
   }, [isTimetableActive]);
 
+  // ============================================
+  // SYNC CURRENT TAB WITH STUDENT ROUTES
+  // ============================================
+
+  useEffect(() => {
+    if (location.pathname === "/school-admin/students") {
+      setCurrentTab("all-students");
+
+      return;
+    }
+
+    if (location.pathname.startsWith("/school-admin/students/add")) {
+      setCurrentTab("add-student");
+
+      return;
+    }
+
+    if (location.pathname.startsWith("/school-admin/students/class-wise")) {
+      setCurrentTab("class-wise-students");
+
+      return;
+    }
+
+    if (location.pathname.startsWith("/school-admin/students/bulk-promotion")) {
+      setCurrentTab("bulk-promotion");
+
+      return;
+    }
+  }, [location.pathname, setCurrentTab]);
 
   // ============================================
   // KEEP HOMEWORK ACTIVE ON CHILD ROUTES
   // ============================================
 
   useEffect(() => {
-
     if (isHomeworkActive) {
-
-      setCurrentTab(
-        "homework"
-      );
-
+      setCurrentTab("homework");
     }
-
-  }, [
-    isHomeworkActive,
-    setCurrentTab,
-  ]);
-
+  }, [isHomeworkActive, setCurrentTab]);
 
   return (
     <>
-
       {/* ========================================
           MOBILE OVERLAY
       ======================================== */}
 
       {isOpen && (
-
         <div
           className="
             fixed
@@ -2236,13 +1992,9 @@ const Sidebar: React.FC<
 
             lg:hidden
           "
-          onClick={
-            onClose
-          }
+          onClick={onClose}
         />
-
       )}
-
 
       {/* ========================================
           SIDEBAR
@@ -2272,15 +2024,9 @@ const Sidebar: React.FC<
           lg:h-full
           lg:translate-x-0
 
-          ${
-            isOpen
-              ? "translate-x-0"
-              : "-translate-x-full"
-          }
+          ${isOpen ? "translate-x-0" : "-translate-x-full"}
         `}
       >
-
-
         {/* ======================================
             HEADER
         ====================================== */}
@@ -2299,7 +2045,6 @@ const Sidebar: React.FC<
             py-5
           "
         >
-
           <div
             className="
               flex
@@ -2307,7 +2052,6 @@ const Sidebar: React.FC<
               gap-3
             "
           >
-
             <div
               className="
                 flex
@@ -2325,19 +2069,15 @@ const Sidebar: React.FC<
                 shadow-md
               "
             >
-
               <Icon
                 icon="lucide:graduation-cap"
                 className="
                   text-2xl
                 "
               />
-
             </div>
 
-
             <div>
-
               <p
                 className="
                   text-base
@@ -2348,7 +2088,6 @@ const Sidebar: React.FC<
                 Riverside Academy
               </p>
 
-
               <p
                 className="
                   text-xs
@@ -2357,17 +2096,12 @@ const Sidebar: React.FC<
               >
                 School ERP · 2025–26
               </p>
-
             </div>
-
           </div>
-
 
           <button
             type="button"
-            onClick={
-              onClose
-            }
+            onClick={onClose}
             className="
               p-1
 
@@ -2378,18 +2112,14 @@ const Sidebar: React.FC<
               lg:hidden
             "
           >
-
             <Icon
               icon="lucide:x"
               className="
                 text-xl
               "
             />
-
           </button>
-
         </div>
-
 
         {/* ======================================
             NAVIGATION
@@ -2415,7 +2145,6 @@ const Sidebar: React.FC<
             [&::-webkit-scrollbar-thumb]:bg-[#D1D5DB]
           "
         >
-
           <p
             className="
               px-3
@@ -2432,40 +2161,25 @@ const Sidebar: React.FC<
             Operations
           </p>
 
-
           <div
             className="
               space-y-1
               text-sm
             "
           >
-
-
             {/* ==================================
                 DASHBOARD
             ================================== */}
 
-            {dashboardItems.map(
-              (item) => {
+            {dashboardItems.map((item) => {
+              const isActive = currentTab === item.id;
 
-                const isActive =
-                  currentTab ===
-                  item.id;
-
-                return (
-
-                  <button
-                    key={
-                      item.id
-                    }
-                    type="button"
-                    onClick={() =>
-                      handleNavigation(
-                        item.id,
-                        item.path
-                      )
-                    }
-                    className={`
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => handleNavigation(item.id, item.path)}
+                  className={`
                       flex
                       min-h-11
                       w-full
@@ -2495,43 +2209,27 @@ const Sidebar: React.FC<
                             `
                       }
                     `}
-                  >
-
-                    <Icon
-                      icon={
-                        item.icon
-                      }
-                      className="
+                >
+                  <Icon
+                    icon={item.icon}
+                    className="
                         text-lg
                       "
-                    />
+                  />
 
-
-                    {
-                      item.label
-                    }
-
-                  </button>
-
-                );
-              }
-            )}
-
+                  {item.label}
+                </button>
+              );
+            })}
 
             {/* ==================================
                 ACADEMIC
             ================================== */}
 
             <div>
-
               <button
                 type="button"
-                onClick={() =>
-                  setIsAcademicOpen(
-                    (previous) =>
-                      !previous
-                  )
-                }
+                onClick={() => setIsAcademicOpen((previous) => !previous)}
                 className={`
                   flex
                   min-h-11
@@ -2549,8 +2247,7 @@ const Sidebar: React.FC<
                   duration-200
 
                   ${
-                    isAcademicActive ||
-                    isAcademicOpen
+                    isAcademicActive || isAcademicOpen
                       ? `
                           bg-[#E8F0FB]
                           text-[#1F5FAE]
@@ -2564,14 +2261,12 @@ const Sidebar: React.FC<
                   }
                 `}
               >
-
                 <Icon
                   icon="lucide:book-open"
                   className="
                     text-lg
                   "
                 />
-
 
                 <span
                   className="
@@ -2582,7 +2277,6 @@ const Sidebar: React.FC<
                   Academic
                 </span>
 
-
                 <Icon
                   icon={
                     isAcademicOpen
@@ -2593,12 +2287,9 @@ const Sidebar: React.FC<
                     text-sm
                   "
                 />
-
               </button>
 
-
               {isAcademicOpen && (
-
                 <div
                   className="
                     ml-4
@@ -2612,28 +2303,15 @@ const Sidebar: React.FC<
                     pl-2
                   "
                 >
+                  {academicItems.map((item) => {
+                    const isActive = currentTab === item.id;
 
-                  {academicItems.map(
-                    (item) => {
-
-                      const isActive =
-                        currentTab ===
-                        item.id;
-
-                      return (
-
-                        <button
-                          key={
-                            item.id
-                          }
-                          type="button"
-                          onClick={() =>
-                            handleNavigation(
-                              item.id,
-                              item.path
-                            )
-                          }
-                          className={`
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => handleNavigation(item.id, item.path)}
+                        className={`
                             flex
                             min-h-10
                             w-full
@@ -2664,68 +2342,173 @@ const Sidebar: React.FC<
                                   `
                             }
                           `}
-                        >
-
-                          <Icon
-                            icon={
-                              item.icon
-                            }
-                            className="
+                      >
+                        <Icon
+                          icon={item.icon}
+                          className="
                               text-base
                             "
-                          />
+                        />
 
-
-                          {
-                            item.label
-                          }
-
-                        </button>
-
-                      );
-                    }
-                  )}
-
+                        {item.label}
+                      </button>
+                    );
+                  })}
                 </div>
-
               )}
-
             </div>
 
+            {/* ==================================
+                STUDENTS
+            ================================== */}
+
+            <div>
+              <button
+                type="button"
+                onClick={() => setIsStudentsOpen((previous) => !previous)}
+                className={`
+                  flex
+                  min-h-11
+                  w-full
+                  items-center
+                  gap-3
+
+                  rounded-lg
+
+                  px-3
+
+                  font-semibold
+
+                  transition-all
+                  duration-200
+
+                  ${
+                    isStudentsActive || isStudentsOpen
+                      ? `
+                          bg-[#E8F0FB]
+                          text-[#1F5FAE]
+                        `
+                      : `
+                          text-[#6B7280]
+
+                          hover:bg-[#F9FAFB]
+                          hover:text-[#15243B]
+                        `
+                  }
+                `}
+              >
+                <Icon
+                  icon="lucide:users"
+                  className="
+                    text-lg
+                  "
+                />
+
+                <span
+                  className="
+                    flex-1
+                    text-left
+                  "
+                >
+                  Students
+                </span>
+
+                <Icon
+                  icon={
+                    isStudentsOpen
+                      ? "lucide:chevron-down"
+                      : "lucide:chevron-right"
+                  }
+                  className="
+                    text-sm
+                  "
+                />
+              </button>
+
+              {isStudentsOpen && (
+                <div
+                  className="
+                    ml-4
+                    mt-1
+
+                    space-y-1
+
+                    border-l-2
+                    border-[#E5E7EB]
+
+                    pl-2
+                  "
+                >
+                  {studentItems.map((item) => {
+                    const isActive = currentTab === item.id;
+
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => handleNavigation(item.id, item.path)}
+                        className={`
+                            flex
+                            min-h-10
+                            w-full
+                            items-center
+                            gap-3
+
+                            rounded-lg
+
+                            px-3
+
+                            text-sm
+                            font-medium
+
+                            transition-all
+                            duration-200
+
+                            ${
+                              isActive
+                                ? `
+                                    bg-[#E8F0FB]
+                                    text-[#1F5FAE]
+                                  `
+                                : `
+                                    text-[#6B7280]
+
+                                    hover:bg-[#F9FAFB]
+                                    hover:text-[#15243B]
+                                  `
+                            }
+                          `}
+                      >
+                        <Icon
+                          icon={item.icon}
+                          className="
+                              text-base
+                            "
+                        />
+
+                        {item.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
 
             {/* ==================================
-                STUDENTS + TEACHERS
+                TEACHERS
             ================================== */}
 
             {otherItems
-              .filter(
-                (item) =>
-                  item.id ===
-                    "students" ||
-                  item.id ===
-                    "teachers"
-              )
-              .map(
-                (item) => {
+              .filter((item) => item.id === "teachers")
+              .map((item) => {
+                const isActive = currentTab === item.id;
 
-                  const isActive =
-                    currentTab ===
-                    item.id;
-
-                  return (
-
-                    <button
-                      key={
-                        item.id
-                      }
-                      type="button"
-                      onClick={() =>
-                        handleNavigation(
-                          item.id,
-                          item.path
-                        )
-                      }
-                      className={`
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => handleNavigation(item.id, item.path)}
+                    className={`
                         flex
                         min-h-11
                         w-full
@@ -2755,43 +2538,27 @@ const Sidebar: React.FC<
                               `
                         }
                       `}
-                    >
-
-                      <Icon
-                        icon={
-                          item.icon
-                        }
-                        className="
+                  >
+                    <Icon
+                      icon={item.icon}
+                      className="
                           text-lg
                         "
-                      />
+                    />
 
-
-                      {
-                        item.label
-                      }
-
-                    </button>
-
-                  );
-                }
-              )}
-
+                    {item.label}
+                  </button>
+                );
+              })}
 
             {/* ==================================
                 ATTENDANCE
             ================================== */}
 
             <div>
-
               <button
                 type="button"
-                onClick={() =>
-                  setIsAttendanceOpen(
-                    (previous) =>
-                      !previous
-                  )
-                }
+                onClick={() => setIsAttendanceOpen((previous) => !previous)}
                 className={`
                   flex
                   min-h-11
@@ -2809,8 +2576,7 @@ const Sidebar: React.FC<
                   duration-200
 
                   ${
-                    isAttendanceActive ||
-                    isAttendanceOpen
+                    isAttendanceActive || isAttendanceOpen
                       ? `
                           bg-[#E8F0FB]
                           text-[#1F5FAE]
@@ -2824,14 +2590,12 @@ const Sidebar: React.FC<
                   }
                 `}
               >
-
                 <Icon
                   icon="lucide:calendar-check"
                   className="
                     text-lg
                   "
                 />
-
 
                 <span
                   className="
@@ -2842,7 +2606,6 @@ const Sidebar: React.FC<
                   Attendance
                 </span>
 
-
                 <Icon
                   icon={
                     isAttendanceOpen
@@ -2853,12 +2616,9 @@ const Sidebar: React.FC<
                     text-sm
                   "
                 />
-
               </button>
 
-
               {isAttendanceOpen && (
-
                 <div
                   className="
                     ml-4
@@ -2872,28 +2632,15 @@ const Sidebar: React.FC<
                     pl-2
                   "
                 >
+                  {attendanceItems.map((item) => {
+                    const isActive = currentTab === item.id;
 
-                  {attendanceItems.map(
-                    (item) => {
-
-                      const isActive =
-                        currentTab ===
-                        item.id;
-
-                      return (
-
-                        <button
-                          key={
-                            item.id
-                          }
-                          type="button"
-                          onClick={() =>
-                            handleNavigation(
-                              item.id,
-                              item.path
-                            )
-                          }
-                          className={`
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => handleNavigation(item.id, item.path)}
+                        className={`
                             flex
                             min-h-10
                             w-full
@@ -2924,49 +2671,30 @@ const Sidebar: React.FC<
                                   `
                             }
                           `}
-                        >
-
-                          <Icon
-                            icon={
-                              item.icon
-                            }
-                            className="
+                      >
+                        <Icon
+                          icon={item.icon}
+                          className="
                               text-base
                             "
-                          />
+                        />
 
-
-                          {
-                            item.label
-                          }
-
-                        </button>
-
-                      );
-                    }
-                  )}
-
+                        {item.label}
+                      </button>
+                    );
+                  })}
                 </div>
-
               )}
-
             </div>
-
 
             {/* ==================================
                 TIMETABLE
             ================================== */}
 
             <div>
-
               <button
                 type="button"
-                onClick={() =>
-                  setIsTimetableOpen(
-                    (previous) =>
-                      !previous
-                  )
-                }
+                onClick={() => setIsTimetableOpen((previous) => !previous)}
                 className={`
                   flex
                   min-h-11
@@ -2984,8 +2712,7 @@ const Sidebar: React.FC<
                   duration-200
 
                   ${
-                    isTimetableActive ||
-                    isTimetableOpen
+                    isTimetableActive || isTimetableOpen
                       ? `
                           bg-[#E8F0FB]
                           text-[#1F5FAE]
@@ -2999,14 +2726,12 @@ const Sidebar: React.FC<
                   }
                 `}
               >
-
                 <Icon
                   icon="lucide:calendar-clock"
                   className="
                     text-lg
                   "
                 />
-
 
                 <span
                   className="
@@ -3016,7 +2741,6 @@ const Sidebar: React.FC<
                 >
                   Timetable
                 </span>
-
 
                 <Icon
                   icon={
@@ -3028,12 +2752,9 @@ const Sidebar: React.FC<
                     text-sm
                   "
                 />
-
               </button>
 
-
               {isTimetableOpen && (
-
                 <div
                   className="
                     ml-4
@@ -3047,28 +2768,15 @@ const Sidebar: React.FC<
                     pl-2
                   "
                 >
+                  {timetableItems.map((item) => {
+                    const isActive = currentTab === item.id;
 
-                  {timetableItems.map(
-                    (item) => {
-
-                      const isActive =
-                        currentTab ===
-                        item.id;
-
-                      return (
-
-                        <button
-                          key={
-                            item.id
-                          }
-                          type="button"
-                          onClick={() =>
-                            handleNavigation(
-                              item.id,
-                              item.path
-                            )
-                          }
-                          className={`
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => handleNavigation(item.id, item.path)}
+                        className={`
                             flex
                             min-h-10
                             w-full
@@ -3099,67 +2807,37 @@ const Sidebar: React.FC<
                                   `
                             }
                           `}
-                        >
-
-                          <Icon
-                            icon={
-                              item.icon
-                            }
-                            className="
+                      >
+                        <Icon
+                          icon={item.icon}
+                          className="
                               text-base
                             "
-                          />
+                        />
 
-
-                          {
-                            item.label
-                          }
-
-                        </button>
-
-                      );
-                    }
-                  )}
-
+                        {item.label}
+                      </button>
+                    );
+                  })}
                 </div>
-
               )}
-
             </div>
-
 
             {/* ==================================
                 HOMEWORK
             ================================== */}
 
             {otherItems
-              .filter(
-                (item) =>
-                  item.id ===
-                  "homework"
-              )
-              .map(
-                (item) => {
+              .filter((item) => item.id === "homework")
+              .map((item) => {
+                const isActive = isHomeworkActive || currentTab === item.id;
 
-                  const isActive =
-                    isHomeworkActive ||
-                    currentTab ===
-                      item.id;
-
-                  return (
-
-                    <button
-                      key={
-                        item.id
-                      }
-                      type="button"
-                      onClick={() =>
-                        handleNavigation(
-                          item.id,
-                          item.path
-                        )
-                      }
-                      className={`
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => handleNavigation(item.id, item.path)}
+                    className={`
                         flex
                         min-h-11
                         w-full
@@ -3189,28 +2867,18 @@ const Sidebar: React.FC<
                               `
                         }
                       `}
-                    >
-
-                      <Icon
-                        icon={
-                          item.icon
-                        }
-                        className="
+                  >
+                    <Icon
+                      icon={item.icon}
+                      className="
                           text-lg
                         "
-                      />
+                    />
 
-
-                      {
-                        item.label
-                      }
-
-                    </button>
-
-                  );
-                }
-              )}
-
+                    {item.label}
+                  </button>
+                );
+              })}
 
             {/* ==================================
                 REMAINING ITEMS
@@ -3218,35 +2886,17 @@ const Sidebar: React.FC<
 
             {otherItems
               .filter(
-                (item) =>
-                  item.id !==
-                    "students" &&
-                  item.id !==
-                    "teachers" &&
-                  item.id !==
-                    "homework"
+                (item) => item.id !== "teachers" && item.id !== "homework",
               )
-              .map(
-                (item) => {
+              .map((item) => {
+                const isActive = currentTab === item.id;
 
-                  const isActive =
-                    currentTab ===
-                    item.id;
-
-                  return (
-
-                    <button
-                      key={
-                        item.id
-                      }
-                      type="button"
-                      onClick={() =>
-                        handleNavigation(
-                          item.id,
-                          item.path
-                        )
-                      }
-                      className={`
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => handleNavigation(item.id, item.path)}
+                    className={`
                         flex
                         min-h-11
                         w-full
@@ -3276,32 +2926,20 @@ const Sidebar: React.FC<
                               `
                         }
                       `}
-                    >
-
-                      <Icon
-                        icon={
-                          item.icon
-                        }
-                        className="
+                  >
+                    <Icon
+                      icon={item.icon}
+                      className="
                           text-lg
                         "
-                      />
+                    />
 
-
-                      {
-                        item.label
-                      }
-
-                    </button>
-
-                  );
-                }
-              )}
-
+                    {item.label}
+                  </button>
+                );
+              })}
           </div>
-
         </nav>
-
 
         {/* ======================================
             FOOTER
@@ -3321,15 +2959,11 @@ const Sidebar: React.FC<
             text-sm
           "
         >
+          {/* HELP */}
 
           <button
             type="button"
-            onClick={() =>
-              handleNavigation(
-                "help",
-                "/help"
-              )
-            }
+            onClick={() => handleNavigation("help", "/help")}
             className="
               flex
               min-h-11
@@ -3349,28 +2983,20 @@ const Sidebar: React.FC<
               hover:text-[#15243B]
             "
           >
-
             <Icon
               icon="lucide:circle-help"
               className="
                 text-lg
               "
             />
-
-
             Help & Support
-
           </button>
 
+          {/* PROFILE */}
 
           <button
             type="button"
-            onClick={() =>
-              handleNavigation(
-                "profile",
-                "/profile"
-              )
-            }
+            onClick={() => handleNavigation("profile", "/profile")}
             className="
               flex
               min-h-11
@@ -3390,36 +3016,25 @@ const Sidebar: React.FC<
               hover:text-[#15243B]
             "
           >
-
             <Icon
               icon="lucide:user"
               className="
                 text-lg
               "
             />
-
-
             Admin Profile
-
           </button>
 
+          {/* LOGOUT */}
 
           <button
             type="button"
             onClick={() => {
+              localStorage.removeItem("accessToken");
 
-              localStorage.removeItem(
-                "accessToken"
-              );
+              localStorage.removeItem("user");
 
-              localStorage.removeItem(
-                "user"
-              );
-
-              navigate(
-                "/login"
-              );
-
+              navigate("/login");
             }}
             className="
               flex
@@ -3439,26 +3054,18 @@ const Sidebar: React.FC<
               hover:bg-[#FEF2F2]
             "
           >
-
             <Icon
               icon="lucide:log-out"
               className="
                 text-lg
               "
             />
-
-
             Logout
-
           </button>
-
         </div>
-
       </aside>
-
     </>
   );
 };
-
 
 export default Sidebar;

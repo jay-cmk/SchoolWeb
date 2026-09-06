@@ -33,7 +33,11 @@ import homeworkSubmissionReducer
 import schoolAdminDashboardReducer
   from "../features/schoolAdminDashboard/schoolAdminDashboard.slice";  
 
+import studentReducer from "../features/student/student.slice";
 
+import studentPromotionReducer from "../features/student/studentPromotion.slice";
+import sessionSelectionReducer from
+  "../features/academic/sessions/sessionSelection.slice";
 
 
 export const store = configureStore({
@@ -64,6 +68,11 @@ export const store = configureStore({
 
    schoolAdminDashboard:
   schoolAdminDashboardReducer,
+  students: studentReducer,
+
+  studentPromotion: studentPromotionReducer,
+  sessionSelection:
+  sessionSelectionReducer,
   },
 
 });

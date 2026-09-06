@@ -1,57 +1,15 @@
-// import React, { useEffect, useMemo, useState } from "react";
-// import { Icon } from "@iconify/react";
-// import { useDispatch, useSelector } from "react-redux";
-// import { useNavigate } from "react-router-dom";
-// import HomeworkStats from "../../../components/homework/HomeworkStats";
-// import HomeworkFilters, { type FilterOption } from "../../../components/homework/HomeworkFilters";
-// import HomeworkTable from "../../../components/homework/HomeworkTable";
-// import HomeworkCalendar from "../../../components/homework/HomeworkCalendar";
-// import HomeworkState from "../../../components/homework/HomeworkState";
-// import { deleteHomework, getHomeworks, getHomeworkStats } from "../../../features/homework/homework.slice";
-// import type { HomeworkFilters as HomeworkFilterType } from "../../../features/homework/homework.types";
-
-// const optionOf = (list: any[], fallback = "name"): FilterOption[] => list.map((x:any)=>({ value: x._id ?? x.id, label: x.name ?? x.sessionName ?? x.title ?? x[fallback] ?? "Unnamed" })).filter(x=>x.value);
-
-// const HomeworkList: React.FC = () => {
-//   const dispatch = useDispatch<any>();
-//   const navigate = useNavigate();
-//   const { homeworks = [], stats = null, pagination = null, loading = false, error = null } = useSelector((s:any)=>s.homework ?? {});
-//   const [view, setView] = useState<"list"|"calendar">("list");
-//   const [filters, setFilters] = useState<HomeworkFilterType>({ page: 1, limit: 10 });
-
-//   const sessions = useSelector((s:any)=>s.sessions?.sessions ?? s.academicSessions?.sessions ?? []);
-//   const classes = useSelector((s:any)=>s.classes?.classes ?? []);
-//   const sections = useSelector((s:any)=>s.sections?.sections ?? []);
-//   const subjects = useSelector((s:any)=>s.subjects?.subjects ?? []);
-//   const teachers = useSelector((s:any)=>s.teachers?.teachers ?? []);
-
-//   useEffect(()=>{ dispatch(getHomeworks(filters)); dispatch(getHomeworkStats()); }, [dispatch, filters]);
-
-//   const options = useMemo(()=>({ sessions:optionOf(sessions), classes:optionOf(classes), sections:optionOf(sections), subjects:optionOf(subjects), teachers:optionOf(teachers) }),[sessions,classes,sections,subjects,teachers]);
-//   const remove = async (id:string) => { if (!window.confirm("Delete this homework?")) return; await dispatch(deleteHomework(id)); dispatch(getHomeworkStats()); };
-
-//   return <div className="min-h-screen bg-slate-50"><main className="mx-auto w-full max-w-[1400px] space-y-6 p-6 lg:p-8">
-//     <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"><div><div className="text-sm text-slate-500">Academics / Homework</div><h1 className="mt-2 text-2xl font-bold text-slate-900">Homework</h1><p className="mt-1 text-sm text-slate-500">Monitor assignments, deadlines and student submissions.</p></div><div className="flex flex-wrap gap-3"><div className="inline-flex rounded-lg border border-slate-200 bg-white p-1"><button onClick={()=>setView("list")} className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold ${view==="list"?"bg-blue-600 text-white":"text-slate-600 hover:bg-slate-50"}`}><Icon icon="lucide:list" className="h-4 w-4"/>List</button><button onClick={()=>setView("calendar")} className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold ${view==="calendar"?"bg-blue-600 text-white":"text-slate-600 hover:bg-slate-50"}`}><Icon icon="lucide:calendar" className="h-4 w-4"/>Calendar</button></div><button onClick={()=>navigate("/school-admin/homework/add")} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700"><Icon icon="lucide:plus" className="h-4 w-4"/>Add Homework</button></div></div>
-
-//     <HomeworkStats stats={stats}/>
-//     <HomeworkFilters filters={filters} {...options} onChange={setFilters} onReset={()=>setFilters({page:1,limit:10})}/>
-//     {loading && homeworks.length===0 ? <HomeworkState type="loading"/> : error ? <HomeworkState type="error" message={error} onRetry={()=>dispatch(getHomeworks(filters))}/> : homeworks.length===0 ? <HomeworkState type="empty"/> : view==="calendar" ? <HomeworkCalendar homeworks={homeworks} onView={(id)=>navigate(`/school-admin/homework/${id}`)}/> : <HomeworkTable homeworks={homeworks} onView={(id)=>navigate(`/school-admin/homework/${id}`)} onSubmissions={(id)=>navigate(`/school-admin/homework/${id}/submissions`)} onDelete={remove}/>} 
-
-//     {view==="list" && pagination && pagination.totalPages>1 && <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 text-sm"><span className="text-slate-500">Page {pagination.page} of {pagination.totalPages}</span><div className="flex gap-2"><button disabled={pagination.page<=1} onClick={()=>setFilters(f=>({...f,page:(pagination.page||1)-1}))} className="rounded-lg border border-slate-300 px-3 py-2 disabled:opacity-40">Previous</button><button disabled={pagination.page>=pagination.totalPages} onClick={()=>setFilters(f=>({...f,page:(pagination.page||1)+1}))} className="rounded-lg border border-slate-300 px-3 py-2 disabled:opacity-40">Next</button></div></div>}
-//   </main></div>;
-// };
-// export default HomeworkList;
 
 
-import React, {
+import {
   useEffect,
+  useMemo,
   useState,
 } from "react";
 
 import {
-  useDispatch,
-  useSelector,
-} from "react-redux";
+  useAppDispatch,
+  useAppSelector,
+} from "../../../app/hooks";
 
 import {
   useNavigate,
@@ -67,6 +25,7 @@ import HomeworkState from "../../../components/homework/HomeworkState";
 
 import {
   deleteHomework,
+  clearHomeworkState,
   getHomeworks,
   getHomeworkStats,
 } from "../../../features/homework/homework.slice";
@@ -100,7 +59,7 @@ const HomeworkList = () => {
     useNavigate();
 
   const dispatch =
-    useDispatch<any>();
+    useAppDispatch();
 
 
   // ====================================================
@@ -130,49 +89,67 @@ const HomeworkList = () => {
   // ====================================================
 
   const homeworkState =
-    useSelector(
-      (state: any) =>
+    useAppSelector(
+      (state) =>
         state.homework
     );
 
 
   const sessions =
-    useSelector(
-      (state: any) =>
-        state.sessions
-          ?.sessions ?? []
+    useAppSelector(
+      (state) =>
+        state.sessions.sessions
     );
 
 
   const classes =
-    useSelector(
-      (state: any) =>
-        state.classes
-          ?.classes ?? []
+    useAppSelector(
+      (state) =>
+        state.classes.classes
     );
 
 
   const sections =
-    useSelector(
-      (state: any) =>
-        state.sections
-          ?.sections ?? []
+    useAppSelector(
+      (state) =>
+        state.sections.sections
     );
 
 
   const subjects =
-    useSelector(
-      (state: any) =>
-        state.subjects
-          ?.subjects ?? []
+    useAppSelector(
+      (state) =>
+        state.subjects.subjects
     );
 
 
   const teachers =
-    useSelector(
-      (state: any) =>
-        state.teachers
-          ?.teachers ?? []
+    useAppSelector(
+      (state) =>
+        state.teachers.teachers
+    );
+
+
+  const selectedSessionId =
+    useAppSelector(
+      (state) =>
+        state.sessionSelection
+          .selectedSessionId
+    );
+
+
+  const selectedSession =
+    useMemo(
+      () =>
+        sessions.find(
+          (session) =>
+            session._id ===
+            selectedSessionId
+        ) ?? null,
+      [
+        sessions,
+        selectedSessionId,
+      ]
     );
 
 
@@ -211,32 +188,124 @@ const HomeworkList = () => {
   // ====================================================
 
   useEffect(() => {
-    dispatch(
-      getSessions()
-    );
-
-    dispatch(
-      getClasses()
-    );
-
-    dispatch(
-      getSections(
-        undefined
-      )
-    );
-
-    dispatch(
-      getSubjects(
-        undefined
-      )
-    );
+    if (sessions.length === 0) {
+      dispatch(
+        getSessions()
+      );
+    }
 
     dispatch(
       getTeachers(
         undefined
       )
     );
-  }, [dispatch]);
+  }, [
+    dispatch,
+    sessions.length,
+  ]);
+
+
+  // ====================================================
+  // GLOBAL SESSION CHANGE
+  // ====================================================
+
+  useEffect(() => {
+    setViewMode(
+      "list"
+    );
+
+    setFilters(
+      selectedSessionId
+        ? {
+            sessionId:
+              selectedSessionId,
+          }
+        : {}
+    );
+
+    dispatch(
+      clearHomeworkState()
+    );
+
+    if (!selectedSessionId) {
+      return;
+    }
+
+    dispatch(
+      getClasses({
+        sessionId:
+          selectedSessionId,
+      })
+    );
+
+    dispatch(
+      getSections({
+        sessionId:
+          selectedSessionId,
+      })
+    );
+
+    dispatch(
+      getSubjects({
+        sessionId:
+          selectedSessionId,
+      })
+    );
+  }, [
+    dispatch,
+    selectedSessionId,
+  ]);
+
+
+  const sessionClasses =
+    useMemo(
+      () =>
+        selectedSessionId
+          ? classes.filter(
+              (item) =>
+                item.sessionId ===
+                selectedSessionId
+            )
+          : [],
+      [classes, selectedSessionId]
+    );
+
+
+  const sessionSections =
+    useMemo(
+      () =>
+        selectedSessionId
+          ? sections.filter(
+              (item) =>
+                item.sessionId ===
+                  selectedSessionId &&
+                (
+                  !filters.classId ||
+                  item.classId ===
+                    filters.classId
+                )
+            )
+          : [],
+      [
+        sections,
+        selectedSessionId,
+        filters.classId,
+      ]
+    );
+
+
+  const sessionSubjects =
+    useMemo(
+      () =>
+        selectedSessionId
+          ? subjects.filter(
+              (item) =>
+                item.sessionId ===
+                selectedSessionId
+            )
+          : [],
+      [subjects, selectedSessionId]
+    );
 
 
   // ====================================================
@@ -244,9 +313,17 @@ const HomeworkList = () => {
   // ====================================================
 
   useEffect(() => {
+    if (!selectedSessionId) {
+      return;
+    }
+
     dispatch(
       getHomeworks(
-        filters
+        {
+          ...filters,
+          sessionId:
+            selectedSessionId,
+        }
       )
     );
 
@@ -256,6 +333,7 @@ const HomeworkList = () => {
   }, [
     dispatch,
     filters,
+    selectedSessionId,
   ]);
 
 
@@ -265,7 +343,14 @@ const HomeworkList = () => {
 
   const handleReset =
     () => {
-      setFilters({});
+      setFilters(
+        selectedSessionId
+          ? {
+              sessionId:
+                selectedSessionId,
+            }
+          : {}
+      );
     };
 
 
@@ -402,17 +487,32 @@ const HomeworkList = () => {
               student homework.
             </p>
 
+            <div className="mt-3 inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-700">
+              <Icon
+                icon="lucide:calendar-days"
+              />
+
+              <span className="font-medium">
+                {selectedSession
+                  ? `Academic Session: ${selectedSession.name}`
+                  : "Select an academic session from the Topbar"}
+              </span>
+            </div>
+
           </div>
 
 
           <button
             type="button"
+            disabled={
+              !selectedSessionId
+            }
             onClick={() =>
               navigate(
                 "/school-admin/homework/add"
               )
             }
-            className="flex h-11 items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 text-sm font-medium text-white hover:bg-blue-700"
+            className="flex h-11 items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
 
             <Icon
@@ -448,16 +548,21 @@ const HomeworkList = () => {
 
           <HomeworkFilters
             filters={filters}
-            sessions={sessions}
-            classes={classes}
-            sections={sections}
-            subjects={subjects}
+            classes={sessionClasses}
+            sections={sessionSections}
+            subjects={sessionSubjects}
             teachers={teachers}
             onChange={(
               newFilters
             ) =>
               setFilters({
                 ...newFilters,
+                ...(selectedSessionId
+                  ? {
+                      sessionId:
+                        selectedSessionId,
+                    }
+                  : {}),
                 page: 1,
               })
             }
@@ -598,6 +703,9 @@ const HomeworkList = () => {
             <HomeworkCalendar
               homeworks={
                 homeworks
+              }
+              onView={
+                handleView
               }
             />
 

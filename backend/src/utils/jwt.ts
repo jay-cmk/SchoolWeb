@@ -153,7 +153,7 @@ export const generateAccessToken = (
     payload,
     env.jwtAccessSecret,
     {
-      expiresIn: "60m",
+      expiresIn: "7d",
     }
   );
 };

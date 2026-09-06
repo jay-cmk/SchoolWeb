@@ -42,13 +42,9 @@ import type {
 
 interface SectionFormState {
   sessionId: string;
-
   classId: string;
-
   name: string;
-
   roomNumber: string;
-
   capacity: string;
 }
 
@@ -59,13 +55,9 @@ interface SectionFormState {
 
 const initialFormState: SectionFormState = {
   sessionId: "",
-
   classId: "",
-
   name: "",
-
   roomNumber: "",
-
   capacity: "",
 };
 
@@ -76,11 +68,8 @@ const initialFormState: SectionFormState = {
 
 interface StatCardProps {
   title: string;
-
   value: string | number;
-
   subtext: string;
-
   icon: string;
 }
 
@@ -93,11 +82,8 @@ const StatCard = ({
 }: StatCardProps) => {
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-
       <div className="flex items-start justify-between">
-
         <div>
-
           <p className="text-sm font-medium text-gray-500">
             {title}
           </p>
@@ -105,26 +91,19 @@ const StatCard = ({
           <p className="mt-2 text-3xl font-bold text-gray-900">
             {value}
           </p>
-
         </div>
 
-
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-
           <Icon
             icon={icon}
             className="text-xl"
           />
-
         </div>
-
       </div>
-
 
       <p className="mt-3 text-xs text-gray-500">
         {subtext}
       </p>
-
     </div>
   );
 };
@@ -135,9 +114,7 @@ const StatCard = ({
 // ============================================
 
 const Sections = () => {
-  const dispatch =
-    useAppDispatch();
-
+  const dispatch = useAppDispatch();
 
   // ============================================
   // REDUX
@@ -149,25 +126,31 @@ const Sections = () => {
     loading,
     error,
   } = useAppSelector(
-    (state) =>
-      state.sections
+    (state) => state.sections
   );
-
 
   const {
     sessions,
   } = useAppSelector(
-    (state) =>
-      state.sessions
+    (state) => state.sessions
   );
-
 
   const {
     classes,
   } = useAppSelector(
-    (state) =>
-      state.classes
+    (state) => state.classes
   );
+
+  // ============================================
+  // GLOBAL SELECTED SESSION
+  // ============================================
+
+  const selectedSessionId =
+    useAppSelector(
+      (state) =>
+        state.sessionSelection
+          .selectedSessionId
+    );
 
 
   // ============================================
@@ -179,30 +162,16 @@ const Sections = () => {
     setSearchQuery,
   ] = useState("");
 
-
-  const [
-    sessionFilter,
-    setSessionFilter,
-  ] = useState(
-    "ALL"
-  );
-
-
   const [
     classFilter,
     setClassFilter,
-  ] = useState(
-    "ALL"
-  );
-
+  ] = useState("ALL");
 
   const [
     statusFilter,
     setStatusFilter,
   ] = useState<
-    "ALL" |
-    "ACTIVE" |
-    "INACTIVE"
+    "ALL" | "ACTIVE" | "INACTIVE"
   >("ALL");
 
 
@@ -215,9 +184,7 @@ const Sections = () => {
     setCurrentPage,
   ] = useState(1);
 
-
-  const itemsPerPage =
-    6;
+  const itemsPerPage = 6;
 
 
   // ============================================
@@ -229,12 +196,10 @@ const Sections = () => {
     setShowCreateModal,
   ] = useState(false);
 
-
   const [
     showEditModal,
     setShowEditModal,
   ] = useState(false);
-
 
   const [
     showDetailsModal,
@@ -249,10 +214,9 @@ const Sections = () => {
   const [
     formData,
     setFormData,
-  ] =
-    useState<SectionFormState>(
-      initialFormState
-    );
+  ] = useState<SectionFormState>(
+    initialFormState
+  );
 
 
   // ============================================
@@ -264,55 +228,90 @@ const Sections = () => {
     setSubmitting,
   ] = useState(false);
 
-
   const [
     statusActionId,
     setStatusActionId,
-  ] =
-    useState<
-      string | null
-    >(null);
-
+  ] = useState<string | null>(
+    null
+  );
 
   const [
     activeMenu,
     setActiveMenu,
-  ] =
-    useState<
-      string | null
-    >(null);
-
+  ] = useState<string | null>(
+    null
+  );
 
   const [
     toastMessage,
     setToastMessage,
-  ] =
-    useState<
-      string | null
-    >(null);
+  ] = useState<string | null>(
+    null
+  );
 
 
   // ============================================
-  // INITIAL LOAD
+  // LOAD ACADEMIC SESSIONS
   // ============================================
 
   useEffect(() => {
+    if (sessions.length === 0) {
+      dispatch(getSessions());
+    }
+  }, [
+    dispatch,
+    sessions.length,
+  ]);
+
+
+  // ============================================
+  // LOAD DATA FOR GLOBAL SELECTED SESSION
+  // ============================================
+
+  useEffect(() => {
+    if (!selectedSessionId) {
+      return;
+    }
+
+    // Selected session ki classes
     dispatch(
-      getSections(
-        undefined
-      )
+      getClasses({
+        sessionId:
+          selectedSessionId,
+      })
+    );
+
+    // Selected session ke sections
+    dispatch(
+      getSections({
+        sessionId:
+          selectedSessionId,
+      })
+    );
+
+    // Session change hone par
+    // old class filter clear
+    setClassFilter("ALL");
+
+    // Pagination reset
+    setCurrentPage(1);
+
+    // Open modals close
+    setShowCreateModal(false);
+    setShowEditModal(false);
+    setShowDetailsModal(false);
+
+    setFormData(
+      initialFormState
     );
 
     dispatch(
-      getSessions()
+      clearSelectedSection()
     );
-
-    dispatch(
-      getClasses(
-        undefined
-      )
-    );
-  }, [dispatch]);
+  }, [
+    dispatch,
+    selectedSessionId,
+  ]);
 
 
   // ============================================
@@ -338,9 +337,7 @@ const Sections = () => {
 
   useEffect(() => {
     if (error) {
-      showToast(
-        error
-      );
+      showToast(error);
     }
   }, [error]);
 
@@ -352,21 +349,38 @@ const Sections = () => {
   const showToast = (
     message: string
   ) => {
-    setToastMessage(
-      message
-    );
-
+    setToastMessage(message);
 
     window.setTimeout(
       () => {
-        setToastMessage(
-          null
-        );
+        setToastMessage(null);
       },
-
       3000
     );
   };
+
+
+  // ============================================
+  // SELECTED SESSION
+  // ============================================
+
+  const selectedSession =
+    useMemo(() => {
+      if (!selectedSessionId) {
+        return null;
+      }
+
+      return (
+        sessions.find(
+          (session) =>
+            session._id ===
+            selectedSessionId
+        ) ?? null
+      );
+    }, [
+      sessions,
+      selectedSessionId,
+    ]);
 
 
   // ============================================
@@ -383,11 +397,7 @@ const Sections = () => {
           sessionId
       );
 
-
-    return (
-      session?.name ||
-      "-"
-    );
+    return session?.name || "-";
   };
 
 
@@ -405,60 +415,28 @@ const Sections = () => {
           classId
       );
 
-
-    return (
-      classData?.name ||
-      "-"
-    );
+    return classData?.name || "-";
   };
 
 
   // ============================================
-  // AVAILABLE CLASSES FOR FORM
+  // AVAILABLE CLASSES
   // ============================================
 
   const availableClasses =
     useMemo(() => {
-      if (
-        !formData.sessionId
-      ) {
-        return classes;
+      if (!selectedSessionId) {
+        return [];
       }
-
 
       return classes.filter(
         (classData) =>
           classData.sessionId ===
-          formData.sessionId
+          selectedSessionId
       );
     }, [
       classes,
-      formData.sessionId,
-    ]);
-
-
-  // ============================================
-  // FILTER CLASSES
-  // ============================================
-
-  const filterClasses =
-    useMemo(() => {
-      if (
-        sessionFilter ===
-        "ALL"
-      ) {
-        return classes;
-      }
-
-
-      return classes.filter(
-        (classData) =>
-          classData.sessionId ===
-          sessionFilter
-      );
-    }, [
-      classes,
-      sessionFilter,
+      selectedSessionId,
     ]);
 
 
@@ -476,35 +454,10 @@ const Sections = () => {
       value,
     } = e.target;
 
-
-    // Academic Session change hone par
-    // old selected class clear kar do
-    if (
-      name ===
-      "sessionId"
-    ) {
-      setFormData(
-        (previous) => ({
-          ...previous,
-
-          sessionId:
-            value,
-
-          classId:
-            "",
-        })
-      );
-
-      return;
-    }
-
-
     setFormData(
       (previous) => ({
         ...previous,
-
-        [name]:
-          value,
+        [name]: value,
       })
     );
   };
@@ -514,48 +467,48 @@ const Sections = () => {
   // OPEN CREATE MODAL
   // ============================================
 
-  const openCreateModal =
-    () => {
-      const currentSession =
-        sessions.find(
-          (session) =>
-            session.isCurrent
-        );
-
-
-      setFormData({
-        ...initialFormState,
-
-        sessionId:
-          currentSession
-            ?._id ||
-          sessions[0]
-            ?._id ||
-          "",
-      });
-
-
-      dispatch(
-        clearSectionError()
+  const openCreateModal = () => {
+    if (!selectedSessionId) {
+      showToast(
+        "Please select an academic session first"
       );
 
+      return;
+    }
 
-      setShowCreateModal(
-        true
-      );
-    };
-
-
-  const closeCreateModal =
-    () => {
-      setShowCreateModal(
-        false
+    if (
+      availableClasses.length ===
+      0
+    ) {
+      showToast(
+        "Create a class in the selected academic session first"
       );
 
-      setFormData(
-        initialFormState
-      );
-    };
+      return;
+    }
+
+    setFormData({
+      ...initialFormState,
+
+      sessionId:
+        selectedSessionId,
+    });
+
+    dispatch(
+      clearSectionError()
+    );
+
+    setShowCreateModal(true);
+  };
+
+
+  const closeCreateModal = () => {
+    setShowCreateModal(false);
+
+    setFormData(
+      initialFormState
+    );
+  };
 
 
   // ============================================
@@ -569,10 +522,7 @@ const Sections = () => {
     ) => {
       e.preventDefault();
 
-
-      if (
-        !formData.sessionId
-      ) {
+      if (!selectedSessionId) {
         showToast(
           "Academic session is required"
         );
@@ -580,10 +530,18 @@ const Sections = () => {
         return;
       }
 
-
       if (
-        !formData.classId
+        formData.sessionId !==
+        selectedSessionId
       ) {
+        showToast(
+          "Selected academic session does not match"
+        );
+
+        return;
+      }
+
+      if (!formData.classId) {
         showToast(
           "Class is required"
         );
@@ -591,17 +549,28 @@ const Sections = () => {
         return;
       }
 
+      const selectedClass =
+        availableClasses.find(
+          (classData) =>
+            classData._id ===
+            formData.classId
+        );
 
-      if (
-        !formData.name.trim()
-      ) {
+      if (!selectedClass) {
+        showToast(
+          "Selected class does not belong to this academic session"
+        );
+
+        return;
+      }
+
+      if (!formData.name.trim()) {
         showToast(
           "Section name is required"
         );
 
         return;
       }
-
 
       if (
         formData.capacity &&
@@ -616,25 +585,24 @@ const Sections = () => {
         return;
       }
 
-
       const payload:
         CreateSectionPayload =
         {
           sessionId:
-            formData.sessionId,
+            selectedSessionId,
 
           classId:
             formData.classId,
 
           name:
-            formData.name
-              .trim(),
+            formData.name.trim(),
 
           ...(formData.roomNumber
             .trim()
             ? {
                 roomNumber:
-                  formData.roomNumber.trim(),
+                  formData.roomNumber
+                    .trim(),
               }
             : {}),
 
@@ -648,12 +616,8 @@ const Sections = () => {
             : {}),
         };
 
-
       try {
-        setSubmitting(
-          true
-        );
-
+        setSubmitting(true);
 
         await dispatch(
           createSection(
@@ -661,39 +625,33 @@ const Sections = () => {
           )
         ).unwrap();
 
-
         showToast(
           "Section created successfully"
         );
 
-
         closeCreateModal();
 
-
         await dispatch(
-          getSections(
-            undefined
-          )
+          getSections({
+            sessionId:
+              selectedSessionId,
+          })
         ).unwrap();
 
       } catch (err) {
         showToast(
-          typeof err ===
-            "string"
+          typeof err === "string"
             ? err
             : "Failed to create section"
         );
       } finally {
-        setSubmitting(
-          false
-        );
+        setSubmitting(false);
       }
     };
 
 
   // ============================================
   // VIEW SECTION
-  // GET /academic/sections/:sectionId
   // ============================================
 
   const handleViewSection =
@@ -701,15 +659,11 @@ const Sections = () => {
       sectionId: string
     ) => {
       try {
-        setActiveMenu(
-          null
-        );
-
+        setActiveMenu(null);
 
         dispatch(
           clearSelectedSection()
         );
-
 
         await dispatch(
           getSectionById(
@@ -717,15 +671,13 @@ const Sections = () => {
           )
         ).unwrap();
 
-
         setShowDetailsModal(
           true
         );
 
       } catch (err) {
         showToast(
-          typeof err ===
-            "string"
+          typeof err === "string"
             ? err
             : "Failed to fetch section"
         );
@@ -738,7 +690,6 @@ const Sections = () => {
       setShowDetailsModal(
         false
       );
-
 
       dispatch(
         clearSelectedSection()
@@ -755,15 +706,11 @@ const Sections = () => {
       sectionId: string
     ) => {
       try {
-        setActiveMenu(
-          null
-        );
-
+        setActiveMenu(null);
 
         dispatch(
           clearSelectedSection()
         );
-
 
         const section =
           await dispatch(
@@ -771,7 +718,6 @@ const Sections = () => {
               sectionId
             )
           ).unwrap();
-
 
         setFormData({
           sessionId:
@@ -796,15 +742,13 @@ const Sections = () => {
               : "",
         });
 
-
         setShowEditModal(
           true
         );
 
       } catch (err) {
         showToast(
-          typeof err ===
-            "string"
+          typeof err === "string"
             ? err
             : "Failed to fetch section"
         );
@@ -818,11 +762,9 @@ const Sections = () => {
         false
       );
 
-
       setFormData(
         initialFormState
       );
-
 
       dispatch(
         clearSelectedSection()
@@ -832,7 +774,6 @@ const Sections = () => {
 
   // ============================================
   // UPDATE SECTION
-  // PUT /academic/sections/:sectionId
   // ============================================
 
   const handleUpdateSection =
@@ -840,7 +781,6 @@ const Sections = () => {
       e: React.FormEvent
     ) => {
       e.preventDefault();
-
 
       if (
         !selectedSection?._id
@@ -852,17 +792,25 @@ const Sections = () => {
         return;
       }
 
-
       if (
-        !formData.name.trim()
+        selectedSessionId &&
+        selectedSection.sessionId !==
+          selectedSessionId
       ) {
+        showToast(
+          "This section does not belong to the selected academic session"
+        );
+
+        return;
+      }
+
+      if (!formData.name.trim()) {
         showToast(
           "Section name is required"
         );
 
         return;
       }
-
 
       if (
         formData.capacity &&
@@ -877,13 +825,11 @@ const Sections = () => {
         return;
       }
 
-
       const data:
         UpdateSectionPayload =
         {
           name:
-            formData.name
-              .trim(),
+            formData.name.trim(),
 
           roomNumber:
             formData.roomNumber
@@ -899,12 +845,8 @@ const Sections = () => {
             : {}),
         };
 
-
       try {
-        setSubmitting(
-          true
-        );
-
+        setSubmitting(true);
 
         await dispatch(
           updateSection({
@@ -915,40 +857,35 @@ const Sections = () => {
           })
         ).unwrap();
 
-
         showToast(
           "Section updated successfully"
         );
 
-
         closeEditModal();
 
-
-        await dispatch(
-          getSections(
-            undefined
-          )
-        ).unwrap();
+        if (selectedSessionId) {
+          await dispatch(
+            getSections({
+              sessionId:
+                selectedSessionId,
+            })
+          ).unwrap();
+        }
 
       } catch (err) {
         showToast(
-          typeof err ===
-            "string"
+          typeof err === "string"
             ? err
             : "Failed to update section"
         );
-
       } finally {
-        setSubmitting(
-          false
-        );
+        setSubmitting(false);
       }
     };
 
 
   // ============================================
   // UPDATE STATUS
-  // PATCH /academic/sections/:sectionId/status
   // ============================================
 
   const handleToggleStatus =
@@ -956,15 +893,11 @@ const Sections = () => {
       section: SectionData
     ) => {
       try {
-        setActiveMenu(
-          null
-        );
-
+        setActiveMenu(null);
 
         setStatusActionId(
           section._id
         );
-
 
         await dispatch(
           updateSectionStatus({
@@ -976,7 +909,6 @@ const Sections = () => {
           })
         ).unwrap();
 
-
         showToast(
           section.isActive
             ? "Section marked inactive"
@@ -985,12 +917,10 @@ const Sections = () => {
 
       } catch (err) {
         showToast(
-          typeof err ===
-            "string"
+          typeof err === "string"
             ? err
             : "Failed to update section status"
         );
-
       } finally {
         setStatusActionId(
           null
@@ -1010,38 +940,40 @@ const Sections = () => {
           .trim()
           .toLowerCase();
 
-
       return sections.filter(
         (section) => {
+          /*
+           * API already selectedSessionId
+           * se filtered data la rahi hai.
+           *
+           * Ye extra check defensive hai.
+           */
+          const matchesSelectedSession =
+            !selectedSessionId ||
+            section.sessionId ===
+              selectedSessionId;
+
           const className =
             getClassName(
               section.classId
-            )
-              .toLowerCase();
-
+            ).toLowerCase();
 
           const sessionName =
             getSessionName(
               section.sessionId
-            )
-              .toLowerCase();
-
+            ).toLowerCase();
 
           const matchesSearch =
             section.name
               .toLowerCase()
-              .includes(
-                search
-              ) ||
+              .includes(search) ||
 
             (
               section.roomNumber ||
               ""
             )
               .toLowerCase()
-              .includes(
-                search
-              ) ||
+              .includes(search) ||
 
             className.includes(
               search
@@ -1051,20 +983,11 @@ const Sections = () => {
               search
             );
 
-
-          const matchesSession =
-            sessionFilter ===
-              "ALL" ||
-            section.sessionId ===
-              sessionFilter;
-
-
           const matchesClass =
             classFilter ===
               "ALL" ||
             section.classId ===
               classFilter;
-
 
           const matchesStatus =
             statusFilter ===
@@ -1082,10 +1005,9 @@ const Sections = () => {
               !section.isActive
             );
 
-
           return (
+            matchesSelectedSession &&
             matchesSearch &&
-            matchesSession &&
             matchesClass &&
             matchesStatus
           );
@@ -1095,8 +1017,8 @@ const Sections = () => {
       sections,
       sessions,
       classes,
+      selectedSessionId,
       searchQuery,
-      sessionFilter,
       classFilter,
       statusFilter,
     ]);
@@ -1112,7 +1034,6 @@ const Sections = () => {
         itemsPerPage
     );
 
-
   const paginatedSections =
     filteredSections.slice(
       (currentPage - 1) *
@@ -1127,22 +1048,9 @@ const Sections = () => {
     setCurrentPage(1);
   }, [
     searchQuery,
-    sessionFilter,
     classFilter,
     statusFilter,
-  ]);
-
-
-  // ============================================
-  // WHEN SESSION FILTER CHANGES
-  // ============================================
-
-  useEffect(() => {
-    setClassFilter(
-      "ALL"
-    );
-  }, [
-    sessionFilter,
+    selectedSessionId,
   ]);
 
 
@@ -1150,26 +1058,43 @@ const Sections = () => {
   // STATS
   // ============================================
 
+  const sessionSections =
+    useMemo(() => {
+      if (!selectedSessionId) {
+        return [];
+      }
+
+      return sections.filter(
+        (section) =>
+          section.sessionId ===
+          selectedSessionId
+      );
+    }, [
+      sections,
+      selectedSessionId,
+    ]);
+
+
   const totalSections =
-    sections.length;
+    sessionSections.length;
 
 
   const activeSections =
-    sections.filter(
+    sessionSections.filter(
       (section) =>
         section.isActive
     ).length;
 
 
   const inactiveSections =
-    sections.filter(
+    sessionSections.filter(
       (section) =>
         !section.isActive
     ).length;
 
 
   const totalCapacity =
-    sections.reduce(
+    sessionSections.reduce(
       (
         total,
         section
@@ -1179,7 +1104,6 @@ const Sections = () => {
           section.capacity ||
           0
         ),
-
       0
     );
 
@@ -1188,143 +1112,120 @@ const Sections = () => {
   // RESET FILTERS
   // ============================================
 
-  const resetFilters =
-    () => {
-      setSearchQuery(
-        ""
-      );
+  const resetFilters = () => {
+    setSearchQuery("");
 
-      setSessionFilter(
-        "ALL"
-      );
+    setClassFilter("ALL");
 
-      setClassFilter(
-        "ALL"
-      );
+    setStatusFilter("ALL");
 
-      setStatusFilter(
-        "ALL"
-      );
-
-      setCurrentPage(
-        1
-      );
-    };
+    setCurrentPage(1);
+  };
 
 
   // ============================================
   // EXPORT CSV
   // ============================================
 
-  const handleExport =
-    () => {
-      if (
-        filteredSections.length ===
-        0
-      ) {
-        showToast(
-          "No sections to export"
-        );
-
-        return;
-      }
-
-
-      const headers = [
-        "Section",
-        "Class",
-        "Academic Session",
-        "Room Number",
-        "Capacity",
-        "Status",
-      ];
-
-
-      const rows =
-        filteredSections.map(
-          (section) => [
-            section.name,
-
-            getClassName(
-              section.classId
-            ),
-
-            getSessionName(
-              section.sessionId
-            ),
-
-            section.roomNumber ||
-              "",
-
-            section.capacity ||
-              "",
-
-            section.isActive
-              ? "Active"
-              : "Inactive",
-          ]
-        );
-
-
-      const csv =
-        [
-          headers,
-          ...rows,
-        ]
-          .map(
-            (row) =>
-              row
-                .map(
-                  (item) =>
-                    `"${String(
-                      item
-                    ).replace(
-                      /"/g,
-                      '""'
-                    )}"`
-                )
-                .join(",")
-          )
-          .join("\n");
-
-
-      const blob =
-        new Blob(
-          [csv],
-          {
-            type:
-              "text/csv;charset=utf-8;",
-          }
-        );
-
-
-      const url =
-        URL.createObjectURL(
-          blob
-        );
-
-
-      const link =
-        document.createElement(
-          "a"
-        );
-
-
-      link.href =
-        url;
-
-
-      link.download =
-        "sections.csv";
-
-
-      link.click();
-
-
-      URL.revokeObjectURL(
-        url
+  const handleExport = () => {
+    if (
+      filteredSections.length ===
+      0
+    ) {
+      showToast(
+        "No sections to export"
       );
-    };
+
+      return;
+    }
+
+    const headers = [
+      "Section",
+      "Class",
+      "Academic Session",
+      "Room Number",
+      "Capacity",
+      "Status",
+    ];
+
+    const rows =
+      filteredSections.map(
+        (section) => [
+          section.name,
+
+          getClassName(
+            section.classId
+          ),
+
+          getSessionName(
+            section.sessionId
+          ),
+
+          section.roomNumber ||
+            "",
+
+          section.capacity ??
+            "",
+
+          section.isActive
+            ? "Active"
+            : "Inactive",
+        ]
+      );
+
+    const csv =
+      [
+        headers,
+        ...rows,
+      ]
+        .map(
+          (row) =>
+            row
+              .map(
+                (item) =>
+                  `"${String(
+                    item
+                  ).replace(
+                    /"/g,
+                    '""'
+                  )}"`
+              )
+              .join(",")
+        )
+        .join("\n");
+
+    const blob =
+      new Blob(
+        [csv],
+        {
+          type:
+            "text/csv;charset=utf-8;",
+        }
+      );
+
+    const url =
+      URL.createObjectURL(
+        blob
+      );
+
+    const link =
+      document.createElement(
+        "a"
+      );
+
+    link.href = url;
+
+    link.download =
+      selectedSession
+        ? `sections-${selectedSession.name}.csv`
+        : "sections.csv";
+
+    link.click();
+
+    URL.revokeObjectURL(
+      url
+    );
+  };
 
 
   // ============================================
@@ -1333,14 +1234,12 @@ const Sections = () => {
 
   if (
     loading &&
-    sections.length ===
-      0
+    sections.length === 0 &&
+    selectedSessionId
   ) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
-
         <div className="text-center">
-
           <Icon
             icon="lucide:loader-2"
             className="mx-auto animate-spin text-4xl text-blue-600"
@@ -1349,9 +1248,7 @@ const Sections = () => {
           <p className="mt-3 text-sm text-gray-500">
             Loading sections...
           </p>
-
         </div>
-
       </div>
     );
   }
@@ -1366,7 +1263,6 @@ const Sections = () => {
 
       {toastMessage && (
         <div className="fixed bottom-5 right-5 z-[100] flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-3 text-white shadow-xl">
-
           <Icon
             icon="lucide:info"
             className="text-lg text-green-400"
@@ -1375,7 +1271,6 @@ const Sections = () => {
           <span className="text-sm font-medium">
             {toastMessage}
           </span>
-
         </div>
       )}
 
@@ -1385,11 +1280,8 @@ const Sections = () => {
       ======================================== */}
 
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-
         <div>
-
           <div className="flex items-center gap-2 text-sm text-gray-500">
-
             <span>
               Academics
             </span>
@@ -1401,19 +1293,25 @@ const Sections = () => {
             <span className="font-semibold text-gray-900">
               Sections
             </span>
-
           </div>
-
 
           <h1 className="mt-2 text-3xl font-bold text-gray-900">
             Sections
           </h1>
 
-
           <p className="mt-1 text-sm text-gray-500">
             Manage class sections, rooms and student capacity.
           </p>
 
+          {selectedSession && (
+            <div className="mt-2 inline-flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700">
+              <Icon icon="lucide:calendar-range" />
+
+              Academic Session:
+              {" "}
+              {selectedSession.name}
+            </div>
+          )}
         </div>
 
 
@@ -1422,23 +1320,19 @@ const Sections = () => {
             openCreateModal
           }
           disabled={
-            sessions.length ===
-              0 ||
-            classes.length ===
+            !selectedSessionId ||
+            availableClasses.length ===
               0
           }
           className="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
-
           <Icon
             icon="lucide:plus"
             className="text-lg"
           />
 
           Add Section
-
         </button>
-
       </div>
 
 
@@ -1446,20 +1340,23 @@ const Sections = () => {
           MISSING DEPENDENCY
       ======================================== */}
 
-      {sessions.length ===
-        0 && (
+      {!selectedSessionId && (
         <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
-          Create an Academic Session before creating sections.
+          Select an Academic Session from the topbar first.
         </div>
       )}
 
 
-      {sessions.length >
-        0 &&
-        classes.length ===
+      {selectedSessionId &&
+        availableClasses.length ===
           0 && (
           <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
-            Create a Class before creating sections.
+            No classes exist in{" "}
+            <strong>
+              {selectedSession?.name ||
+                "the selected academic session"}
+            </strong>
+            . Create a Class before creating sections.
           </div>
         )}
 
@@ -1470,11 +1367,9 @@ const Sections = () => {
 
       {error && (
         <div className="mt-5 flex items-center justify-between rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-
           <span>
             {error}
           </span>
-
 
           <button
             onClick={() =>
@@ -1483,13 +1378,10 @@ const Sections = () => {
               )
             }
           >
-
             <Icon
               icon="lucide:x"
             />
-
           </button>
-
         </div>
       )}
 
@@ -1499,16 +1391,18 @@ const Sections = () => {
       ======================================== */}
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-
         <StatCard
           title="Total Sections"
           value={
             totalSections
           }
-          subtext="All class sections"
+          subtext={
+            selectedSession
+              ? `${selectedSession.name} sections`
+              : "Selected session sections"
+          }
           icon="lucide:layers"
         />
-
 
         <StatCard
           title="Active Sections"
@@ -1519,7 +1413,6 @@ const Sections = () => {
           icon="lucide:circle-check"
         />
 
-
         <StatCard
           title="Inactive Sections"
           value={
@@ -1529,7 +1422,6 @@ const Sections = () => {
           icon="lucide:circle-off"
         />
 
-
         <StatCard
           title="Total Capacity"
           value={
@@ -1538,7 +1430,6 @@ const Sections = () => {
           subtext="Combined student capacity"
           icon="lucide:users"
         />
-
       </div>
 
 
@@ -1551,13 +1442,11 @@ const Sections = () => {
         {/* FILTERS */}
 
         <div className="border-b border-gray-200 p-5">
-
           <div className="flex flex-col gap-3 xl:flex-row">
 
             {/* SEARCH */}
 
             <div className="relative flex-1">
-
               <Icon
                 icon="lucide:search"
                 className="absolute left-3 top-3.5 text-gray-400"
@@ -1576,48 +1465,7 @@ const Sections = () => {
                 placeholder="Search section, class or room..."
                 className="min-h-11 w-full rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm outline-none focus:border-blue-600"
               />
-
             </div>
-
-
-            {/* SESSION */}
-
-            <select
-              value={
-                sessionFilter
-              }
-              onChange={(e) =>
-                setSessionFilter(
-                  e.target.value
-                )
-              }
-              className="min-h-11 rounded-lg border border-gray-300 bg-white px-4 text-sm outline-none focus:border-blue-600"
-            >
-
-              <option value="ALL">
-                All Academic Sessions
-              </option>
-
-              {sessions.map(
-                (session) => (
-                  <option
-                    key={
-                      session._id
-                    }
-                    value={
-                      session._id
-                    }
-                  >
-                    {session.name}
-
-                    {session.isCurrent
-                      ? " (Current)"
-                      : ""}
-                  </option>
-                )
-              )}
-
-            </select>
 
 
             {/* CLASS */}
@@ -1631,14 +1479,16 @@ const Sections = () => {
                   e.target.value
                 )
               }
-              className="min-h-11 rounded-lg border border-gray-300 bg-white px-4 text-sm outline-none focus:border-blue-600"
+              disabled={
+                !selectedSessionId
+              }
+              className="min-h-11 rounded-lg border border-gray-300 bg-white px-4 text-sm outline-none focus:border-blue-600 disabled:bg-gray-100"
             >
-
               <option value="ALL">
                 All Classes
               </option>
 
-              {filterClasses.map(
+              {availableClasses.map(
                 (classData) => (
                   <option
                     key={
@@ -1652,7 +1502,6 @@ const Sections = () => {
                   </option>
                 )
               )}
-
             </select>
 
 
@@ -1672,7 +1521,6 @@ const Sections = () => {
               }
               className="min-h-11 rounded-lg border border-gray-300 bg-white px-4 text-sm outline-none focus:border-blue-600"
             >
-
               <option value="ALL">
                 All Status
               </option>
@@ -1684,7 +1532,6 @@ const Sections = () => {
               <option value="INACTIVE">
                 Inactive
               </option>
-
             </select>
 
 
@@ -1708,17 +1555,13 @@ const Sections = () => {
               }
               className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 text-sm font-medium hover:bg-gray-50"
             >
-
               <Icon
                 icon="lucide:download"
               />
 
               Export
-
             </button>
-
           </div>
-
         </div>
 
 
@@ -1727,13 +1570,9 @@ const Sections = () => {
         ======================================== */}
 
         <div className="overflow-x-auto">
-
           <table className="w-full min-w-[950px] text-left text-sm">
-
             <thead className="bg-gray-50 text-xs uppercase text-gray-500">
-
               <tr>
-
                 <th className="px-5 py-4 font-semibold">
                   Section
                 </th>
@@ -1765,14 +1604,11 @@ const Sections = () => {
                 <th className="px-5 py-4 text-right font-semibold">
                   Actions
                 </th>
-
               </tr>
-
             </thead>
 
 
             <tbody className="divide-y divide-gray-200">
-
               {paginatedSections.map(
                 (section) => (
                   <tr
@@ -1785,7 +1621,6 @@ const Sections = () => {
                     {/* SECTION */}
 
                     <td className="px-5 py-4">
-
                       <button
                         onClick={() =>
                           handleViewSection(
@@ -1797,58 +1632,48 @@ const Sections = () => {
                         Section{" "}
                         {section.name}
                       </button>
-
                     </td>
 
 
                     {/* CLASS */}
 
                     <td className="px-5 py-4 font-medium text-gray-700">
-
                       {getClassName(
                         section.classId
                       )}
-
                     </td>
 
 
                     {/* SESSION */}
 
                     <td className="px-5 py-4 text-gray-600">
-
                       {getSessionName(
                         section.sessionId
                       )}
-
                     </td>
 
 
                     {/* ROOM */}
 
                     <td className="px-5 py-4 text-gray-600">
-
                       {section.roomNumber ||
                         "-"}
-
                     </td>
 
 
                     {/* CAPACITY */}
 
                     <td className="px-5 py-4 text-gray-600">
-
                       {section.capacity !==
                       undefined
                         ? section.capacity
                         : "-"}
-
                     </td>
 
 
                     {/* STATUS */}
 
                     <td className="px-5 py-4">
-
                       <span
                         className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
                           section.isActive
@@ -1856,36 +1681,28 @@ const Sections = () => {
                             : "bg-gray-100 text-gray-600"
                         }`}
                       >
-
                         {section.isActive
                           ? "Active"
                           : "Inactive"}
-
                       </span>
-
                     </td>
 
 
                     {/* CREATED */}
 
                     <td className="px-5 py-4 text-gray-500">
-
                       {new Date(
                         section.createdAt
                       ).toLocaleDateString(
                         "en-IN"
                       )}
-
                     </td>
 
 
                     {/* ACTIONS */}
 
                     <td className="relative px-5 py-4 text-right">
-
                       <div className="flex justify-end gap-1">
-
-                        {/* VIEW */}
 
                         <button
                           onClick={() =>
@@ -1896,15 +1713,11 @@ const Sections = () => {
                           className="rounded-lg p-2 text-blue-600 hover:bg-blue-50"
                           title="View"
                         >
-
                           <Icon
                             icon="lucide:eye"
                           />
-
                         </button>
 
-
-                        {/* EDIT */}
 
                         <button
                           onClick={() =>
@@ -1915,18 +1728,13 @@ const Sections = () => {
                           className="rounded-lg p-2 text-amber-600 hover:bg-amber-50"
                           title="Edit"
                         >
-
                           <Icon
                             icon="lucide:pencil"
                           />
-
                         </button>
 
 
-                        {/* MORE */}
-
                         <div className="relative">
-
                           <button
                             onClick={() =>
                               setActiveMenu(
@@ -1938,18 +1746,15 @@ const Sections = () => {
                             }
                             className="rounded-lg p-2 text-gray-500 hover:bg-gray-100"
                           >
-
                             <Icon
                               icon="lucide:ellipsis-vertical"
                             />
-
                           </button>
 
 
                           {activeMenu ===
                             section._id && (
                             <div className="absolute right-0 top-10 z-50 w-48 rounded-lg border border-gray-200 bg-white py-1 text-left shadow-xl">
-
                               <button
                                 onClick={() =>
                                   handleToggleStatus(
@@ -1962,7 +1767,6 @@ const Sections = () => {
                                 }
                                 className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                               >
-
                                 <Icon
                                   icon={
                                     section.isActive
@@ -1977,24 +1781,16 @@ const Sections = () => {
                                   : section.isActive
                                     ? "Make Inactive"
                                     : "Make Active"}
-
                               </button>
-
                             </div>
                           )}
-
                         </div>
-
                       </div>
-
                     </td>
-
                   </tr>
                 )
               )}
-
             </tbody>
-
           </table>
 
 
@@ -2003,7 +1799,6 @@ const Sections = () => {
           {paginatedSections.length ===
             0 && (
             <div className="p-12 text-center">
-
               <Icon
                 icon="lucide:layers-3"
                 className="mx-auto text-4xl text-gray-400"
@@ -2014,12 +1809,12 @@ const Sections = () => {
               </h3>
 
               <p className="mt-1 text-sm text-gray-500">
-                Change filters or create a new section.
+                {selectedSession
+                  ? `No sections found for ${selectedSession.name}.`
+                  : "Select an academic session from the topbar."}
               </p>
-
             </div>
           )}
-
         </div>
 
 
@@ -2028,16 +1823,12 @@ const Sections = () => {
         ======================================== */}
 
         <div className="flex flex-col gap-3 border-t border-gray-200 p-4 sm:flex-row sm:items-center sm:justify-between">
-
           <p className="text-sm text-gray-500">
-
             Showing{" "}
-
             {filteredSections.length ===
             0
               ? 0
-              : (currentPage -
-                  1) *
+              : (currentPage - 1) *
                   itemsPerPage +
                 1}
 
@@ -2046,7 +1837,6 @@ const Sections = () => {
             {Math.min(
               currentPage *
                 itemsPerPage,
-
               filteredSections.length
             )}
 
@@ -2055,16 +1845,13 @@ const Sections = () => {
             {filteredSections.length}
 
             {" sections"}
-
           </p>
 
 
           <div className="flex gap-2">
-
             <button
               disabled={
-                currentPage ===
-                1
+                currentPage === 1
               }
               onClick={() =>
                 setCurrentPage(
@@ -2083,7 +1870,6 @@ const Sections = () => {
                 length:
                   totalPages,
               },
-
               (_, index) =>
                 index + 1
             ).map(
@@ -2110,8 +1896,7 @@ const Sections = () => {
 
             <button
               disabled={
-                totalPages ===
-                  0 ||
+                totalPages === 0 ||
                 currentPage ===
                   totalPages
               }
@@ -2125,11 +1910,8 @@ const Sections = () => {
             >
               Next
             </button>
-
           </div>
-
         </div>
-
       </section>
 
 
@@ -2144,8 +1926,9 @@ const Sections = () => {
           formData={
             formData
           }
-          sessions={
-            sessions
+          sessionName={
+            selectedSession?.name ||
+            "-"
           }
           classes={
             availableClasses
@@ -2180,8 +1963,10 @@ const Sections = () => {
           formData={
             formData
           }
-          sessions={
-            sessions
+          sessionName={
+            getSessionName(
+              formData.sessionId
+            )
           }
           classes={
             availableClasses
@@ -2230,7 +2015,6 @@ const Sections = () => {
             }
           />
         )}
-
     </div>
   );
 };
@@ -2248,11 +2032,8 @@ interface SectionFormModalProps {
   formData:
     SectionFormState;
 
-  sessions: {
-    _id: string;
-    name: string;
-    isCurrent: boolean;
-  }[];
+  sessionName:
+    string;
 
   classes: {
     _id: string;
@@ -2285,7 +2066,7 @@ const SectionFormModal = ({
   title,
   submitLabel,
   formData,
-  sessions,
+  sessionName,
   classes,
   submitting,
   disableRelations,
@@ -2295,15 +2076,12 @@ const SectionFormModal = ({
 }: SectionFormModalProps) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-
       <div className="w-full max-w-2xl rounded-2xl bg-white shadow-xl">
 
         {/* HEADER */}
 
         <div className="flex items-center justify-between border-b border-gray-200 px-6 py-5">
-
           <div>
-
             <h2 className="text-xl font-bold text-gray-900">
               {title}
             </h2>
@@ -2311,9 +2089,7 @@ const SectionFormModal = ({
             <p className="mt-1 text-sm text-gray-500">
               Configure section information.
             </p>
-
           </div>
-
 
           <button
             type="button"
@@ -2321,14 +2097,11 @@ const SectionFormModal = ({
               onClose
             }
           >
-
             <Icon
               icon="lucide:x"
               className="text-xl text-gray-500"
             />
-
           </button>
-
         </div>
 
 
@@ -2337,7 +2110,6 @@ const SectionFormModal = ({
             onSubmit
           }
         >
-
           <div className="space-y-5 p-6">
 
             {/* ==================================
@@ -2349,59 +2121,23 @@ const SectionFormModal = ({
               {/* SESSION */}
 
               <div>
-
                 <label className="mb-2 block text-sm font-semibold text-gray-700">
                   Academic Session *
                 </label>
 
-                <select
-                  name="sessionId"
-                  value={
-                    formData.sessionId
-                  }
-                  onChange={
-                    onChange
-                  }
-                  disabled={
-                    disableRelations
-                  }
-                  className="min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm outline-none focus:border-blue-600 disabled:bg-gray-100"
-                >
+                <div className="flex min-h-11 items-center rounded-lg border border-gray-300 bg-gray-100 px-3 text-sm font-medium text-gray-700">
+                  {sessionName}
+                </div>
 
-                  <option value="">
-                    Select Academic Session
-                  </option>
-
-                  {sessions.map(
-                    (session) => (
-                      <option
-                        key={
-                          session._id
-                        }
-                        value={
-                          session._id
-                        }
-                      >
-
-                        {session.name}
-
-                        {session.isCurrent
-                          ? " (Current)"
-                          : ""}
-
-                      </option>
-                    )
-                  )}
-
-                </select>
-
+                <p className="mt-1 text-xs text-gray-500">
+                  Session is controlled from the topbar.
+                </p>
               </div>
 
 
               {/* CLASS */}
 
               <div>
-
                 <label className="mb-2 block text-sm font-semibold text-gray-700">
                   Class *
                 </label>
@@ -2420,7 +2156,6 @@ const SectionFormModal = ({
                   }
                   className="min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm outline-none focus:border-blue-600 disabled:bg-gray-100"
                 >
-
                   <option value="">
                     Select Class
                   </option>
@@ -2439,18 +2174,15 @@ const SectionFormModal = ({
                       </option>
                     )
                   )}
-
                 </select>
 
-
-                {!formData.sessionId && (
-                  <p className="mt-1 text-xs text-gray-500">
-                    Select an academic session first.
+                {classes.length ===
+                  0 && (
+                  <p className="mt-1 text-xs text-amber-600">
+                    No classes are available in this academic session.
                   </p>
                 )}
-
               </div>
-
             </div>
 
 
@@ -2463,7 +2195,6 @@ const SectionFormModal = ({
               {/* SECTION NAME */}
 
               <div>
-
                 <label className="mb-2 block text-sm font-semibold text-gray-700">
                   Section Name *
                 </label>
@@ -2481,18 +2212,15 @@ const SectionFormModal = ({
                   className="min-h-11 w-full rounded-lg border border-gray-300 px-3 text-sm outline-none focus:border-blue-600"
                 />
 
-
                 <p className="mt-1 text-xs text-gray-500">
                   Example: A, B, C
                 </p>
-
               </div>
 
 
               {/* ROOM */}
 
               <div>
-
                 <label className="mb-2 block text-sm font-semibold text-gray-700">
                   Room Number
                 </label>
@@ -2509,9 +2237,7 @@ const SectionFormModal = ({
                   placeholder="Example: 201"
                   className="min-h-11 w-full rounded-lg border border-gray-300 px-3 text-sm outline-none focus:border-blue-600"
                 />
-
               </div>
-
             </div>
 
 
@@ -2520,7 +2246,6 @@ const SectionFormModal = ({
             ================================== */}
 
             <div>
-
               <label className="mb-2 block text-sm font-semibold text-gray-700">
                 Student Capacity
               </label>
@@ -2539,11 +2264,9 @@ const SectionFormModal = ({
                 className="min-h-11 w-full rounded-lg border border-gray-300 px-3 text-sm outline-none focus:border-blue-600"
               />
 
-
               <p className="mt-1 text-xs text-gray-500">
                 Maximum number of students that can be assigned to this section.
               </p>
-
             </div>
 
 
@@ -2552,17 +2275,13 @@ const SectionFormModal = ({
             ================================== */}
 
             <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
-
               <div className="flex gap-3">
-
                 <Icon
                   icon="lucide:info"
                   className="mt-0.5 shrink-0 text-xl text-blue-600"
                 />
 
-
                 <div>
-
                   <p className="text-sm font-semibold text-blue-900">
                     Student Roll Numbers
                   </p>
@@ -2570,13 +2289,9 @@ const SectionFormModal = ({
                   <p className="mt-1 text-xs leading-5 text-blue-700">
                     Roll number Section ka field nahi hai. Student module me each student ke saath sectionId aur rollNumber store hoga.
                   </p>
-
                 </div>
-
               </div>
-
             </div>
-
           </div>
 
 
@@ -2585,7 +2300,6 @@ const SectionFormModal = ({
           ================================== */}
 
           <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
-
             <button
               type="button"
               onClick={
@@ -2596,7 +2310,6 @@ const SectionFormModal = ({
               Cancel
             </button>
 
-
             <button
               type="submit"
               disabled={
@@ -2604,7 +2317,6 @@ const SectionFormModal = ({
               }
               className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
             >
-
               {submitting && (
                 <Icon
                   icon="lucide:loader-2"
@@ -2613,15 +2325,10 @@ const SectionFormModal = ({
               )}
 
               {submitLabel}
-
             </button>
-
           </div>
-
         </form>
-
       </div>
-
     </div>
   );
 };
@@ -2654,15 +2361,12 @@ const SectionDetailsModal = ({
 }: SectionDetailsModalProps) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-
       <div className="w-full max-w-xl rounded-2xl bg-white shadow-xl">
 
         {/* HEADER */}
 
         <div className="flex items-center justify-between border-b border-gray-200 px-6 py-5">
-
           <div>
-
             <h2 className="text-xl font-bold text-gray-900">
               Section Details
             </h2>
@@ -2670,23 +2374,18 @@ const SectionDetailsModal = ({
             <p className="mt-1 text-sm text-gray-500">
               Section information
             </p>
-
           </div>
-
 
           <button
             onClick={
               onClose
             }
           >
-
             <Icon
               icon="lucide:x"
               className="text-xl text-gray-500"
             />
-
           </button>
-
         </div>
 
 
@@ -2695,11 +2394,8 @@ const SectionDetailsModal = ({
           {/* MAIN INFO */}
 
           <div className="mb-6 rounded-xl bg-gray-50 p-5">
-
             <div className="flex items-start justify-between">
-
               <div>
-
                 <p className="text-sm text-gray-500">
                   {className}
                 </p>
@@ -2708,9 +2404,7 @@ const SectionDetailsModal = ({
                   Section{" "}
                   {section.name}
                 </h3>
-
               </div>
-
 
               <span
                 className={`rounded-full px-3 py-1 text-xs font-semibold ${
@@ -2719,29 +2413,23 @@ const SectionDetailsModal = ({
                     : "bg-gray-200 text-gray-600"
                 }`}
               >
-
                 {section.isActive
                   ? "Active"
                   : "Inactive"}
-
               </span>
-
             </div>
-
           </div>
 
 
           {/* DETAILS */}
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-
             <DetailItem
               label="Academic Session"
               value={
                 sessionName
               }
             />
-
 
             <DetailItem
               label="Class"
@@ -2750,14 +2438,12 @@ const SectionDetailsModal = ({
               }
             />
 
-
             <DetailItem
               label="Section"
               value={
                 section.name
               }
             />
-
 
             <DetailItem
               label="Room Number"
@@ -2766,7 +2452,6 @@ const SectionDetailsModal = ({
                 "-"
               }
             />
-
 
             <DetailItem
               label="Capacity"
@@ -2780,7 +2465,6 @@ const SectionDetailsModal = ({
               }
             />
 
-
             <DetailItem
               label="Status"
               value={
@@ -2789,7 +2473,6 @@ const SectionDetailsModal = ({
                   : "Inactive"
               }
             />
-
 
             <DetailItem
               label="Created"
@@ -2800,7 +2483,6 @@ const SectionDetailsModal = ({
               )}
             />
 
-
             <DetailItem
               label="Updated"
               value={new Date(
@@ -2809,14 +2491,11 @@ const SectionDetailsModal = ({
                 "en-IN"
               )}
             />
-
           </div>
-
         </div>
 
 
         <div className="flex justify-end border-t border-gray-200 px-6 py-4">
-
           <button
             onClick={
               onClose
@@ -2825,11 +2504,8 @@ const SectionDetailsModal = ({
           >
             Close
           </button>
-
         </div>
-
       </div>
-
     </div>
   );
 };
@@ -2840,11 +2516,8 @@ const SectionDetailsModal = ({
 // ============================================
 
 interface DetailItemProps {
-  label:
-    string;
-
-  value:
-    string;
+  label: string;
+  value: string;
 }
 
 
@@ -2854,7 +2527,6 @@ const DetailItem = ({
 }: DetailItemProps) => {
   return (
     <div>
-
       <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
         {label}
       </p>
@@ -2862,7 +2534,6 @@ const DetailItem = ({
       <p className="mt-1 font-semibold text-gray-900">
         {value}
       </p>
-
     </div>
   );
 };

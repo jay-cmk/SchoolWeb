@@ -1,0 +1,1258 @@
+import React, { useEffect, useMemo, useState } from "react";
+
+import { useNavigate } from "react-router-dom";
+
+import { Icon } from "@iconify/react";
+
+import { getSessions } from "../../../features/academic/sessions/session.slice";
+
+import { getClasses } from "../../../features/academic/classes/class.slice";
+
+import { getSections } from "../../../features/academic/sections/section.slice";
+
+import {
+  clearStudents,
+  getStudentsByEnrollment,
+} from "../../../features/student/student.slice";
+
+import type {
+  Student,
+  StudentEnrollmentFilters,
+} from "../../../features/student/student.types";
+
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+
+const ClassWiseStudents: React.FC = () => {
+  const dispatch = useAppDispatch();
+
+  const navigate = useNavigate();
+
+  // ============================================
+  // REDUX
+  // ============================================
+
+  const { sessions, loading: sessionLoading } = useAppSelector(
+    (state) => state.sessions,
+  );
+
+  const { classes, loading: classLoading } = useAppSelector(
+    (state) => state.classes,
+  );
+
+  const { sections, loading: sectionLoading } = useAppSelector(
+    (state) => state.sections,
+  );
+
+  const {
+    students,
+    loading: studentLoading,
+    error: studentError,
+  } = useAppSelector((state) => state.students);
+
+  const { selectedSessionId } = useAppSelector(
+    (state) => state.sessionSelection,
+  );
+
+  // ============================================
+  // LOCAL STATE
+  // ============================================
+
+  const [classId, setClassId] = useState("");
+
+  const [sectionId, setSectionId] = useState("");
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // ============================================
+  // INITIAL SESSIONS
+  // ============================================
+
+  useEffect(() => {
+    if (sessions.length === 0) {
+      dispatch(getSessions());
+    }
+  }, [dispatch, sessions.length]);
+
+  // ============================================
+  // GLOBAL SESSION CHANGE
+  // ============================================
+
+  useEffect(() => {
+    setClassId("");
+    setSectionId("");
+    setSearchQuery("");
+
+    dispatch(clearStudents());
+
+    if (!selectedSessionId) {
+      return;
+    }
+
+    dispatch(
+      getClasses({
+        sessionId: selectedSessionId,
+      }),
+    );
+  }, [dispatch, selectedSessionId]);
+
+  // ============================================
+  // FILTER CLASSES
+  // ============================================
+
+  const filteredClasses = useMemo(() => {
+    if (!selectedSessionId) {
+      return [];
+    }
+
+    return classes.filter(
+      (classItem) => classItem.sessionId === selectedSessionId,
+    );
+  }, [classes, selectedSessionId]);
+
+  // ============================================
+  // FILTER SECTIONS
+  // ============================================
+
+  const filteredSections = useMemo(() => {
+    if (!selectedSessionId || !classId) {
+      return [];
+    }
+
+    return sections.filter(
+      (section) =>
+        section.sessionId === selectedSessionId && section.classId === classId,
+    );
+  }, [sections, selectedSessionId, classId]);
+
+  // ============================================
+  // SELECTED DATA
+  // ============================================
+
+  const selectedSession = useMemo(
+    () => sessions.find((session) => session._id === selectedSessionId),
+    [sessions, selectedSessionId],
+  );
+
+  const selectedClass = useMemo(
+    () => filteredClasses.find((classItem) => classItem._id === classId),
+    [filteredClasses, classId],
+  );
+
+  const selectedSection = useMemo(
+    () => filteredSections.find((section) => section._id === sectionId),
+    [filteredSections, sectionId],
+  );
+
+  // ============================================
+  // CLASS CHANGE
+  // ============================================
+
+  const handleClassChange = (value: string) => {
+    setClassId(value);
+    setSectionId("");
+    setSearchQuery("");
+
+    dispatch(clearStudents());
+
+    if (!selectedSessionId || !value) {
+      return;
+    }
+
+    dispatch(
+      getSections({
+        sessionId: selectedSessionId,
+
+        classId: value,
+      }),
+    );
+  };
+
+  // ============================================
+  // SECTION CHANGE
+  // ============================================
+
+  const handleSectionChange = (value: string) => {
+    setSectionId(value);
+    setSearchQuery("");
+
+    dispatch(clearStudents());
+  };
+
+  // ============================================
+  // LOAD STUDENTS FROM ENROLLMENT HISTORY
+  // ============================================
+
+  useEffect(() => {
+    if (!selectedSessionId || !classId || !sectionId) {
+      return;
+    }
+
+    const filters: StudentEnrollmentFilters = {
+      sessionId: selectedSessionId,
+
+      classId,
+
+      sectionId,
+    };
+
+    dispatch(getStudentsByEnrollment(filters));
+  }, [dispatch, selectedSessionId, classId, sectionId]);
+
+  // ============================================
+  // SEARCH
+  // ============================================
+
+  const filteredStudents = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    if (!query) {
+      return students;
+    }
+
+    return students.filter((student) => {
+      const name = student.name?.toLowerCase() || "";
+
+      const admissionNumber = student.admissionNumber?.toLowerCase() || "";
+
+      const rollNumber = student.rollNumber?.toString().toLowerCase() || "";
+
+      const email = student.email?.toLowerCase() || "";
+
+      const mobile = student.mobile?.toLowerCase() || "";
+
+      return (
+        name.includes(query) ||
+        admissionNumber.includes(query) ||
+        rollNumber.includes(query) ||
+        email.includes(query) ||
+        mobile.includes(query)
+      );
+    });
+  }, [students, searchQuery]);
+
+  // ============================================
+  // VIEW STUDENT
+  // ============================================
+
+  const handleViewStudent = (student: Student) => {
+    navigate(`/school-admin/students/${student._id}`);
+  };
+
+  // ============================================
+  // COMMON INPUT CLASS
+  // ============================================
+
+  const inputClassName = `
+    min-h-11
+    w-full
+    rounded-lg
+    border
+    border-[#D1D5DB]
+    bg-white
+    px-3
+    text-sm
+    text-[#15243B]
+    outline-none
+    transition-all
+    focus:border-[#1F5FAE]
+    focus:ring-1
+    focus:ring-[#1F5FAE]
+    disabled:cursor-not-allowed
+    disabled:bg-[#F9FAFB]
+    disabled:text-[#9CA3AF]
+  `;
+
+  // ============================================
+  // LOADING
+  // ============================================
+
+  const initialLoading = studentLoading && students.length === 0;
+
+  // ============================================
+  // RETRY
+  // ============================================
+
+  const handleRetry = () => {
+    if (!selectedSessionId || !classId || !sectionId) {
+      return;
+    }
+
+    const filters: StudentEnrollmentFilters = {
+      sessionId: selectedSessionId,
+
+      classId,
+
+      sectionId,
+    };
+
+    dispatch(getStudentsByEnrollment(filters));
+  };
+
+  return (
+    <div
+      className="
+        min-h-full
+        bg-[#F7F9FC]
+        p-4
+        md:p-6
+        lg:p-8
+      "
+    >
+      {/* ========================================
+          HEADER
+      ======================================== */}
+
+      <div
+        className="
+          mb-6
+          flex
+          flex-col
+          gap-4
+          lg:flex-row
+          lg:items-center
+          lg:justify-between
+        "
+      >
+        <div>
+          <div
+            className="
+              mb-2
+              flex
+              items-center
+              gap-2
+              text-sm
+              text-[#6B7280]
+            "
+          >
+            <button
+              type="button"
+              onClick={() => navigate("/school-admin/students")}
+              className="
+                hover:text-[#1F5FAE]
+              "
+            >
+              Students
+            </button>
+
+            <Icon icon="lucide:chevron-right" className="text-sm" />
+
+            <span
+              className="
+                text-[#15243B]
+              "
+            >
+              Class-wise Students
+            </span>
+          </div>
+
+          <h1
+            className="
+              text-2xl
+              font-bold
+              text-[#15243B]
+              md:text-3xl
+            "
+          >
+            Class-wise Students
+          </h1>
+
+          <p
+            className="
+              mt-1
+              text-sm
+              text-[#6B7280]
+            "
+          >
+            View students from the selected academic session, class and section.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          disabled={!selectedSessionId}
+          onClick={() => navigate("/school-admin/students/add")}
+          className="
+            inline-flex
+            min-h-11
+            items-center
+            justify-center
+            gap-2
+            rounded-lg
+            bg-[#1F5FAE]
+            px-5
+            text-sm
+            font-semibold
+            text-white
+            transition-colors
+            hover:bg-[#174F91]
+            disabled:cursor-not-allowed
+            disabled:opacity-50
+          "
+        >
+          <Icon icon="lucide:user-plus" className="text-lg" />
+          Add Student
+        </button>
+      </div>
+
+      {/* ========================================
+          ERROR
+      ======================================== */}
+
+      {studentError && (
+        <div
+          className="
+            mb-5
+            flex
+            items-start
+            gap-3
+            rounded-lg
+            border
+            border-red-200
+            bg-red-50
+            p-4
+          "
+        >
+          <Icon
+            icon="lucide:circle-alert"
+            className="
+              mt-0.5
+              shrink-0
+              text-xl
+              text-red-500
+            "
+          />
+
+          <div className="flex-1">
+            <p
+              className="
+                text-sm
+                font-semibold
+                text-red-700
+              "
+            >
+              Failed to load students
+            </p>
+
+            <p
+              className="
+                mt-1
+                text-sm
+                text-red-600
+              "
+            >
+              {studentError}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleRetry}
+            className="
+              text-sm
+              font-semibold
+              text-red-700
+              hover:underline
+            "
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      {/* ========================================
+          FILTER CARD
+      ======================================== */}
+
+      <div
+        className="
+          mb-6
+          rounded-xl
+          border
+          border-[#E5E7EB]
+          bg-white
+        "
+      >
+        <div
+          className="
+            border-b
+            border-[#E5E7EB]
+            px-5
+            py-4
+          "
+        >
+          <div
+            className="
+              flex
+              items-center
+              gap-3
+            "
+          >
+            <div
+              className="
+                flex
+                h-10
+                w-10
+                items-center
+                justify-center
+                rounded-lg
+                bg-[#E8F0FB]
+                text-[#1F5FAE]
+              "
+            >
+              <Icon icon="lucide:list-filter" className="text-xl" />
+            </div>
+
+            <div>
+              <h2
+                className="
+                  font-semibold
+                  text-[#15243B]
+                "
+              >
+                Select Class
+              </h2>
+
+              <p
+                className="
+                  text-xs
+                  text-[#6B7280]
+                "
+              >
+                Global Session → Class → Section
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className="
+            grid
+            grid-cols-1
+            gap-5
+            p-5
+            md:grid-cols-3
+          "
+        >
+          {/* SESSION */}
+
+          <div>
+            <label
+              className="
+                mb-2
+                block
+                text-sm
+                font-semibold
+                text-[#15243B]
+              "
+            >
+              Academic Session
+            </label>
+
+            <div
+              className="
+                flex
+                min-h-11
+                w-full
+                items-center
+                rounded-lg
+                border
+                border-[#D1D5DB]
+                bg-[#F9FAFB]
+                px-3
+                text-sm
+                font-semibold
+                text-[#15243B]
+              "
+            >
+              {sessionLoading
+                ? "Loading session..."
+                : selectedSession?.name || "No session selected"}
+            </div>
+          </div>
+
+          {/* CLASS */}
+
+          <div>
+            <label
+              className="
+                mb-2
+                block
+                text-sm
+                font-semibold
+                text-[#15243B]
+              "
+            >
+              Class
+            </label>
+
+            <select
+              value={classId}
+              onChange={(event) => handleClassChange(event.target.value)}
+              disabled={!selectedSessionId || classLoading}
+              className={inputClassName}
+            >
+              <option value="">
+                {classLoading
+                  ? "Loading classes..."
+                  : !selectedSessionId
+                    ? "Select session from topbar"
+                    : "Select class"}
+              </option>
+
+              {filteredClasses.map((classItem) => (
+                <option key={classItem._id} value={classItem._id}>
+                  {classItem.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* SECTION */}
+
+          <div>
+            <label
+              className="
+                mb-2
+                block
+                text-sm
+                font-semibold
+                text-[#15243B]
+              "
+            >
+              Section
+            </label>
+
+            <select
+              value={sectionId}
+              onChange={(event) => handleSectionChange(event.target.value)}
+              disabled={!classId || sectionLoading}
+              className={inputClassName}
+            >
+              <option value="">
+                {sectionLoading
+                  ? "Loading sections..."
+                  : !classId
+                    ? "Select class first"
+                    : "Select section"}
+              </option>
+
+              {filteredSections.map((section) => (
+                <option key={section._id} value={section._id}>
+                  {section.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* ========================================
+          NO GLOBAL SESSION
+      ======================================== */}
+
+      {!selectedSessionId ? (
+        <div
+          className="
+            flex
+            min-h-[350px]
+            items-center
+            justify-center
+            rounded-xl
+            border
+            border-[#E5E7EB]
+            bg-white
+            p-6
+          "
+        >
+          <div
+            className="
+              max-w-md
+              text-center
+            "
+          >
+            <div
+              className="
+                mx-auto
+                flex
+                h-14
+                w-14
+                items-center
+                justify-center
+                rounded-full
+                bg-[#E8F0FB]
+                text-[#1F5FAE]
+              "
+            >
+              <Icon icon="lucide:calendar-days" className="text-2xl" />
+            </div>
+
+            <h3
+              className="
+                mt-4
+                font-semibold
+                text-[#15243B]
+              "
+            >
+              Select academic session
+            </h3>
+
+            <p
+              className="
+                mt-1
+                text-sm
+                leading-6
+                text-[#6B7280]
+              "
+            >
+              Select an academic session from the topbar first.
+            </p>
+          </div>
+        </div>
+      ) : !classId || !sectionId ? (
+        <div
+          className="
+            flex
+            min-h-[350px]
+            items-center
+            justify-center
+            rounded-xl
+            border
+            border-[#E5E7EB]
+            bg-white
+            p-6
+          "
+        >
+          <div
+            className="
+              max-w-md
+              text-center
+            "
+          >
+            <div
+              className="
+                mx-auto
+                flex
+                h-14
+                w-14
+                items-center
+                justify-center
+                rounded-full
+                bg-[#E8F0FB]
+                text-[#1F5FAE]
+              "
+            >
+              <Icon icon="lucide:school" className="text-2xl" />
+            </div>
+
+            <h3
+              className="
+                mt-4
+                font-semibold
+                text-[#15243B]
+              "
+            >
+              Select class and section
+            </h3>
+
+            <p
+              className="
+                mt-1
+                text-sm
+                leading-6
+                text-[#6B7280]
+              "
+            >
+              Current global session is{" "}
+              <strong>{selectedSession?.name || "-"}</strong>. Select class and
+              section above to view students.
+            </p>
+          </div>
+        </div>
+      ) : initialLoading ? (
+        <div
+          className="
+            flex
+            min-h-[350px]
+            items-center
+            justify-center
+            rounded-xl
+            border
+            border-[#E5E7EB]
+            bg-white
+          "
+        >
+          <div className="text-center">
+            <Icon
+              icon="lucide:loader-circle"
+              className="
+                mx-auto
+                animate-spin
+                text-4xl
+                text-[#1F5FAE]
+              "
+            />
+
+            <p
+              className="
+                mt-3
+                text-sm
+                text-[#6B7280]
+              "
+            >
+              Loading students...
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div
+          className="
+            overflow-hidden
+            rounded-xl
+            border
+            border-[#E5E7EB]
+            bg-white
+          "
+        >
+          {/* CARD HEADER */}
+
+          <div
+            className="
+              flex
+              flex-col
+              gap-4
+              border-b
+              border-[#E5E7EB]
+              p-5
+              lg:flex-row
+              lg:items-center
+              lg:justify-between
+            "
+          >
+            <div>
+              <h2
+                className="
+                  text-lg
+                  font-semibold
+                  text-[#15243B]
+                "
+              >
+                {selectedClass?.name}
+                {" - "}
+                {selectedSection?.name}
+              </h2>
+
+              <p
+                className="
+                  mt-1
+                  text-sm
+                  text-[#6B7280]
+                "
+              >
+                {selectedSession?.name}
+                {" • "}
+                {filteredStudents.length} student
+                {filteredStudents.length !== 1 ? "s" : ""}
+              </p>
+            </div>
+
+            <div
+              className="
+                relative
+                w-full
+                lg:max-w-sm
+              "
+            >
+              <Icon
+                icon="lucide:search"
+                className="
+                  absolute
+                  left-3
+                  top-1/2
+                  -translate-y-1/2
+                  text-lg
+                  text-[#6B7280]
+                "
+              />
+
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Search students..."
+                className="
+                  min-h-11
+                  w-full
+                  rounded-lg
+                  border
+                  border-[#D1D5DB]
+                  bg-white
+                  pl-10
+                  pr-10
+                  text-sm
+                  text-[#15243B]
+                  outline-none
+                  transition-all
+                  placeholder:text-[#9CA3AF]
+                  focus:border-[#1F5FAE]
+                  focus:ring-1
+                  focus:ring-[#1F5FAE]
+                "
+              />
+
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="
+                    absolute
+                    right-3
+                    top-1/2
+                    -translate-y-1/2
+                    text-[#9CA3AF]
+                    hover:text-[#15243B]
+                  "
+                >
+                  <Icon icon="lucide:x" className="text-lg" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* ====================================
+              STUDENT TABLE
+          ==================================== */}
+
+          {filteredStudents.length > 0 ? (
+            <div
+              className="
+                overflow-x-auto
+              "
+            >
+              <table
+                className="
+                  w-full
+                  min-w-[980px]
+                  text-left
+                "
+              >
+                <thead
+                  className="
+                    bg-[#F9FAFB]
+                  "
+                >
+                  <tr
+                    className="
+                      border-b
+                      border-[#E5E7EB]
+                    "
+                  >
+                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-[#6B7280]">
+                      Student
+                    </th>
+
+                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-[#6B7280]">
+                      Admission No.
+                    </th>
+
+                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-[#6B7280]">
+                      Roll No.
+                    </th>
+
+                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-[#6B7280]">
+                      Enrollment
+                    </th>
+
+                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-[#6B7280]">
+                      Promotion
+                    </th>
+
+                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-[#6B7280]">
+                      Mobile
+                    </th>
+
+                    <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-[#6B7280]">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody
+                  className="
+                    divide-y
+                    divide-[#E5E7EB]
+                  "
+                >
+                  {filteredStudents.map((student) => (
+                    <tr
+                      key={student._id}
+                      className="
+                          transition-colors
+                          hover:bg-[#F9FAFB]
+                        "
+                    >
+                      <td className="px-5 py-4">
+                        <div
+                          className="
+                              flex
+                              items-center
+                              gap-3
+                            "
+                        >
+                          <div
+                            className="
+                                flex
+                                h-10
+                                w-10
+                                shrink-0
+                                items-center
+                                justify-center
+                                rounded-full
+                                bg-[#E8F0FB]
+                                text-sm
+                                font-bold
+                                uppercase
+                                text-[#1F5FAE]
+                              "
+                          >
+                            {student.name?.charAt(0) || "S"}
+                          </div>
+
+                          <div
+                            className="
+                                min-w-0
+                              "
+                          >
+                            <p
+                              className="
+                                  truncate
+                                  text-sm
+                                  font-semibold
+                                  text-[#15243B]
+                                "
+                            >
+                              {student.name}
+                            </p>
+
+                            <p
+                              className="
+                                  mt-0.5
+                                  truncate
+                                  text-xs
+                                  text-[#6B7280]
+                                "
+                            >
+                              {student.email || "No email"}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+
+                      <td
+                        className="
+                            px-5
+                            py-4
+                            text-sm
+                            font-medium
+                            text-[#15243B]
+                          "
+                      >
+                        {student.admissionNumber}
+                      </td>
+
+                      <td
+                        className="
+                            px-5
+                            py-4
+                            text-sm
+                            text-[#6B7280]
+                          "
+                      >
+                        {student.rollNumber ?? "-"}
+                      </td>
+
+                      <td
+                        className="
+                            px-5
+                            py-4
+                          "
+                      >
+                        <span
+                          className="
+                              rounded-full
+                              bg-[#F3F4F6]
+                              px-2.5
+                              py-1
+                              text-xs
+                              font-semibold
+                              text-[#374151]
+                            "
+                        >
+                          {student.enrollment?.enrollmentStatus || "-"}
+                        </span>
+                      </td>
+
+                      <td
+                        className="
+                            px-5
+                            py-4
+                          "
+                      >
+                        <span
+                          className="
+                              rounded-full
+                              bg-[#F3F4F6]
+                              px-2.5
+                              py-1
+                              text-xs
+                              font-semibold
+                              text-[#374151]
+                            "
+                        >
+                          {student.enrollment?.promotionStatus || "-"}
+                        </span>
+                      </td>
+
+                      <td
+                        className="
+                            px-5
+                            py-4
+                            text-sm
+                            text-[#6B7280]
+                          "
+                      >
+                        {student.mobile || "-"}
+                      </td>
+
+                      <td
+                        className="
+                            px-5
+                            py-4
+                          "
+                      >
+                        <div
+                          className="
+                              flex
+                              items-center
+                              justify-end
+                              gap-1
+                            "
+                        >
+                          <button
+                            type="button"
+                            onClick={() => handleViewStudent(student)}
+                            title="View Student"
+                            className="
+                                flex
+                                h-9
+                                w-9
+                                items-center
+                                justify-center
+                                rounded-lg
+                                text-[#6B7280]
+                                transition-colors
+                                hover:bg-[#E8F0FB]
+                                hover:text-[#1F5FAE]
+                              "
+                          >
+                            <Icon icon="lucide:eye" className="text-lg" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div
+              className="
+                flex
+                min-h-[320px]
+                items-center
+                justify-center
+                p-6
+              "
+            >
+              <div
+                className="
+                  max-w-sm
+                  text-center
+                "
+              >
+                <div
+                  className="
+                    mx-auto
+                    flex
+                    h-14
+                    w-14
+                    items-center
+                    justify-center
+                    rounded-full
+                    bg-[#F3F4F6]
+                    text-[#6B7280]
+                  "
+                >
+                  <Icon
+                    icon={searchQuery ? "lucide:search-x" : "lucide:users"}
+                    className="text-2xl"
+                  />
+                </div>
+
+                <h3
+                  className="
+                    mt-4
+                    font-semibold
+                    text-[#15243B]
+                  "
+                >
+                  {searchQuery
+                    ? "No students found"
+                    : "No students in this section"}
+                </h3>
+
+                <p
+                  className="
+                    mt-1
+                    text-sm
+                    leading-6
+                    text-[#6B7280]
+                  "
+                >
+                  {searchQuery
+                    ? "No student matches your search."
+                    : "No enrollment records were found for the selected session, class and section."}
+                </p>
+
+                {!searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => navigate("/school-admin/students/add")}
+                    className="
+                      mt-5
+                      inline-flex
+                      min-h-10
+                      items-center
+                      gap-2
+                      rounded-lg
+                      bg-[#1F5FAE]
+                      px-4
+                      text-sm
+                      font-semibold
+                      text-white
+                      hover:bg-[#174F91]
+                    "
+                  >
+                    <Icon icon="lucide:user-plus" />
+                    Add Student
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ClassWiseStudents;

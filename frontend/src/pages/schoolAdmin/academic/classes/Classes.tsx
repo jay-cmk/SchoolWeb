@@ -42,14 +42,18 @@ import type {
 
 interface ClassFormState {
   sessionId: string;
+
   name: string;
+
   order: string;
 }
 
 
 const initialFormState: ClassFormState = {
   sessionId: "",
+
   name: "",
+
   order: "",
 };
 
@@ -60,7 +64,9 @@ const initialFormState: ClassFormState = {
 
 interface StatCardProps {
   title: string;
+
   value: string | number;
+
   subtext: string;
 }
 
@@ -97,7 +103,7 @@ const Classes = () => {
 
 
   // ============================================
-  // REDUX
+  // REDUX - CLASSES
   // ============================================
 
   const {
@@ -110,6 +116,10 @@ const Classes = () => {
   );
 
 
+  // ============================================
+  // REDUX - ACADEMIC SESSIONS
+  // ============================================
+
   const {
     sessions,
   } = useAppSelector(
@@ -118,25 +128,64 @@ const Classes = () => {
 
 
   // ============================================
+  // GLOBAL SELECTED SESSION
+  // Topbar se controlled
+  // ============================================
+
+  const selectedSessionId =
+    useAppSelector(
+      (state) =>
+        state.sessionSelection
+          .selectedSessionId
+    );
+
+
+  // ============================================
+  // SELECTED SESSION OBJECT
+  // ============================================
+
+  const selectedSession =
+    useMemo(() => {
+      if (!selectedSessionId) {
+        return null;
+      }
+
+      return (
+        sessions.find(
+          (session) =>
+            session._id ===
+            selectedSessionId
+        ) ?? null
+      );
+    }, [
+      sessions,
+      selectedSessionId,
+    ]);
+
+
+  // ============================================
   // FILTERS
   // ============================================
 
-  const [searchQuery, setSearchQuery] =
-    useState("");
+  const [
+    searchQuery,
+    setSearchQuery,
+  ] = useState("");
 
-  const [statusFilter, setStatusFilter] =
-    useState("ALL");
-
-  const [sessionFilter, setSessionFilter] =
-    useState("ALL");
+  const [
+    statusFilter,
+    setStatusFilter,
+  ] = useState("ALL");
 
 
   // ============================================
   // PAGINATION
   // ============================================
 
-  const [currentPage, setCurrentPage] =
-    useState(1);
+  const [
+    currentPage,
+    setCurrentPage,
+  ] = useState(1);
 
   const itemsPerPage = 6;
 
@@ -145,58 +194,134 @@ const Classes = () => {
   // MODALS
   // ============================================
 
-  const [showAddModal, setShowAddModal] =
-    useState(false);
+  const [
+    showAddModal,
+    setShowAddModal,
+  ] = useState(false);
 
-  const [showEditModal, setShowEditModal] =
-    useState(false);
+  const [
+    showEditModal,
+    setShowEditModal,
+  ] = useState(false);
 
-  const [showDetailsModal, setShowDetailsModal] =
-    useState(false);
+  const [
+    showDetailsModal,
+    setShowDetailsModal,
+  ] = useState(false);
 
 
   // ============================================
   // FORM
   // ============================================
 
-  const [formData, setFormData] =
-    useState<ClassFormState>(
-      initialFormState
-    );
+  const [
+    formData,
+    setFormData,
+  ] = useState<ClassFormState>(
+    initialFormState
+  );
 
 
   // ============================================
   // ACTION STATE
   // ============================================
 
-  const [submitting, setSubmitting] =
-    useState(false);
+  const [
+    submitting,
+    setSubmitting,
+  ] = useState(false);
 
   const [
     statusActionId,
     setStatusActionId,
-  ] = useState<string | null>(null);
+  ] = useState<string | null>(
+    null
+  );
 
-  const [activeMenu, setActiveMenu] =
-    useState<string | null>(null);
+  const [
+    activeMenu,
+    setActiveMenu,
+  ] = useState<string | null>(
+    null
+  );
 
-  const [toastMessage, setToastMessage] =
-    useState<string | null>(null);
+  const [
+    toastMessage,
+    setToastMessage,
+  ] = useState<string | null>(
+    null
+  );
 
 
   // ============================================
-  // INITIAL DATA
+  // LOAD SESSIONS
   // ============================================
 
   useEffect(() => {
+    if (sessions.length === 0) {
+      dispatch(
+        getSessions()
+      );
+    }
+  }, [
+    dispatch,
+    sessions.length,
+  ]);
+
+
+  // ============================================
+  // LOAD CLASSES BY GLOBAL SELECTED SESSION
+  // ============================================
+
+  useEffect(() => {
+    if (!selectedSessionId) {
+      return;
+    }
+
     dispatch(
-      getClasses(undefined)
+      getClasses({
+        sessionId:
+          selectedSessionId,
+      })
+    );
+
+  }, [
+    dispatch,
+    selectedSessionId,
+  ]);
+
+
+  // ============================================
+  // RESET PAGE STATE WHEN SESSION CHANGES
+  // ============================================
+
+  useEffect(() => {
+    setSearchQuery("");
+
+    setStatusFilter("ALL");
+
+    setCurrentPage(1);
+
+    setActiveMenu(null);
+
+    setShowAddModal(false);
+
+    setShowEditModal(false);
+
+    setShowDetailsModal(false);
+
+    setFormData(
+      initialFormState
     );
 
     dispatch(
-      getSessions()
+      clearSelectedClass()
     );
-  }, [dispatch]);
+
+  }, [
+    dispatch,
+    selectedSessionId,
+  ]);
 
 
   // ============================================
@@ -234,10 +359,14 @@ const Classes = () => {
   const showToast = (
     message: string
   ) => {
-    setToastMessage(message);
+    setToastMessage(
+      message
+    );
 
     window.setTimeout(() => {
-      setToastMessage(null);
+      setToastMessage(
+        null
+      );
     }, 3000);
   };
 
@@ -252,10 +381,14 @@ const Classes = () => {
     const session =
       sessions.find(
         (item) =>
-          item._id === sessionId
+          item._id ===
+          sessionId
       );
 
-    return session?.name || "-";
+    return (
+      session?.name ||
+      "-"
+    );
   };
 
 
@@ -273,31 +406,39 @@ const Classes = () => {
       value,
     } = e.target;
 
-    setFormData((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
+    setFormData(
+      (previous) => ({
+        ...previous,
+
+        [name]: value,
+      })
+    );
   };
 
 
   // ============================================
   // OPEN CREATE
+  //
+  // IMPORTANT:
+  // Class always selected global session me
+  // create hogi.
   // ============================================
 
   const openCreateModal = () => {
-    const currentSession =
-      sessions.find(
-        (session) =>
-          session.isCurrent
+    if (!selectedSessionId) {
+      showToast(
+        "Please select an academic session first"
       );
+
+      return;
+    }
 
     setFormData({
       sessionId:
-        currentSession?._id ||
-        sessions[0]?._id ||
-        "",
+        selectedSessionId,
 
       name: "",
+
       order: "",
     });
 
@@ -305,12 +446,20 @@ const Classes = () => {
       clearClassError()
     );
 
-    setShowAddModal(true);
+    setShowAddModal(
+      true
+    );
   };
 
 
+  // ============================================
+  // CLOSE CREATE
+  // ============================================
+
   const closeCreateModal = () => {
-    setShowAddModal(false);
+    setShowAddModal(
+      false
+    );
 
     setFormData(
       initialFormState
@@ -323,71 +472,153 @@ const Classes = () => {
   // POST /academic/classes
   // ============================================
 
-  const handleCreateClass = async (
-    e: React.FormEvent
-  ) => {
-    e.preventDefault();
+  const handleCreateClass =
+    async (
+      e: React.FormEvent
+    ) => {
+      e.preventDefault();
 
-    if (!formData.sessionId) {
-      showToast(
-        "Academic session is required"
-      );
+      if (
+        !selectedSessionId
+      ) {
+        showToast(
+          "Please select an academic session first"
+        );
 
-      return;
-    }
+        return;
+      }
 
-    if (!formData.name.trim()) {
-      showToast(
-        "Class name is required"
-      );
+      if (
+        !formData.sessionId
+      ) {
+        showToast(
+          "Academic session is required"
+        );
 
-      return;
-    }
+        return;
+      }
+
+      /*
+       * Safety check:
+       * Modal/session data global selected session
+       * se different nahi hona chahiye.
+       */
+
+      if (
+        formData.sessionId !==
+        selectedSessionId
+      ) {
+        showToast(
+          "Selected academic session has changed. Please reopen the form."
+        );
+
+        return;
+      }
+
+      if (
+        !formData.name.trim()
+      ) {
+        showToast(
+          "Class name is required"
+        );
+
+        return;
+      }
 
 
-    const payload: CreateClassPayload = {
-      sessionId:
-        formData.sessionId,
+      // ========================================
+      // ORDER VALIDATION
+      // ========================================
 
-      name:
-        formData.name.trim(),
+      if (
+        formData.order !== ""
+      ) {
+        const order =
+          Number(
+            formData.order
+          );
 
-      ...(formData.order !== ""
-        ? {
-            order: Number(
-              formData.order
-            ),
-          }
-        : {}),
+        if (
+          !Number.isInteger(
+            order
+          ) ||
+          order < 0
+        ) {
+          showToast(
+            "Class order must be a valid non-negative integer"
+          );
+
+          return;
+        }
+      }
+
+
+      // ========================================
+      // PAYLOAD
+      // ========================================
+
+      const payload:
+        CreateClassPayload = {
+          sessionId:
+            selectedSessionId,
+
+          name:
+            formData.name.trim(),
+
+          ...(formData.order !== ""
+            ? {
+                order:
+                  Number(
+                    formData.order
+                  ),
+              }
+            : {}),
+        };
+
+
+      try {
+        setSubmitting(
+          true
+        );
+
+        await dispatch(
+          createClass(
+            payload
+          )
+        ).unwrap();
+
+        showToast(
+          "Class created successfully"
+        );
+
+        closeCreateModal();
+
+
+        // ========================================
+        // REFETCH CURRENT SELECTED SESSION
+        // ========================================
+
+        await dispatch(
+          getClasses({
+            sessionId:
+              selectedSessionId,
+          })
+        ).unwrap();
+
+      } catch (err) {
+        showToast(
+          typeof err ===
+            "string"
+            ? err
+            : "Failed to create class"
+        );
+
+      } finally {
+        setSubmitting(
+          false
+        );
+      }
     };
-
-
-    try {
-      setSubmitting(true);
-
-      await dispatch(
-        createClass(payload)
-      ).unwrap();
-
-      showToast(
-        "Class created successfully"
-      );
-
-      closeCreateModal();
-
-      await dispatch(
-        getClasses(undefined)
-      ).unwrap();
-    } catch (err) {
-      showToast(
-        typeof err === "string"
-          ? err
-          : "Failed to create class"
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
 
   // ============================================
@@ -395,38 +626,54 @@ const Classes = () => {
   // GET /academic/classes/:classId
   // ============================================
 
-  const handleViewClass = async (
-    classId: string
-  ) => {
-    try {
-      setActiveMenu(null);
+  const handleViewClass =
+    async (
+      classId: string
+    ) => {
+      try {
+        setActiveMenu(
+          null
+        );
+
+        dispatch(
+          clearSelectedClass()
+        );
+
+        await dispatch(
+          getClassById(
+            classId
+          )
+        ).unwrap();
+
+        setShowDetailsModal(
+          true
+        );
+
+      } catch (err) {
+        showToast(
+          typeof err ===
+            "string"
+            ? err
+            : "Failed to fetch class"
+        );
+      }
+    };
+
+
+  // ============================================
+  // CLOSE DETAILS
+  // ============================================
+
+  const closeDetailsModal =
+    () => {
+      setShowDetailsModal(
+        false
+      );
 
       dispatch(
         clearSelectedClass()
       );
-
-      await dispatch(
-        getClassById(classId)
-      ).unwrap();
-
-      setShowDetailsModal(true);
-    } catch (err) {
-      showToast(
-        typeof err === "string"
-          ? err
-          : "Failed to fetch class"
-      );
-    }
-  };
-
-
-  const closeDetailsModal = () => {
-    setShowDetailsModal(false);
-
-    dispatch(
-      clearSelectedClass()
-    );
-  };
+    };
 
 
   // ============================================
@@ -434,59 +681,97 @@ const Classes = () => {
   // GET CLASS BY ID FIRST
   // ============================================
 
-  const handleOpenEdit = async (
-    classId: string
-  ) => {
-    try {
-      setActiveMenu(null);
+  const handleOpenEdit =
+    async (
+      classId: string
+    ) => {
+      try {
+        setActiveMenu(
+          null
+        );
+
+        dispatch(
+          clearSelectedClass()
+        );
+
+        const classData =
+          await dispatch(
+            getClassById(
+              classId
+            )
+          ).unwrap();
+
+
+        // ========================================
+        // SESSION SAFETY
+        // ========================================
+
+        if (
+          selectedSessionId &&
+          classData.sessionId !==
+            selectedSessionId
+        ) {
+          showToast(
+            "This class does not belong to the selected academic session."
+          );
+
+          dispatch(
+            clearSelectedClass()
+          );
+
+          return;
+        }
+
+
+        setFormData({
+          sessionId:
+            classData.sessionId,
+
+          name:
+            classData.name,
+
+          order:
+            classData.order !==
+            undefined
+              ? String(
+                  classData.order
+                )
+              : "",
+        });
+
+        setShowEditModal(
+          true
+        );
+
+      } catch (err) {
+        showToast(
+          typeof err ===
+            "string"
+            ? err
+            : "Failed to fetch class"
+        );
+      }
+    };
+
+
+  // ============================================
+  // CLOSE EDIT
+  // ============================================
+
+  const closeEditModal =
+    () => {
+      setShowEditModal(
+        false
+      );
+
+      setFormData(
+        initialFormState
+      );
 
       dispatch(
         clearSelectedClass()
       );
-
-      const classData =
-        await dispatch(
-          getClassById(classId)
-        ).unwrap();
-
-      setFormData({
-        sessionId:
-          classData.sessionId,
-
-        name:
-          classData.name,
-
-        order:
-          classData.order !==
-          undefined
-            ? String(
-                classData.order
-              )
-            : "",
-      });
-
-      setShowEditModal(true);
-    } catch (err) {
-      showToast(
-        typeof err === "string"
-          ? err
-          : "Failed to fetch class"
-      );
-    }
-  };
-
-
-  const closeEditModal = () => {
-    setShowEditModal(false);
-
-    setFormData(
-      initialFormState
-    );
-
-    dispatch(
-      clearSelectedClass()
-    );
-  };
+    };
 
 
   // ============================================
@@ -494,73 +779,143 @@ const Classes = () => {
   // PUT /academic/classes/:classId
   // ============================================
 
-  const handleUpdateClass = async (
-    e: React.FormEvent
-  ) => {
-    e.preventDefault();
+  const handleUpdateClass =
+    async (
+      e: React.FormEvent
+    ) => {
+      e.preventDefault();
 
-    if (!selectedClass?._id) {
-      showToast(
-        "Class not selected"
-      );
+      if (
+        !selectedClass?._id
+      ) {
+        showToast(
+          "Class not selected"
+        );
 
-      return;
-    }
+        return;
+      }
 
-    if (!formData.name.trim()) {
-      showToast(
-        "Class name is required"
-      );
+      if (
+        !selectedSessionId
+      ) {
+        showToast(
+          "Academic session is not selected"
+        );
 
-      return;
-    }
+        return;
+      }
+
+      if (
+        selectedClass.sessionId !==
+        selectedSessionId
+      ) {
+        showToast(
+          "Selected academic session has changed. Please reopen the class."
+        );
+
+        return;
+      }
+
+      if (
+        !formData.name.trim()
+      ) {
+        showToast(
+          "Class name is required"
+        );
+
+        return;
+      }
 
 
-    const data: UpdateClassPayload = {
-      name:
-        formData.name.trim(),
+      // ========================================
+      // ORDER VALIDATION
+      // ========================================
 
-      ...(formData.order !== ""
-        ? {
-            order: Number(
-              formData.order
-            ),
-          }
-        : {}),
+      if (
+        formData.order !== ""
+      ) {
+        const order =
+          Number(
+            formData.order
+          );
+
+        if (
+          !Number.isInteger(
+            order
+          ) ||
+          order < 0
+        ) {
+          showToast(
+            "Class order must be a valid non-negative integer"
+          );
+
+          return;
+        }
+      }
+
+
+      const data:
+        UpdateClassPayload = {
+          name:
+            formData.name.trim(),
+
+          ...(formData.order !== ""
+            ? {
+                order:
+                  Number(
+                    formData.order
+                  ),
+              }
+            : {}),
+        };
+
+
+      try {
+        setSubmitting(
+          true
+        );
+
+        await dispatch(
+          updateClass({
+            classId:
+              selectedClass._id,
+
+            data,
+          })
+        ).unwrap();
+
+        showToast(
+          "Class updated successfully"
+        );
+
+        closeEditModal();
+
+
+        // ========================================
+        // REFETCH SELECTED SESSION
+        // ========================================
+
+        await dispatch(
+          getClasses({
+            sessionId:
+              selectedSessionId,
+          })
+        ).unwrap();
+
+      } catch (err) {
+        showToast(
+          typeof err ===
+            "string"
+            ? err
+            : "Failed to update class"
+        );
+
+      } finally {
+        setSubmitting(
+          false
+        );
+      }
     };
-
-
-    try {
-      setSubmitting(true);
-
-      await dispatch(
-        updateClass({
-          classId:
-            selectedClass._id,
-
-          data,
-        })
-      ).unwrap();
-
-      showToast(
-        "Class updated successfully"
-      );
-
-      closeEditModal();
-
-      await dispatch(
-        getClasses(undefined)
-      ).unwrap();
-    } catch (err) {
-      showToast(
-        typeof err === "string"
-          ? err
-          : "Failed to update class"
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
 
   // ============================================
@@ -568,41 +923,91 @@ const Classes = () => {
   // PATCH /academic/classes/:classId/status
   // ============================================
 
-  const handleToggleStatus = async (
-    classData: ClassData
-  ) => {
-    try {
-      setActiveMenu(null);
+  const handleToggleStatus =
+    async (
+      classData: ClassData
+    ) => {
+      if (
+        selectedSessionId &&
+        classData.sessionId !==
+          selectedSessionId
+      ) {
+        showToast(
+          "This class does not belong to the selected academic session."
+        );
 
-      setStatusActionId(
-        classData._id
+        return;
+      }
+
+      try {
+        setActiveMenu(
+          null
+        );
+
+        setStatusActionId(
+          classData._id
+        );
+
+        await dispatch(
+          updateClassStatus({
+            classId:
+              classData._id,
+
+            isActive:
+              !classData.isActive,
+          })
+        ).unwrap();
+
+        showToast(
+          classData.isActive
+            ? "Class marked inactive"
+            : "Class marked active"
+        );
+
+      } catch (err) {
+        showToast(
+          typeof err ===
+            "string"
+            ? err
+            : "Failed to update class status"
+        );
+
+      } finally {
+        setStatusActionId(
+          null
+        );
+      }
+    };
+
+
+  // ============================================
+  // SESSION CLASSES
+  //
+  // API already session-filtered hai,
+  // lekin ye extra frontend safety hai.
+  //
+  // Session switch ke time old Redux data
+  // ek moment ke liye screen par nahi dikhega.
+  // ============================================
+
+  const sessionClasses =
+    useMemo(() => {
+      if (
+        !selectedSessionId
+      ) {
+        return [];
+      }
+
+      return classes.filter(
+        (classData) =>
+          classData.sessionId ===
+          selectedSessionId
       );
 
-      await dispatch(
-        updateClassStatus({
-          classId:
-            classData._id,
-
-          isActive:
-            !classData.isActive,
-        })
-      ).unwrap();
-
-      showToast(
-        classData.isActive
-          ? "Class marked inactive"
-          : "Class marked active"
-      );
-    } catch (err) {
-      showToast(
-        typeof err === "string"
-          ? err
-          : "Failed to update class status"
-      );
-    } finally {
-      setStatusActionId(null);
-    }
-  };
+    }, [
+      classes,
+      selectedSessionId,
+    ]);
 
 
   // ============================================
@@ -616,7 +1021,7 @@ const Classes = () => {
           .trim()
           .toLowerCase();
 
-      return classes.filter(
+      return sessionClasses.filter(
         (classData) => {
           const sessionName =
             getSessionName(
@@ -628,14 +1033,17 @@ const Classes = () => {
           const matchesSearch =
             classData.name
               .toLowerCase()
-              .includes(search) ||
+              .includes(
+                search
+              ) ||
             sessionName.includes(
               search
             );
 
 
           const matchesStatus =
-            statusFilter === "ALL" ||
+            statusFilter ===
+              "ALL" ||
             (
               statusFilter ===
                 "ACTIVE" &&
@@ -648,25 +1056,18 @@ const Classes = () => {
             );
 
 
-          const matchesSession =
-            sessionFilter === "ALL" ||
-            classData.sessionId ===
-              sessionFilter;
-
-
           return (
             matchesSearch &&
-            matchesStatus &&
-            matchesSession
+            matchesStatus
           );
         }
       );
+
     }, [
-      classes,
+      sessionClasses,
       sessions,
       searchQuery,
       statusFilter,
-      sessionFilter,
     ]);
 
 
@@ -701,6 +1102,7 @@ const Classes = () => {
         totalPages
       );
     }
+
   }, [
     currentPage,
     totalPages,
@@ -709,21 +1111,22 @@ const Classes = () => {
 
   // ============================================
   // STATS
+  // ONLY SELECTED SESSION
   // ============================================
 
   const totalClasses =
-    classes.length;
+    sessionClasses.length;
 
 
   const activeClasses =
-    classes.filter(
+    sessionClasses.filter(
       (item) =>
         item.isActive
     ).length;
 
 
   const inactiveClasses =
-    classes.filter(
+    sessionClasses.filter(
       (item) =>
         !item.isActive
     ).length;
@@ -733,15 +1136,46 @@ const Classes = () => {
   // RESET FILTER
   // ============================================
 
-  const resetFilters = () => {
-    setSearchQuery("");
+  const resetFilters =
+    () => {
+      setSearchQuery("");
 
-    setStatusFilter("ALL");
+      setStatusFilter(
+        "ALL"
+      );
 
-    setSessionFilter("ALL");
+      setCurrentPage(
+        1
+      );
+    };
 
-    setCurrentPage(1);
-  };
+
+  // ============================================
+  // GLOBAL SESSION NOT READY
+  // ============================================
+
+  if (
+    !selectedSessionId
+  ) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#F7F9FC]">
+
+        <div className="text-center">
+
+          <Icon
+            icon="lucide:loader-circle"
+            className="mx-auto animate-spin text-4xl text-[#1F5FAE]"
+          />
+
+          <p className="mt-3 text-sm text-[#6B7280]">
+            Loading academic session...
+          </p>
+
+        </div>
+
+      </div>
+    );
+  }
 
 
   // ============================================
@@ -750,7 +1184,8 @@ const Classes = () => {
 
   if (
     loading &&
-    classes.length === 0
+    sessionClasses.length ===
+      0
   ) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#F7F9FC]">
@@ -772,6 +1207,10 @@ const Classes = () => {
     );
   }
 
+
+  // ============================================
+  // RENDER
+  // ============================================
 
   return (
     <div className="min-h-screen bg-[#F7F9FC]">
@@ -829,7 +1268,12 @@ const Classes = () => {
 
 
             <p className="mt-1 text-sm text-[#6B7280]">
-              Manage classes for each academic session.
+              Manage classes for{" "}
+              <span className="font-semibold text-[#15243B]">
+                {selectedSession?.name ||
+                  "selected academic session"}
+              </span>
+              .
             </p>
 
           </div>
@@ -840,7 +1284,8 @@ const Classes = () => {
               openCreateModal
             }
             disabled={
-              sessions.length === 0
+              !selectedSessionId ||
+              !selectedSession
             }
             className="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#1F5FAE] px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-[#174E91] disabled:cursor-not-allowed disabled:opacity-50"
           >
@@ -857,9 +1302,45 @@ const Classes = () => {
         </div>
 
 
-        {sessions.length === 0 && (
+        {/* ========================================
+            SELECTED SESSION INFO
+        ======================================== */}
+
+        <div className="mt-5 flex flex-wrap items-center gap-3 rounded-xl border border-[#DCE6F5] bg-[#F5F9FF] px-4 py-3">
+
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#E8F0FB] text-[#1F5FAE]">
+            <Icon
+              icon="lucide:calendar-days"
+              className="text-lg"
+            />
+          </div>
+
+          <div>
+
+            <p className="text-xs font-medium text-[#6B7280]">
+              Selected Academic Session
+            </p>
+
+            <p className="text-sm font-bold text-[#15243B]">
+              {selectedSession?.name ||
+                "Academic Session"}
+              {selectedSession?.isCurrent
+                ? " (Current)"
+                : ""}
+            </p>
+
+          </div>
+
+          <p className="ml-auto hidden text-xs text-[#6B7280] sm:block">
+            Change session from the top bar
+          </p>
+
+        </div>
+
+
+        {!selectedSession && (
           <div className="mt-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-            Create an Academic Session before creating classes.
+            The selected academic session could not be found. Please select another session from the top bar.
           </div>
         )}
 
@@ -899,19 +1380,29 @@ const Classes = () => {
 
           <StatCard
             title="Total Classes"
-            value={totalClasses}
-            subtext="All academic classes"
+            value={
+              totalClasses
+            }
+            subtext={
+              selectedSession
+                ? `${selectedSession.name} classes`
+                : "Selected session classes"
+            }
           />
 
           <StatCard
             title="Active Classes"
-            value={activeClasses}
+            value={
+              activeClasses
+            }
             subtext="Currently active classes"
           />
 
           <StatCard
             title="Inactive Classes"
-            value={inactiveClasses}
+            value={
+              inactiveClasses
+            }
             subtext="Currently inactive classes"
           />
 
@@ -924,7 +1415,9 @@ const Classes = () => {
 
         <div className="mt-6 overflow-hidden rounded-xl border border-[#E5E7EB] bg-white shadow-sm">
 
-          {/* FILTERS */}
+          {/* ========================================
+              FILTERS
+          ======================================== */}
 
           <div className="flex flex-col gap-3 border-b border-[#E5E7EB] p-5 lg:flex-row">
 
@@ -936,13 +1429,17 @@ const Classes = () => {
               />
 
               <input
-                value={searchQuery}
+                value={
+                  searchQuery
+                }
                 onChange={(e) => {
                   setSearchQuery(
                     e.target.value
                   );
 
-                  setCurrentPage(1);
+                  setCurrentPage(
+                    1
+                  );
                 }}
                 placeholder="Search class..."
                 className="w-full bg-transparent text-sm text-[#15243B] outline-none"
@@ -951,51 +1448,35 @@ const Classes = () => {
             </div>
 
 
-            <select
-              value={sessionFilter}
-              onChange={(e) => {
-                setSessionFilter(
-                  e.target.value
-                );
+            {/* GLOBAL SESSION DISPLAY */}
 
-                setCurrentPage(1);
-              }}
-              className="min-h-11 rounded-lg border border-[#D1D5DB] bg-white px-4 text-sm text-[#15243B]"
-            >
+            <div className="flex min-h-11 min-w-[190px] items-center gap-2 rounded-lg border border-[#D1D5DB] bg-[#F9FAFB] px-4">
 
-              <option value="ALL">
-                All Academic Sessions
-              </option>
+              <Icon
+                icon="lucide:calendar-range"
+                className="text-[#6B7280]"
+              />
 
-              {sessions.map(
-                (session) => (
-                  <option
-                    key={
-                      session._id
-                    }
-                    value={
-                      session._id
-                    }
-                  >
-                    {session.name}
-                    {session.isCurrent
-                      ? " (Current)"
-                      : ""}
-                  </option>
-                )
-              )}
+              <span className="text-sm font-medium text-[#15243B]">
+                {selectedSession?.name ||
+                  "Academic Session"}
+              </span>
 
-            </select>
+            </div>
 
 
             <select
-              value={statusFilter}
+              value={
+                statusFilter
+              }
               onChange={(e) => {
                 setStatusFilter(
                   e.target.value
                 );
 
-                setCurrentPage(1);
+                setCurrentPage(
+                  1
+                );
               }}
               className="min-h-11 rounded-lg border border-[#D1D5DB] bg-white px-4 text-sm text-[#15243B]"
             >
@@ -1071,7 +1552,9 @@ const Classes = () => {
               <tbody className="divide-y divide-[#E5E7EB]">
 
                 {paginatedClasses.map(
-                  (classData) => (
+                  (
+                    classData
+                  ) => (
                     <tr
                       key={
                         classData._id
@@ -1080,13 +1563,17 @@ const Classes = () => {
                     >
 
                       <td className="px-5 py-4 font-semibold text-[#15243B]">
-                        {classData.name}
+                        {
+                          classData.name
+                        }
                       </td>
 
 
                       <td className="px-5 py-4 text-[#6B7280]">
-                        {classData.order ??
-                          "-"}
+                        {
+                          classData.order ??
+                          "-"
+                        }
                       </td>
 
 
@@ -1237,6 +1724,10 @@ const Classes = () => {
             </table>
 
 
+            {/* ========================================
+                EMPTY
+            ======================================== */}
+
             {paginatedClasses.length ===
               0 && (
               <div className="p-12 text-center">
@@ -1251,7 +1742,12 @@ const Classes = () => {
                 </h3>
 
                 <p className="mt-1 text-sm text-[#6B7280]">
-                  Change filters or create a new class.
+                  No classes found for{" "}
+                  <span className="font-semibold">
+                    {selectedSession?.name ||
+                      "the selected academic session"}
+                  </span>
+                  .
                 </p>
 
               </div>
@@ -1289,7 +1785,9 @@ const Classes = () => {
 
               {" of "}
 
-              {filteredClasses.length}
+              {
+                filteredClasses.length
+              }
 
               {" classes"}
 
@@ -1300,7 +1798,8 @@ const Classes = () => {
 
               <button
                 disabled={
-                  currentPage === 1
+                  currentPage ===
+                  1
                 }
                 onClick={() =>
                   setCurrentPage(
@@ -1318,7 +1817,8 @@ const Classes = () => {
                 disabled={
                   currentPage ===
                     totalPages ||
-                  totalPages === 0
+                  totalPages ===
+                    0
                 }
                 onClick={() =>
                   setCurrentPage(
@@ -1348,9 +1848,19 @@ const Classes = () => {
         <ClassFormModal
           title="Add Class"
           submitLabel="Create Class"
-          formData={formData}
-          sessions={sessions}
-          submitting={submitting}
+          formData={
+            formData
+          }
+          sessions={
+            selectedSession
+              ? [
+                  selectedSession,
+                ]
+              : []
+          }
+          submitting={
+            submitting
+          }
           onChange={
             handleInputChange
           }
@@ -1360,7 +1870,9 @@ const Classes = () => {
           onSubmit={
             handleCreateClass
           }
-          allowSessionChange
+          allowSessionChange={
+            false
+          }
         />
       )}
 
@@ -1373,9 +1885,15 @@ const Classes = () => {
         <ClassFormModal
           title="Edit Class"
           submitLabel="Save Changes"
-          formData={formData}
-          sessions={sessions}
-          submitting={submitting}
+          formData={
+            formData
+          }
+          sessions={
+            sessions
+          }
+          submitting={
+            submitting
+          }
           onChange={
             handleInputChange
           }
@@ -1385,7 +1903,9 @@ const Classes = () => {
           onSubmit={
             handleUpdateClass
           }
-          allowSessionChange={false}
+          allowSessionChange={
+            false
+          }
         />
       )}
 
@@ -1431,9 +1951,11 @@ const Classes = () => {
 
                 <DetailItem
                   label="Academic Session"
-                  value={getSessionName(
-                    selectedClass.sessionId
-                  )}
+                  value={
+                    getSessionName(
+                      selectedClass.sessionId
+                    )
+                  }
                 />
 
                 <DetailItem
@@ -1459,20 +1981,24 @@ const Classes = () => {
 
                 <DetailItem
                   label="Created"
-                  value={new Date(
-                    selectedClass.createdAt
-                  ).toLocaleDateString(
-                    "en-IN"
-                  )}
+                  value={
+                    new Date(
+                      selectedClass.createdAt
+                    ).toLocaleDateString(
+                      "en-IN"
+                    )
+                  }
                 />
 
                 <DetailItem
                   label="Updated"
-                  value={new Date(
-                    selectedClass.updatedAt
-                  ).toLocaleDateString(
-                    "en-IN"
-                  )}
+                  value={
+                    new Date(
+                      selectedClass.updatedAt
+                    ).toLocaleDateString(
+                      "en-IN"
+                    )
+                  }
                 />
 
               </div>
@@ -1514,7 +2040,9 @@ interface ClassFormModalProps {
 
   sessions: {
     _id: string;
+
     name: string;
+
     isCurrent: boolean;
   }[];
 
@@ -1560,7 +2088,9 @@ const ClassFormModal = ({
 
           <button
             type="button"
-            onClick={onClose}
+            onClick={
+              onClose
+            }
           >
             <Icon
               icon="lucide:x"
@@ -1572,12 +2102,16 @@ const ClassFormModal = ({
 
 
         <form
-          onSubmit={onSubmit}
+          onSubmit={
+            onSubmit
+          }
         >
 
           <div className="space-y-5 p-6">
 
-            {/* SESSION */}
+            {/* ========================================
+                SESSION
+            ======================================== */}
 
             <div>
 
@@ -1590,11 +2124,13 @@ const ClassFormModal = ({
                 value={
                   formData.sessionId
                 }
-                onChange={onChange}
+                onChange={
+                  onChange
+                }
                 disabled={
                   !allowSessionChange
                 }
-                className="min-h-11 w-full rounded-lg border border-[#D1D5DB] px-3 text-sm disabled:bg-gray-100"
+                className="min-h-11 w-full rounded-lg border border-[#D1D5DB] px-3 text-sm disabled:cursor-not-allowed disabled:bg-gray-100"
               >
 
                 <option value="">
@@ -1611,7 +2147,10 @@ const ClassFormModal = ({
                         session._id
                       }
                     >
-                      {session.name}
+                      {
+                        session.name
+                      }
+
                       {session.isCurrent
                         ? " (Current)"
                         : ""}
@@ -1621,10 +2160,19 @@ const ClassFormModal = ({
 
               </select>
 
+
+              {!allowSessionChange && (
+                <p className="mt-1 text-xs text-[#6B7280]">
+                  Academic session is controlled from the top bar.
+                </p>
+              )}
+
             </div>
 
 
-            {/* NAME */}
+            {/* ========================================
+                NAME
+            ======================================== */}
 
             <div>
 
@@ -1638,7 +2186,9 @@ const ClassFormModal = ({
                 value={
                   formData.name
                 }
-                onChange={onChange}
+                onChange={
+                  onChange
+                }
                 placeholder="Example: Class 10"
                 className="min-h-11 w-full rounded-lg border border-[#D1D5DB] px-3 text-sm outline-none focus:border-[#1F5FAE]"
               />
@@ -1646,7 +2196,9 @@ const ClassFormModal = ({
             </div>
 
 
-            {/* ORDER */}
+            {/* ========================================
+                ORDER
+            ======================================== */}
 
             <div>
 
@@ -1660,9 +2212,12 @@ const ClassFormModal = ({
                 value={
                   formData.order
                 }
-                onChange={onChange}
+                onChange={
+                  onChange
+                }
                 placeholder="Example: 10"
                 min="0"
+                step="1"
                 className="min-h-11 w-full rounded-lg border border-[#D1D5DB] px-3 text-sm outline-none focus:border-[#1F5FAE]"
               />
 
@@ -1679,8 +2234,13 @@ const ClassFormModal = ({
 
             <button
               type="button"
-              onClick={onClose}
-              className="rounded-lg border border-[#D1D5DB] px-5 py-2.5 text-sm font-semibold text-[#15243B]"
+              onClick={
+                onClose
+              }
+              disabled={
+                submitting
+              }
+              className="rounded-lg border border-[#D1D5DB] px-5 py-2.5 text-sm font-semibold text-[#15243B] disabled:opacity-50"
             >
               Cancel
             </button>
@@ -1688,7 +2248,9 @@ const ClassFormModal = ({
 
             <button
               type="submit"
-              disabled={submitting}
+              disabled={
+                submitting
+              }
               className="inline-flex items-center gap-2 rounded-lg bg-[#1F5FAE] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
             >
 
@@ -1699,7 +2261,9 @@ const ClassFormModal = ({
                 />
               )}
 
-              {submitLabel}
+              {
+                submitLabel
+              }
 
             </button>
 
@@ -1720,6 +2284,7 @@ const ClassFormModal = ({
 
 interface DetailItemProps {
   label: string;
+
   value: string;
 }
 

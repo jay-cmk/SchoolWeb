@@ -2000,7 +2000,6 @@
 
 
 
-
 import type {
   Request,
   Response,
@@ -2012,10 +2011,12 @@ import {
 
 import {
   HomeworkReviewStatus,
+  HomeworkSubmissionMode,
   HomeworkSubmissionStatus,
 } from "./homeworkSubmission.types";
 
 import {
+  bulkReviewHomework,
   createHomeworkSubmission,
   createMyHomeworkSubmission,
   deleteHomeworkSubmission,
@@ -2024,6 +2025,7 @@ import {
   getHomeworkSubmissionStats,
   getMyHomeworkSubmissions,
   getStudentHomeworkSubmission,
+  markOfflineHomework,
   reviewHomeworkSubmission,
   updateHomeworkSubmission,
   updateMyHomeworkSubmission,
@@ -2032,18 +2034,11 @@ import {
 
 // ======================================================
 // HELPER: GET TEACHER ID FROM JWT
-//
-// SCHOOL_ADMIN:
-// returns undefined.
-//
-// TEACHER:
-// teacherId is mandatory in JWT.
 // ======================================================
 
 const getActorTeacherId = (
   req: Request
 ): string | undefined => {
-
   if (
     req.user?.role !==
     UserRole.TEACHER
@@ -2051,10 +2046,8 @@ const getActorTeacherId = (
     return undefined;
   }
 
-
   const teacherId =
     req.user?.teacherId;
-
 
   if (!teacherId) {
     throw new Error(
@@ -2062,17 +2055,31 @@ const getActorTeacherId = (
     );
   }
 
-
   return teacherId;
 };
 
 
 // ======================================================
+// HELPER: REVIEW STATUS
+// ======================================================
+
+const isAllowedReviewStatus = (
+  value: unknown
+): value is HomeworkReviewStatus => {
+  return (
+    value ===
+      HomeworkReviewStatus.COMPLETED ||
+    value ===
+      HomeworkReviewStatus.INCOMPLETE ||
+    value ===
+      HomeworkReviewStatus.REDO_REQUIRED
+  );
+};
+
+
+// ======================================================
 // CREATE HOMEWORK SUBMISSION
-//
-// Existing School Admin/internal endpoint.
-// Teacher should NOT use this endpoint.
-// Student uses /me.
+// SCHOOL ADMIN
 // ======================================================
 
 export const createHomeworkSubmissionController =
@@ -2080,26 +2087,20 @@ export const createHomeworkSubmissionController =
     req: Request,
     res: Response
   ) => {
-
     try {
-
       const schoolId =
         req.user?.schoolId;
 
-
       if (!schoolId) {
-
         return res.status(
           400
         ).json({
-
           success: false,
 
           message:
             "School ID not found in token",
         });
       }
-
 
       const {
         homeworkId,
@@ -2108,16 +2109,17 @@ export const createHomeworkSubmissionController =
         attachment,
       } = req.body;
 
-
       if (
         !homeworkId ||
-        !studentId
+        typeof homeworkId !==
+          "string" ||
+        !studentId ||
+        typeof studentId !==
+          "string"
       ) {
-
         return res.status(
           400
         ).json({
-
           success: false,
 
           message:
@@ -2125,12 +2127,10 @@ export const createHomeworkSubmissionController =
         });
       }
 
-
       const submission =
         await createHomeworkSubmission(
           schoolId,
           {
-
             homeworkId,
 
             studentId,
@@ -2138,7 +2138,10 @@ export const createHomeworkSubmissionController =
             ...(submissionText !==
             undefined
               ? {
-                  submissionText,
+                  submissionText:
+                    String(
+                      submissionText
+                    ),
                 }
               : {}),
 
@@ -2151,11 +2154,9 @@ export const createHomeworkSubmissionController =
           }
         );
 
-
       return res.status(
         201
       ).json({
-
         success: true,
 
         message:
@@ -2165,21 +2166,16 @@ export const createHomeworkSubmissionController =
           submission,
         },
       });
-
     } catch (error) {
-
       const message =
         error instanceof Error
           ? error.message
           : "Failed to submit homework";
 
-
       return res.status(
         400
       ).json({
-
         success: false,
-
         message,
       });
     }
@@ -2188,12 +2184,7 @@ export const createHomeworkSubmissionController =
 
 // ======================================================
 // GET HOMEWORK SUBMISSIONS
-//
-// SCHOOL_ADMIN:
-// Any homework in own school.
-//
-// TEACHER:
-// Only own homework.
+// SCHOOL ADMIN + TEACHER
 // ======================================================
 
 export const getHomeworkSubmissionsController =
@@ -2201,9 +2192,7 @@ export const getHomeworkSubmissionsController =
     req: Request,
     res: Response
   ) => {
-
     try {
-
       const schoolId =
         req.user?.schoolId;
 
@@ -2214,13 +2203,10 @@ export const getHomeworkSubmissionsController =
         homeworkId,
       } = req.params;
 
-
       if (!schoolId) {
-
         return res.status(
           400
         ).json({
-
           success: false,
 
           message:
@@ -2228,17 +2214,14 @@ export const getHomeworkSubmissionsController =
         });
       }
 
-
       if (
         !homeworkId ||
         typeof homeworkId !==
           "string"
       ) {
-
         return res.status(
           400
         ).json({
-
           success: false,
 
           message:
@@ -2246,25 +2229,18 @@ export const getHomeworkSubmissionsController =
         });
       }
 
-
       const actorTeacherId =
         getActorTeacherId(
           req
         );
 
-
-      // Teacher identity validation
-      // also checks teacherId + userId relation.
-
       if (
         actorTeacherId &&
         !userId
       ) {
-
         return res.status(
           401
         ).json({
-
           success: false,
 
           message:
@@ -2272,9 +2248,7 @@ export const getHomeworkSubmissionsController =
         });
       }
 
-
       const filters = {
-
         ...(typeof req.query.studentId ===
         "string"
           ? {
@@ -2283,6 +2257,15 @@ export const getHomeworkSubmissionsController =
             }
           : {}),
 
+        ...(typeof req.query.submissionMode ===
+        "string"
+          ? {
+              submissionMode:
+                req.query
+                  .submissionMode as
+                  HomeworkSubmissionMode,
+            }
+          : {}),
 
         ...(typeof req.query.submissionStatus ===
         "string"
@@ -2294,7 +2277,6 @@ export const getHomeworkSubmissionsController =
             }
           : {}),
 
-
         ...(typeof req.query.reviewStatus ===
         "string"
           ? {
@@ -2305,7 +2287,6 @@ export const getHomeworkSubmissionsController =
             }
           : {}),
 
-
         ...(typeof req.query.search ===
         "string"
           ? {
@@ -2313,7 +2294,6 @@ export const getHomeworkSubmissionsController =
                 req.query.search,
             }
           : {}),
-
 
         ...(typeof req.query.page ===
         "string"
@@ -2324,7 +2304,6 @@ export const getHomeworkSubmissionsController =
                 ),
             }
           : {}),
-
 
         ...(typeof req.query.limit ===
         "string"
@@ -2337,7 +2316,6 @@ export const getHomeworkSubmissionsController =
           : {}),
       };
 
-
       const result =
         await getHomeworkSubmissions(
           schoolId,
@@ -2349,31 +2327,24 @@ export const getHomeworkSubmissionsController =
             : undefined
         );
 
-
       return res.status(
         200
       ).json({
-
         success: true,
 
         data:
           result,
       });
-
     } catch (error) {
-
       const message =
         error instanceof Error
           ? error.message
           : "Failed to fetch homework submissions";
 
-
       return res.status(
         400
       ).json({
-
         success: false,
-
         message,
       });
     }
@@ -2382,9 +2353,6 @@ export const getHomeworkSubmissionsController =
 
 // ======================================================
 // GET HOMEWORK SUBMISSION STATS
-//
-// TEACHER:
-// Only own homework stats.
 // ======================================================
 
 export const getHomeworkSubmissionStatsController =
@@ -2392,9 +2360,7 @@ export const getHomeworkSubmissionStatsController =
     req: Request,
     res: Response
   ) => {
-
     try {
-
       const schoolId =
         req.user?.schoolId;
 
@@ -2405,13 +2371,10 @@ export const getHomeworkSubmissionStatsController =
         homeworkId,
       } = req.params;
 
-
       if (!schoolId) {
-
         return res.status(
           400
         ).json({
-
           success: false,
 
           message:
@@ -2419,17 +2382,14 @@ export const getHomeworkSubmissionStatsController =
         });
       }
 
-
       if (
         !homeworkId ||
         typeof homeworkId !==
           "string"
       ) {
-
         return res.status(
           400
         ).json({
-
           success: false,
 
           message:
@@ -2437,29 +2397,24 @@ export const getHomeworkSubmissionStatsController =
         });
       }
 
-
       const actorTeacherId =
         getActorTeacherId(
           req
         );
 
-
       if (
         actorTeacherId &&
         !userId
       ) {
-
         return res.status(
           401
         ).json({
-
           success: false,
 
           message:
             "User ID not found in token",
         });
       }
-
 
       const stats =
         await getHomeworkSubmissionStats(
@@ -2471,32 +2426,25 @@ export const getHomeworkSubmissionStatsController =
             : undefined
         );
 
-
       return res.status(
         200
       ).json({
-
         success: true,
 
         data: {
           stats,
         },
       });
-
     } catch (error) {
-
       const message =
         error instanceof Error
           ? error.message
           : "Failed to fetch submission stats";
 
-
       return res.status(
         400
       ).json({
-
         success: false,
-
         message,
       });
     }
@@ -2505,9 +2453,6 @@ export const getHomeworkSubmissionStatsController =
 
 // ======================================================
 // GET SINGLE SUBMISSION
-//
-// TEACHER:
-// Can access only submission belonging to own homework.
 // ======================================================
 
 export const getHomeworkSubmissionByIdController =
@@ -2515,9 +2460,7 @@ export const getHomeworkSubmissionByIdController =
     req: Request,
     res: Response
   ) => {
-
     try {
-
       const schoolId =
         req.user?.schoolId;
 
@@ -2528,13 +2471,10 @@ export const getHomeworkSubmissionByIdController =
         submissionId,
       } = req.params;
 
-
       if (!schoolId) {
-
         return res.status(
           400
         ).json({
-
           success: false,
 
           message:
@@ -2542,17 +2482,14 @@ export const getHomeworkSubmissionByIdController =
         });
       }
 
-
       if (
         !submissionId ||
         typeof submissionId !==
           "string"
       ) {
-
         return res.status(
           400
         ).json({
-
           success: false,
 
           message:
@@ -2560,29 +2497,24 @@ export const getHomeworkSubmissionByIdController =
         });
       }
 
-
       const actorTeacherId =
         getActorTeacherId(
           req
         );
 
-
       if (
         actorTeacherId &&
         !userId
       ) {
-
         return res.status(
           401
         ).json({
-
           success: false,
 
           message:
             "User ID not found in token",
         });
       }
-
 
       const submission =
         await getHomeworkSubmissionById(
@@ -2594,32 +2526,25 @@ export const getHomeworkSubmissionByIdController =
             : undefined
         );
 
-
       return res.status(
         200
       ).json({
-
         success: true,
 
         data: {
           submission,
         },
       });
-
     } catch (error) {
-
       const message =
         error instanceof Error
           ? error.message
           : "Failed to fetch homework submission";
 
-
       return res.status(
         400
       ).json({
-
         success: false,
-
         message,
       });
     }
@@ -2628,11 +2553,7 @@ export const getHomeworkSubmissionByIdController =
 
 // ======================================================
 // UPDATE HOMEWORK SUBMISSION
-//
-// Existing Admin/internal endpoint.
-//
-// Teacher should NOT edit student's submission.
-// Student uses /me/:submissionId.
+// SCHOOL ADMIN ONLY
 // ======================================================
 
 export const updateHomeworkSubmissionController =
@@ -2640,9 +2561,7 @@ export const updateHomeworkSubmissionController =
     req: Request,
     res: Response
   ) => {
-
     try {
-
       const schoolId =
         req.user?.schoolId;
 
@@ -2650,13 +2569,10 @@ export const updateHomeworkSubmissionController =
         submissionId,
       } = req.params;
 
-
       if (!schoolId) {
-
         return res.status(
           400
         ).json({
-
           success: false,
 
           message:
@@ -2664,17 +2580,14 @@ export const updateHomeworkSubmissionController =
         });
       }
 
-
       if (
         !submissionId ||
         typeof submissionId !==
           "string"
       ) {
-
         return res.status(
           400
         ).json({
-
           success: false,
 
           message:
@@ -2682,23 +2595,23 @@ export const updateHomeworkSubmissionController =
         });
       }
 
-
       const {
         submissionText,
         attachment,
       } = req.body;
-
 
       const submission =
         await updateHomeworkSubmission(
           schoolId,
           submissionId,
           {
-
             ...(submissionText !==
             undefined
               ? {
-                  submissionText,
+                  submissionText:
+                    String(
+                      submissionText
+                    ),
                 }
               : {}),
 
@@ -2711,11 +2624,9 @@ export const updateHomeworkSubmissionController =
           }
         );
 
-
       return res.status(
         200
       ).json({
-
         success: true,
 
         message:
@@ -2725,21 +2636,16 @@ export const updateHomeworkSubmissionController =
           submission,
         },
       });
-
     } catch (error) {
-
       const message =
         error instanceof Error
           ? error.message
           : "Failed to update homework submission";
 
-
       return res.status(
         400
       ).json({
-
         success: false,
-
         message,
       });
     }
@@ -2747,15 +2653,8 @@ export const updateHomeworkSubmissionController =
 
 
 // ======================================================
-// REVIEW HOMEWORK SUBMISSION
-//
-// SCHOOL_ADMIN:
-// Can review school submission.
-//
-// TEACHER:
-// Can review only submission from own homework.
-//
-// reviewedBy = User._id
+// REVIEW ONLINE SUBMISSION
+// SCHOOL ADMIN + TEACHER
 // ======================================================
 
 export const reviewHomeworkSubmissionController =
@@ -2763,9 +2662,7 @@ export const reviewHomeworkSubmissionController =
     req: Request,
     res: Response
   ) => {
-
     try {
-
       const schoolId =
         req.user?.schoolId;
 
@@ -2776,13 +2673,10 @@ export const reviewHomeworkSubmissionController =
         submissionId,
       } = req.params;
 
-
       if (!schoolId) {
-
         return res.status(
           400
         ).json({
-
           success: false,
 
           message:
@@ -2790,13 +2684,10 @@ export const reviewHomeworkSubmissionController =
         });
       }
 
-
       if (!userId) {
-
         return res.status(
           401
         ).json({
-
           success: false,
 
           message:
@@ -2804,17 +2695,14 @@ export const reviewHomeworkSubmissionController =
         });
       }
 
-
       if (
         !submissionId ||
         typeof submissionId !==
           "string"
       ) {
-
         return res.status(
           400
         ).json({
-
           success: false,
 
           message:
@@ -2822,22 +2710,26 @@ export const reviewHomeworkSubmissionController =
         });
       }
 
-
-      const actorTeacherId =
-        getActorTeacherId(
-          req
-        );
-
-
       const {
+        reviewStatus,
         remarks,
         marks,
       } = req.body;
 
+      if (
+        !isAllowedReviewStatus(
+          reviewStatus
+        )
+      ) {
+        return res.status(
+          400
+        ).json({
+          success: false,
 
-      // ==================================================
-      // MARKS VALIDATION
-      // ==================================================
+          message:
+            "Review status must be COMPLETED, INCOMPLETE or REDO_REQUIRED",
+        });
+      }
 
       if (
         marks !== undefined &&
@@ -2848,11 +2740,9 @@ export const reviewHomeworkSubmissionController =
           Number(marks) < 0
         )
       ) {
-
         return res.status(
           400
         ).json({
-
           success: false,
 
           message:
@@ -2860,6 +2750,10 @@ export const reviewHomeworkSubmissionController =
         });
       }
 
+      const actorTeacherId =
+        getActorTeacherId(
+          req
+        );
 
       const submission =
         await reviewHomeworkSubmission(
@@ -2867,6 +2761,7 @@ export const reviewHomeworkSubmissionController =
           submissionId,
           userId,
           {
+            reviewStatus,
 
             ...(remarks !==
             undefined
@@ -2894,11 +2789,9 @@ export const reviewHomeworkSubmissionController =
             : undefined
         );
 
-
       return res.status(
         200
       ).json({
-
         success: true,
 
         message:
@@ -2908,21 +2801,16 @@ export const reviewHomeworkSubmissionController =
           submission,
         },
       });
-
     } catch (error) {
-
       const message =
         error instanceof Error
           ? error.message
           : "Failed to review homework submission";
 
-
       return res.status(
         400
       ).json({
-
         success: false,
-
         message,
       });
     }
@@ -2930,33 +2818,30 @@ export const reviewHomeworkSubmissionController =
 
 
 // ======================================================
-// DELETE HOMEWORK SUBMISSION
-//
-// Teacher should NOT get this route permission.
+// MARK OFFLINE / NOTEBOOK HOMEWORK
+// SCHOOL ADMIN + TEACHER
 // ======================================================
 
-export const deleteHomeworkSubmissionController =
+export const markOfflineHomeworkController =
   async (
     req: Request,
     res: Response
   ) => {
-
     try {
-
       const schoolId =
         req.user?.schoolId;
 
+      const userId =
+        req.user?.userId;
+
       const {
-        submissionId,
+        homeworkId,
       } = req.params;
 
-
       if (!schoolId) {
-
         return res.status(
           400
         ).json({
-
           success: false,
 
           message:
@@ -2964,55 +2849,151 @@ export const deleteHomeworkSubmissionController =
         });
       }
 
-
-      if (
-        !submissionId ||
-        typeof submissionId !==
-          "string"
-      ) {
-
+      if (!userId) {
         return res.status(
-          400
+          401
         ).json({
-
           success: false,
 
           message:
-            "Submission ID is required",
+            "User ID not found in token",
         });
       }
 
+      if (
+        !homeworkId ||
+        typeof homeworkId !==
+          "string"
+      ) {
+        return res.status(
+          400
+        ).json({
+          success: false,
 
-      const result =
-        await deleteHomeworkSubmission(
-          schoolId,
-          submissionId
+          message:
+            "Homework ID is required",
+        });
+      }
+
+      const {
+        studentId,
+        reviewStatus,
+        remarks,
+        marks,
+      } = req.body;
+
+      if (
+        !studentId ||
+        typeof studentId !==
+          "string"
+      ) {
+        return res.status(
+          400
+        ).json({
+          success: false,
+
+          message:
+            "Student ID is required",
+        });
+      }
+
+      if (
+        !isAllowedReviewStatus(
+          reviewStatus
+        )
+      ) {
+        return res.status(
+          400
+        ).json({
+          success: false,
+
+          message:
+            "Review status must be COMPLETED, INCOMPLETE or REDO_REQUIRED",
+        });
+      }
+
+      if (
+        marks !== undefined &&
+        (
+          Number.isNaN(
+            Number(marks)
+          ) ||
+          Number(marks) < 0
+        )
+      ) {
+        return res.status(
+          400
+        ).json({
+          success: false,
+
+          message:
+            "Marks must be a valid non-negative number",
+        });
+      }
+
+      const actorTeacherId =
+        getActorTeacherId(
+          req
         );
 
+      const submission =
+        await markOfflineHomework(
+          schoolId,
+          homeworkId,
+          userId,
+          {
+            studentId,
+
+            reviewStatus,
+
+            ...(remarks !==
+            undefined
+              ? {
+                  remarks:
+                    String(
+                      remarks
+                    ),
+                }
+              : {}),
+
+            ...(marks !==
+            undefined
+              ? {
+                  marks:
+                    Number(
+                      marks
+                    ),
+                }
+              : {}),
+          },
+          actorTeacherId,
+          actorTeacherId
+            ? userId
+            : undefined
+        );
 
       return res.status(
         200
       ).json({
-
         success: true,
 
-        ...result,
+        message:
+          "Offline homework marked successfully",
+
+        data: {
+          submission,
+        },
       });
-
     } catch (error) {
-
       const message =
         error instanceof Error
           ? error.message
-          : "Failed to delete homework submission";
-
+          : "Failed to mark offline homework";
 
       return res.status(
         400
       ).json({
-
         success: false,
-
         message,
       });
     }
@@ -3020,10 +3001,310 @@ export const deleteHomeworkSubmissionController =
 
 
 // ======================================================
-// GET STUDENT SUBMISSION FOR HOMEWORK
-//
-// TEACHER:
-// Only students belonging to own homework.
+// BULK REVIEW
+// SCHOOL ADMIN + TEACHER
+// ======================================================
+
+export const bulkReviewHomeworkController =
+  async (
+    req: Request,
+    res: Response
+  ) => {
+    try {
+      const schoolId =
+        req.user?.schoolId;
+
+      const userId =
+        req.user?.userId;
+
+      const {
+        homeworkId,
+      } = req.params;
+
+      if (!schoolId) {
+        return res.status(
+          400
+        ).json({
+          success: false,
+
+          message:
+            "School ID not found in token",
+        });
+      }
+
+      if (!userId) {
+        return res.status(
+          401
+        ).json({
+          success: false,
+
+          message:
+            "User ID not found in token",
+        });
+      }
+
+      if (
+        !homeworkId ||
+        typeof homeworkId !==
+          "string"
+      ) {
+        return res.status(
+          400
+        ).json({
+          success: false,
+
+          message:
+            "Homework ID is required",
+        });
+      }
+
+      const {
+        students,
+      } = req.body;
+
+      if (
+        !Array.isArray(
+          students
+        ) ||
+        students.length === 0
+      ) {
+        return res.status(
+          400
+        ).json({
+          success: false,
+
+          message:
+            "Students array is required",
+        });
+      }
+
+      if (
+        students.length >
+        100
+      ) {
+        return res.status(
+          400
+        ).json({
+          success: false,
+
+          message:
+            "Maximum 100 students can be reviewed at once",
+        });
+      }
+
+      const normalizedStudents =
+        [];
+
+      for (
+        const item of
+        students
+      ) {
+        if (
+          !item ||
+          typeof item.studentId !==
+            "string"
+        ) {
+          return res.status(
+            400
+          ).json({
+            success: false,
+
+            message:
+              "Every student must have a valid studentId",
+          });
+        }
+
+        if (
+          !isAllowedReviewStatus(
+            item.reviewStatus
+          )
+        ) {
+          return res.status(
+            400
+          ).json({
+            success: false,
+
+            message:
+              "Every student must have COMPLETED, INCOMPLETE or REDO_REQUIRED reviewStatus",
+          });
+        }
+
+        if (
+          item.marks !==
+            undefined &&
+          (
+            Number.isNaN(
+              Number(
+                item.marks
+              )
+            ) ||
+            Number(
+              item.marks
+            ) < 0
+          )
+        ) {
+          return res.status(
+            400
+          ).json({
+            success: false,
+
+            message:
+              "Marks must be a valid non-negative number",
+          });
+        }
+
+        normalizedStudents.push({
+          studentId:
+            item.studentId,
+
+          reviewStatus:
+            item.reviewStatus,
+
+          ...(item.remarks !==
+          undefined
+            ? {
+                remarks:
+                  String(
+                    item.remarks
+                  ),
+              }
+            : {}),
+
+          ...(item.marks !==
+          undefined
+            ? {
+                marks:
+                  Number(
+                    item.marks
+                  ),
+              }
+            : {}),
+        });
+      }
+
+      const actorTeacherId =
+        getActorTeacherId(
+          req
+        );
+
+      const result =
+        await bulkReviewHomework(
+          schoolId,
+          homeworkId,
+          userId,
+          {
+            students:
+              normalizedStudents,
+          },
+          actorTeacherId,
+          actorTeacherId
+            ? userId
+            : undefined
+        );
+
+      return res.status(
+        200
+      ).json({
+        success: true,
+
+        message:
+          "Homework reviewed successfully",
+
+        data:
+          result,
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to review homework";
+
+      return res.status(
+        400
+      ).json({
+        success: false,
+        message,
+      });
+    }
+  };
+
+
+// ======================================================
+// DELETE SUBMISSION
+// SCHOOL ADMIN ONLY
+// ======================================================
+
+export const deleteHomeworkSubmissionController =
+  async (
+    req: Request,
+    res: Response
+  ) => {
+    try {
+      const schoolId =
+        req.user?.schoolId;
+
+      const {
+        submissionId,
+      } = req.params;
+
+      if (!schoolId) {
+        return res.status(
+          400
+        ).json({
+          success: false,
+
+          message:
+            "School ID not found in token",
+        });
+      }
+
+      if (
+        !submissionId ||
+        typeof submissionId !==
+          "string"
+      ) {
+        return res.status(
+          400
+        ).json({
+          success: false,
+
+          message:
+            "Submission ID is required",
+        });
+      }
+
+      const result =
+        await deleteHomeworkSubmission(
+          schoolId,
+          submissionId
+        );
+
+      return res.status(
+        200
+      ).json({
+        success: true,
+
+        ...result,
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to delete homework submission";
+
+      return res.status(
+        400
+      ).json({
+        success: false,
+        message,
+      });
+    }
+  };
+
+
+// ======================================================
+// GET STUDENT SUBMISSION
+// SCHOOL ADMIN + TEACHER
 // ======================================================
 
 export const getStudentHomeworkSubmissionController =
@@ -3031,9 +3312,7 @@ export const getStudentHomeworkSubmissionController =
     req: Request,
     res: Response
   ) => {
-
     try {
-
       const schoolId =
         req.user?.schoolId;
 
@@ -3045,13 +3324,10 @@ export const getStudentHomeworkSubmissionController =
         studentId,
       } = req.params;
 
-
       if (!schoolId) {
-
         return res.status(
           400
         ).json({
-
           success: false,
 
           message:
@@ -3059,17 +3335,14 @@ export const getStudentHomeworkSubmissionController =
         });
       }
 
-
       if (
         !homeworkId ||
         typeof homeworkId !==
           "string"
       ) {
-
         return res.status(
           400
         ).json({
-
           success: false,
 
           message:
@@ -3077,17 +3350,14 @@ export const getStudentHomeworkSubmissionController =
         });
       }
 
-
       if (
         !studentId ||
         typeof studentId !==
           "string"
       ) {
-
         return res.status(
           400
         ).json({
-
           success: false,
 
           message:
@@ -3095,29 +3365,24 @@ export const getStudentHomeworkSubmissionController =
         });
       }
 
-
       const actorTeacherId =
         getActorTeacherId(
           req
         );
 
-
       if (
         actorTeacherId &&
         !userId
       ) {
-
         return res.status(
           401
         ).json({
-
           success: false,
 
           message:
             "User ID not found in token",
         });
       }
-
 
       const submission =
         await getStudentHomeworkSubmission(
@@ -3130,32 +3395,25 @@ export const getStudentHomeworkSubmissionController =
             : undefined
         );
 
-
       return res.status(
         200
       ).json({
-
         success: true,
 
         data: {
           submission,
         },
       });
-
     } catch (error) {
-
       const message =
         error instanceof Error
           ? error.message
           : "Failed to fetch student homework submission";
 
-
       return res.status(
         400
       ).json({
-
         success: false,
-
         message,
       });
     }
@@ -3164,8 +3422,6 @@ export const getStudentHomeworkSubmissionController =
 
 // ======================================================
 // STUDENT - SUBMIT MY HOMEWORK
-//
-// POST /api/v1/homework-submissions/me
 // ======================================================
 
 export const createMyHomeworkSubmissionController =
@@ -3173,22 +3429,17 @@ export const createMyHomeworkSubmissionController =
     req: Request,
     res: Response
   ) => {
-
     try {
-
       const schoolId =
         req.user?.schoolId;
 
       const studentId =
         req.user?.studentId;
 
-
       if (!schoolId) {
-
         return res.status(
           401
         ).json({
-
           success: false,
 
           message:
@@ -3196,13 +3447,10 @@ export const createMyHomeworkSubmissionController =
         });
       }
 
-
       if (!studentId) {
-
         return res.status(
           401
         ).json({
-
           success: false,
 
           message:
@@ -3210,24 +3458,20 @@ export const createMyHomeworkSubmissionController =
         });
       }
 
-
       const {
         homeworkId,
         submissionText,
         attachment,
       } = req.body;
 
-
       if (
         !homeworkId ||
         typeof homeworkId !==
           "string"
       ) {
-
         return res.status(
           400
         ).json({
-
           success: false,
 
           message:
@@ -3235,19 +3479,20 @@ export const createMyHomeworkSubmissionController =
         });
       }
 
-
       const submission =
         await createMyHomeworkSubmission(
           schoolId,
           studentId,
           {
-
             homeworkId,
 
             ...(submissionText !==
             undefined
               ? {
-                  submissionText,
+                  submissionText:
+                    String(
+                      submissionText
+                    ),
                 }
               : {}),
 
@@ -3260,11 +3505,9 @@ export const createMyHomeworkSubmissionController =
           }
         );
 
-
       return res.status(
         201
       ).json({
-
         success: true,
 
         message:
@@ -3274,21 +3517,16 @@ export const createMyHomeworkSubmissionController =
           submission,
         },
       });
-
     } catch (error) {
-
       const message =
         error instanceof Error
           ? error.message
           : "Failed to submit homework";
 
-
       return res.status(
         400
       ).json({
-
         success: false,
-
         message,
       });
     }
@@ -3297,8 +3535,6 @@ export const createMyHomeworkSubmissionController =
 
 // ======================================================
 // STUDENT - GET MY SUBMISSIONS
-//
-// GET /api/v1/homework-submissions/me
 // ======================================================
 
 export const getMyHomeworkSubmissionsController =
@@ -3306,22 +3542,17 @@ export const getMyHomeworkSubmissionsController =
     req: Request,
     res: Response
   ) => {
-
     try {
-
       const schoolId =
         req.user?.schoolId;
 
       const studentId =
         req.user?.studentId;
 
-
       if (!schoolId) {
-
         return res.status(
           401
         ).json({
-
           success: false,
 
           message:
@@ -3329,13 +3560,10 @@ export const getMyHomeworkSubmissionsController =
         });
       }
 
-
       if (!studentId) {
-
         return res.status(
           401
         ).json({
-
           success: false,
 
           message:
@@ -3343,18 +3571,15 @@ export const getMyHomeworkSubmissionsController =
         });
       }
 
-
       const submissions =
         await getMyHomeworkSubmissions(
           schoolId,
           studentId
         );
 
-
       return res.status(
         200
       ).json({
-
         success: true,
 
         message:
@@ -3364,21 +3589,16 @@ export const getMyHomeworkSubmissionsController =
           submissions,
         },
       });
-
     } catch (error) {
-
       const message =
         error instanceof Error
           ? error.message
           : "Failed to fetch my homework submissions";
 
-
       return res.status(
         400
       ).json({
-
         success: false,
-
         message,
       });
     }
@@ -3387,8 +3607,6 @@ export const getMyHomeworkSubmissionsController =
 
 // ======================================================
 // STUDENT - UPDATE MY SUBMISSION
-//
-// PUT /api/v1/homework-submissions/me/:submissionId
 // ======================================================
 
 export const updateMyHomeworkSubmissionController =
@@ -3396,9 +3614,7 @@ export const updateMyHomeworkSubmissionController =
     req: Request,
     res: Response
   ) => {
-
     try {
-
       const schoolId =
         req.user?.schoolId;
 
@@ -3409,13 +3625,10 @@ export const updateMyHomeworkSubmissionController =
         submissionId,
       } = req.params;
 
-
       if (!schoolId) {
-
         return res.status(
           401
         ).json({
-
           success: false,
 
           message:
@@ -3423,13 +3636,10 @@ export const updateMyHomeworkSubmissionController =
         });
       }
 
-
       if (!studentId) {
-
         return res.status(
           401
         ).json({
-
           success: false,
 
           message:
@@ -3437,17 +3647,14 @@ export const updateMyHomeworkSubmissionController =
         });
       }
 
-
       if (
         !submissionId ||
         typeof submissionId !==
           "string"
       ) {
-
         return res.status(
           400
         ).json({
-
           success: false,
 
           message:
@@ -3455,12 +3662,10 @@ export const updateMyHomeworkSubmissionController =
         });
       }
 
-
       const {
         submissionText,
         attachment,
       } = req.body;
-
 
       const submission =
         await updateMyHomeworkSubmission(
@@ -3468,11 +3673,13 @@ export const updateMyHomeworkSubmissionController =
           studentId,
           submissionId,
           {
-
             ...(submissionText !==
             undefined
               ? {
-                  submissionText,
+                  submissionText:
+                    String(
+                      submissionText
+                    ),
                 }
               : {}),
 
@@ -3485,11 +3692,9 @@ export const updateMyHomeworkSubmissionController =
           }
         );
 
-
       return res.status(
         200
       ).json({
-
         success: true,
 
         message:
@@ -3499,21 +3704,16 @@ export const updateMyHomeworkSubmissionController =
           submission,
         },
       });
-
     } catch (error) {
-
       const message =
         error instanceof Error
           ? error.message
           : "Failed to update homework submission";
 
-
       return res.status(
         400
       ).json({
-
         success: false,
-
         message,
       });
     }

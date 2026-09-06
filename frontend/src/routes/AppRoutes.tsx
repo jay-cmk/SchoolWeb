@@ -1,6 +1,5 @@
 
 
-
 // import {
 //   Routes,
 //   Route,
@@ -132,10 +131,26 @@
 // import TeacherTimetable
 //   from "../pages/schoolAdmin/timetable/TeacherTimetable";
 
-// import HomeworkList from "../pages/schoolAdmin/homework/HomeworkList";
-// import AddHomework from "../pages/schoolAdmin/homework/AddHomework";
-// import HomeworkDetails from "../pages/schoolAdmin/homework/HomeworkDetails";
-// import StudentSubmissions from "../pages/schoolAdmin/homework/StudentSubmissions";  
+
+// // ============================================
+// // HOMEWORK
+// // ============================================
+
+// import HomeworkList
+//   from "../pages/schoolAdmin/homework/HomeworkList";
+
+
+// import AddHomework
+//   from "../pages/schoolAdmin/homework/AddHomework";
+
+
+// import HomeworkDetails
+//   from "../pages/schoolAdmin/homework/HomeworkDetails";
+
+
+// import StudentSubmissions
+//   from "../pages/schoolAdmin/homework/StudentSubmissions";
+// import EditHomework from "../pages/schoolAdmin/homework/EditHomework";
 
 
 // // ============================================
@@ -143,7 +158,9 @@
 // // ============================================
 
 // const AppRoutes = () => {
+
 //   return (
+
 //     <Routes>
 
 //       {/* ========================================
@@ -359,16 +376,7 @@
 //         />
 
 
-//         {/* ======================================
-//             UPDATE ATTENDANCE
-
-//             Example:
-//             /school-admin/attendance/update
-//             ?sessionId=xxx
-//             &classId=xxx
-//             &sectionId=xxx
-//             &date=2026-08-25
-//         ====================================== */}
+//         {/* UPDATE ATTENDANCE */}
 
 //         <Route
 //           path="/school-admin/attendance/update"
@@ -378,15 +386,7 @@
 //         />
 
 
-//         {/* ======================================
-//             STUDENT ATTENDANCE DETAILS
-
-//             Example:
-//             /school-admin/attendance/student/STUDENT_ID
-//             ?sessionId=xxx
-//             &month=8
-//             &year=2026
-//         ====================================== */}
+//         {/* STUDENT ATTENDANCE DETAILS */}
 
 //         <Route
 //           path="/school-admin/attendance/student/:studentId"
@@ -414,7 +414,7 @@
 //         />
 
 
-//         {/* WEEKLY CLASS TIMETABLE */}
+//         {/* WEEKLY TIMETABLE */}
 
 //         <Route
 //           path="/school-admin/timetable/weekly"
@@ -443,6 +443,57 @@
 //           }
 //         />
 
+
+//         {/* ======================================
+//             HOMEWORK
+//         ====================================== */}
+
+
+//         {/* HOMEWORK LIST */}
+
+//         <Route
+//           path="/school-admin/homework"
+//           element={
+//             <HomeworkList />
+//           }
+//         />
+
+
+//         {/* ADD HOMEWORK */}
+
+//         <Route
+//           path="/school-admin/homework/add"
+//           element={
+//             <AddHomework />
+//           }
+//         />
+
+
+//         {/* HOMEWORK DETAILS */}
+
+//         <Route
+//           path="/school-admin/homework/:homeworkId"
+//           element={
+//             <HomeworkDetails />
+//           }
+//         />
+
+
+//         {/* STUDENT SUBMISSIONS */}
+
+//         <Route
+//           path="/school-admin/homework/:homeworkId/submissions"
+//           element={
+//             <StudentSubmissions />
+//           }
+//         />
+
+//         <Route
+//   path="/school-admin/homework/:homeworkId/edit"
+//   element={<EditHomework />}
+// />
+
+
 //       </Route>
 
 
@@ -468,12 +519,7 @@
 // export default AppRoutes;
 
 
-
-
-
-
-
-
+// src/routes/AppRoutes.tsx
 
 import {
   Routes,
@@ -481,14 +527,11 @@ import {
   Navigate,
 } from "react-router-dom";
 
-
 import Login
   from "../pages/auth/Login";
 
-
 import ProtectedRoute
   from "./ProtectedRoute";
-
 
 import {
   UserRole,
@@ -502,18 +545,14 @@ import {
 import SuperAdminLayout
   from "../components/layout/SuperAdminLayout";
 
-
 import SuperAdminDashboard
   from "../pages/superAdmin/SuperAdminDashboard";
-
 
 import Schools
   from "../pages/superAdmin/Schools";
 
-
 import SchoolDetails
   from "../pages/superAdmin/SchoolDetails";
-
 
 import AddSchool
   from "../pages/superAdmin/AddSchool";
@@ -526,7 +565,6 @@ import AddSchool
 import SchoolAdminLayout
   from "../components/layout/SchoolAdminLayout";
 
-
 import SchoolAdminDashboard
   from "../pages/schoolAdmin/Dashboard";
 
@@ -538,25 +576,37 @@ import SchoolAdminDashboard
 import Sessions
   from "../pages/schoolAdmin/academic/sessions/Sessions";
 
-
 import Classes
   from "../pages/schoolAdmin/academic/classes/Classes";
-
 
 import Sections
   from "../pages/schoolAdmin/academic/sections/Sections";
 
-
 import Subjects
   from "../pages/schoolAdmin/academic/subjects/Subjects";
-
 
 import SubjectAssignments
   from "../pages/schoolAdmin/academic/subjectAssignments/SubjectAssignments";
 
-
 import AcademicSessionDetails
   from "../pages/schoolAdmin/academic/sessions/Sessions";
+
+
+// ============================================
+// STUDENTS
+// ============================================
+
+import StudentList
+  from "../pages/schoolAdmin/students/StudentList";
+
+import AddStudent
+  from "../pages/schoolAdmin/students/AddStudent";
+
+import ClassWiseStudents
+  from "../pages/schoolAdmin/students/ClassWiseStudents";
+
+import StudentDetails
+  from "../pages/schoolAdmin/students/StudentDetails";
 
 
 // ============================================
@@ -574,18 +624,14 @@ import Teachers
 import MarkAttendance
   from "../pages/schoolAdmin/Attendance/MarkAttendance";
 
-
 import DailyAttendance
   from "../pages/schoolAdmin/Attendance/DailyAttendance";
-
 
 import MonthlyAttendance
   from "../pages/schoolAdmin/Attendance/MonthlyAttendance";
 
-
 import UpdateAttendance
   from "../pages/schoolAdmin/Attendance/UpdateAttendance";
-
 
 import StudentAttendanceDetails
   from "../pages/schoolAdmin/Attendance/StudentAttendanceDetails";
@@ -598,10 +644,8 @@ import StudentAttendanceDetails
 import WeeklyClassTimetable
   from "../pages/schoolAdmin/timetable/WeeklyClassTimetable";
 
-
 import DailyTimetable
   from "../pages/schoolAdmin/timetable/DailyTimetable";
-
 
 import TeacherTimetable
   from "../pages/schoolAdmin/timetable/TeacherTimetable";
@@ -614,18 +658,18 @@ import TeacherTimetable
 import HomeworkList
   from "../pages/schoolAdmin/homework/HomeworkList";
 
-
 import AddHomework
   from "../pages/schoolAdmin/homework/AddHomework";
-
 
 import HomeworkDetails
   from "../pages/schoolAdmin/homework/HomeworkDetails";
 
-
 import StudentSubmissions
   from "../pages/schoolAdmin/homework/StudentSubmissions";
-import EditHomework from "../pages/schoolAdmin/homework/EditHomework";
+
+import EditHomework
+  from "../pages/schoolAdmin/homework/EditHomework";
+import BulkPromotion from "../pages/schoolAdmin/students/BulkPromotion";
 
 
 // ============================================
@@ -805,6 +849,50 @@ const AppRoutes = () => {
 
 
         {/* ======================================
+            STUDENTS
+        ====================================== */}
+
+        {/* ALL STUDENTS */}
+
+        <Route
+          path="/school-admin/students"
+          element={
+            <StudentList />
+          }
+        />
+
+
+        {/* ADD STUDENT */}
+
+        <Route
+          path="/school-admin/students/add"
+          element={
+            <AddStudent />
+          }
+        />
+
+
+        {/* CLASS-WISE STUDENTS */}
+
+        <Route
+          path="/school-admin/students/class-wise"
+          element={
+            <ClassWiseStudents />
+          }
+        />
+
+
+        {/* STUDENT DETAILS */}
+
+        <Route
+          path="/school-admin/students/:studentId"
+          element={
+            <StudentDetails />
+          }
+        />
+
+
+        {/* ======================================
             TEACHERS
         ====================================== */}
 
@@ -819,7 +907,6 @@ const AppRoutes = () => {
         {/* ======================================
             ATTENDANCE
         ====================================== */}
-
 
         {/* MARK ATTENDANCE */}
 
@@ -875,7 +962,6 @@ const AppRoutes = () => {
             TIMETABLE
         ====================================== */}
 
-
         {/* DEFAULT TIMETABLE ROUTE */}
 
         <Route
@@ -923,7 +1009,6 @@ const AppRoutes = () => {
             HOMEWORK
         ====================================== */}
 
-
         {/* HOMEWORK LIST */}
 
         <Route
@@ -933,7 +1018,7 @@ const AppRoutes = () => {
           }
         />
 
-
+attendance/daily
         {/* ADD HOMEWORK */}
 
         <Route
@@ -963,11 +1048,20 @@ const AppRoutes = () => {
           }
         />
 
-        <Route
-  path="/school-admin/homework/:homeworkId/edit"
-  element={<EditHomework />}
-/>
 
+        {/* EDIT HOMEWORK */}
+
+        <Route
+          path="/school-admin/homework/:homeworkId/edit"
+          element={
+            <EditHomework />
+          }
+        />
+
+        <Route
+  path="/school-admin/students/bulk-promotion"
+  element={<BulkPromotion />}
+/>
 
       </Route>
 
@@ -987,7 +1081,9 @@ const AppRoutes = () => {
       />
 
     </Routes>
+
   );
+
 };
 
 

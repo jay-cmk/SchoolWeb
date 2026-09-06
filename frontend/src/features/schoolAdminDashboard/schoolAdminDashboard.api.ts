@@ -21,12 +21,18 @@ const getAuthHeaders = () => {
 };
 
 export const getSchoolAdminDashboardApi =
-  async (): Promise<SchoolAdminDashboard> => {
+  async (
+    sessionId: string
+  ): Promise<SchoolAdminDashboard> => {
     const response =
       await axios.get<SchoolAdminDashboardResponse>(
         `${API_URL}/school-admin/dashboard`,
         {
           headers: getAuthHeaders(),
+
+          params: {
+            sessionId,
+          },
         }
       );
 

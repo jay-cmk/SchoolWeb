@@ -1,291 +1,6 @@
 
 
 
-
-
-
-
-// import mongoose, {
-//   Document,
-//   Schema,
-//   Types,
-// } from "mongoose";
-
-// import type {
-//   StudentGender,
-//   // StudentStatus,
-// } from "./student.interface";
-
-// export interface IStudentDocument
-//   extends Document {
-//   schoolId: Types.ObjectId;
-
-//   sessionId: Types.ObjectId;
-//   classId: Types.ObjectId;
-//   sectionId: Types.ObjectId;
-
-//   admissionNumber: string;
-
-//   rollNumber?: number;
-
-//   name: string;
-
-//   dob?: Date;
-
-//   gender: StudentGender;
-
-//   mobile?: string;
-//   email?: string;
-
-//   address?: {
-//     addressLine?: string;
-//     city?: string;
-//     district?: string;
-//     state?: string;
-//     pincode?: string;
-//   };
-
-//   admissionDate: Date;
-
-//   parentId?: Types.ObjectId;
-
-//   status: StudentStatus;
-
-//   createdBy: Types.ObjectId;
-//   updatedBy?: Types.ObjectId;
-
-//   createdAt: Date;
-//   updatedAt: Date;
-// }
-
-// const studentAddressSchema =
-//   new Schema(
-//     {
-//       addressLine: {
-//         type: String,
-//         trim: true,
-//       },
-
-//       city: {
-//         type: String,
-//         trim: true,
-//       },
-
-//       district: {
-//         type: String,
-//         trim: true,
-//       },
-
-//       state: {
-//         type: String,
-//         trim: true,
-//       },
-
-//       pincode: {
-//         type: String,
-//         trim: true,
-//       },
-//     },
-//     {
-//       _id: false,
-//     }
-//   );
-
-// const studentSchema =
-//   new Schema<IStudentDocument>(
-//     {
-//       schoolId: {
-//         type: Schema.Types.ObjectId,
-//         ref: "School",
-//         required: true,
-//         index: true,
-//       },
-
-//       sessionId: {
-//         type: Schema.Types.ObjectId,
-//         ref: "AcademicSession",
-//         required: true,
-//         index: true,
-//       },
-
-//       classId: {
-//         type: Schema.Types.ObjectId,
-//         ref: "Class",
-//         required: true,
-//         index: true,
-//       },
-
-//       sectionId: {
-//         type: Schema.Types.ObjectId,
-//         ref: "Section",
-//         required: true,
-//         index: true,
-//       },
-
-//       admissionNumber: {
-//         type: String,
-//         required: true,
-//         uppercase: true,
-//         trim: true,
-//       },
-
-//       rollNumber: {
-//         type: Number,
-//         min: 1,
-//       },
-
-//       name: {
-//         type: String,
-//         required: true,
-//         trim: true,
-//       },
-
-//       dob: {
-//         type: Date,
-//       },
-
-//       gender: {
-//         type: String,
-
-//         enum: [
-//           "MALE",
-//           "FEMALE",
-//           "OTHER",
-//         ],
-
-//         required: true,
-//       },
-
-//       mobile: {
-//         type: String,
-//         trim: true,
-//       },
-
-//       email: {
-//         type: String,
-//         lowercase: true,
-//         trim: true,
-//       },
-
-//       address: {
-//         type: studentAddressSchema,
-//       },
-
-//       admissionDate: {
-//         type: Date,
-//         default: Date.now,
-//       },
-
-//       parentId: {
-//         type: Schema.Types.ObjectId,
-//         ref: "Parent",
-//       },
-
-//       status: {
-//         type: String,
-
-//         enum: [
-//           "ACTIVE",
-//           "INACTIVE",
-//           "TRANSFERRED",
-//           "PASSED",
-//           "LEFT",
-//         ],
-
-//         default: "ACTIVE",
-//       },
-
-//       createdBy: {
-//         type: Schema.Types.ObjectId,
-//         ref: "User",
-//         required: true,
-//       },
-
-//       updatedBy: {
-//         type: Schema.Types.ObjectId,
-//         ref: "User",
-//       },
-//     },
-//     {
-//       timestamps: true,
-//     }
-//   );
-
-// // ============================================
-// // UNIQUE ADMISSION NUMBER
-// // PER SCHOOL + SESSION
-// // ============================================
-
-// studentSchema.index(
-//   {
-//     schoolId: 1,
-//     sessionId: 1,
-//     admissionNumber: 1,
-//   },
-//   {
-//     unique: true,
-//   }
-// );
-
-// // ============================================
-// // UNIQUE ROLL NUMBER
-// // PER SESSION + CLASS + SECTION
-// // ============================================
-
-// studentSchema.index(
-//   {
-//     schoolId: 1,
-//     sessionId: 1,
-//     classId: 1,
-//     sectionId: 1,
-//     rollNumber: 1,
-//   },
-//   {
-//     unique: true,
-
-//     partialFilterExpression: {
-//       rollNumber: {
-//         $exists: true,
-//       },
-//     },
-//   }
-// );
-
-// // ============================================
-// // SEARCH / FILTER INDEX
-// // ============================================
-
-// studentSchema.index({
-//   schoolId: 1,
-//   sessionId: 1,
-//   classId: 1,
-//   sectionId: 1,
-//   status: 1,
-// });
-
-// const Student =
-//   mongoose.models.Student ||
-//   mongoose.model<IStudentDocument>(
-//     "Student",
-//     studentSchema
-//   );
-
-// export { Student };
-
-// export default Student;
-
-
-
-
-
-
-
-
-
-
-
-
-
 // import mongoose, {
 //   Document,
 //   Schema,
@@ -307,6 +22,9 @@
 //   extends Document {
 
 //   schoolId: Types.ObjectId;
+
+//   // Student login User account
+//   userId?: Types.ObjectId;
 
 //   sessionId: Types.ObjectId;
 
@@ -406,6 +124,16 @@
 //       },
 
 
+//       // ======================================
+//       // STUDENT LOGIN USER ACCOUNT
+//       // ======================================
+
+//       userId: {
+//         type: Schema.Types.ObjectId,
+//         ref: "User",
+//       },
+
+
 //       sessionId: {
 //         type: Schema.Types.ObjectId,
 //         ref: "AcademicSession",
@@ -534,6 +262,22 @@
 
 
 // // ============================================
+// // UNIQUE USER ACCOUNT
+// // ONE USER = ONE STUDENT
+// // ============================================
+
+// studentSchema.index(
+//   {
+//     userId: 1,
+//   },
+//   {
+//     unique: true,
+//     sparse: true,
+//   }
+// );
+
+
+// // ============================================
 // // UNIQUE ADMISSION NUMBER
 // // SCHOOL + SESSION
 // // ============================================
@@ -594,7 +338,10 @@
 
 // const Student: Model<IStudentDocument> =
 //   mongoose.models.Student
-//     ? (mongoose.models.Student as Model<IStudentDocument>)
+//     ? (
+//         mongoose.models
+//           .Student as Model<IStudentDocument>
+//       )
 //     : mongoose.model<IStudentDocument>(
 //         "Student",
 //         studentSchema
@@ -612,13 +359,6 @@
 
 
 
-
-
-
-
-
-
-
 import mongoose, {
   Document,
   Schema,
@@ -627,6 +367,12 @@ import mongoose, {
 } from "mongoose";
 
 import type {
+  AdmissionCategory,
+  AdmissionType,
+  IStudentAddress,
+  IStudentParentDetails,
+  StudentBloodGroup,
+  StudentCategory,
   StudentGender,
   StudentStatus,
 } from "./student.interface";
@@ -654,27 +400,70 @@ export interface IStudentDocument
 
   rollNumber?: number;
 
+  // ============================================
+  // ADMISSION DETAILS
+  // ============================================
+
+  admissionType?: AdmissionType;
+
+  admissionCategory?: AdmissionCategory;
+
+  admissionDate: Date;
+
+  // ============================================
+  // BASIC DETAILS
+  // ============================================
+
   name: string;
 
   dob?: Date;
 
   gender: StudentGender;
 
+  bloodGroup?: StudentBloodGroup;
+
+  religion?: string;
+
+  category?: StudentCategory;
+
+  caste?: string;
+
+  aadhaarNumber?: string;
+
+  photo?: string;
+
+  // ============================================
+  // CONTACT DETAILS
+  // ============================================
+
   mobile?: string;
 
   email?: string;
 
-  address?: {
-    addressLine?: string;
-    city?: string;
-    district?: string;
-    state?: string;
-    pincode?: string;
-  };
+  // ============================================
+  // ADDRESS DETAILS
+  // ============================================
 
-  admissionDate: Date;
+  // Old field preserved for old records
+  address?: IStudentAddress;
+
+  currentAddress?: IStudentAddress;
+
+  permanentAddress?: IStudentAddress;
+
+  // ============================================
+  // PARENT DETAILS
+  // ============================================
+
+  father?: IStudentParentDetails;
+
+  mother?: IStudentParentDetails;
 
   parentId?: Types.ObjectId;
+
+  // ============================================
+  // STATUS
+  // ============================================
 
   status: StudentStatus;
 
@@ -719,6 +508,44 @@ const studentAddressSchema =
         type: String,
         trim: true,
       },
+
+      country: {
+        type: String,
+        trim: true,
+      },
+    },
+    {
+      _id: false,
+    }
+  );
+
+
+// ============================================
+// PARENT DETAILS SCHEMA
+// ============================================
+
+const studentParentDetailsSchema =
+  new Schema(
+    {
+      name: {
+        type: String,
+        trim: true,
+      },
+
+      mobile: {
+        type: String,
+        trim: true,
+      },
+
+      aadhaarNumber: {
+        type: String,
+        trim: true,
+      },
+
+      occupation: {
+        type: String,
+        trim: true,
+      },
     },
     {
       _id: false,
@@ -733,7 +560,6 @@ const studentAddressSchema =
 const studentSchema =
   new Schema<IStudentDocument>(
     {
-
       schoolId: {
         type: Schema.Types.ObjectId,
         ref: "School",
@@ -751,6 +577,10 @@ const studentSchema =
         ref: "User",
       },
 
+
+      // ======================================
+      // ACADEMIC DETAILS
+      // ======================================
 
       sessionId: {
         type: Schema.Types.ObjectId,
@@ -776,6 +606,10 @@ const studentSchema =
       },
 
 
+      // ======================================
+      // ADMISSION DETAILS
+      // ======================================
+
       admissionNumber: {
         type: String,
         required: true,
@@ -789,6 +623,44 @@ const studentSchema =
         min: 1,
       },
 
+
+      admissionType: {
+        type: String,
+
+        enum: [
+          "NEW",
+          "TRANSFER",
+          "READMISSION",
+        ],
+
+        default: "NEW",
+      },
+
+
+      admissionCategory: {
+        type: String,
+
+        enum: [
+          "REGULAR",
+          "RTE",
+          "EWS",
+          "MANAGEMENT",
+          "OTHER",
+        ],
+
+        default: "REGULAR",
+      },
+
+
+      admissionDate: {
+        type: Date,
+        default: Date.now,
+      },
+
+
+      // ======================================
+      // BASIC STUDENT DETAILS
+      // ======================================
 
       name: {
         type: String,
@@ -815,6 +687,63 @@ const studentSchema =
       },
 
 
+      bloodGroup: {
+        type: String,
+
+        enum: [
+          "A+",
+          "A-",
+          "B+",
+          "B-",
+          "AB+",
+          "AB-",
+          "O+",
+          "O-",
+        ],
+      },
+
+
+      religion: {
+        type: String,
+        trim: true,
+      },
+
+
+      category: {
+        type: String,
+
+        enum: [
+          "GENERAL",
+          "OBC",
+          "SC",
+          "ST",
+          "OTHER",
+        ],
+      },
+
+
+      caste: {
+        type: String,
+        trim: true,
+      },
+
+
+      aadhaarNumber: {
+        type: String,
+        trim: true,
+      },
+
+
+      photo: {
+        type: String,
+        trim: true,
+      },
+
+
+      // ======================================
+      // CONTACT DETAILS
+      // ======================================
+
       mobile: {
         type: String,
         trim: true,
@@ -828,22 +757,51 @@ const studentSchema =
       },
 
 
+      // ======================================
+      // ADDRESS DETAILS
+      // ======================================
+
+      // Old field preserved so existing
+      // student records continue working.
       address: {
         type: studentAddressSchema,
       },
 
 
-      admissionDate: {
-        type: Date,
-        default: Date.now,
+      currentAddress: {
+        type: studentAddressSchema,
       },
 
 
+      permanentAddress: {
+        type: studentAddressSchema,
+      },
+
+
+      // ======================================
+      // PARENT DETAILS
+      // ======================================
+
+      father: {
+        type: studentParentDetailsSchema,
+      },
+
+
+      mother: {
+        type: studentParentDetailsSchema,
+      },
+
+
+      // Existing Parent module relation
       parentId: {
         type: Schema.Types.ObjectId,
         ref: "Parent",
       },
 
+
+      // ======================================
+      // STUDENT STATUS
+      // ======================================
 
       status: {
         type: String,
@@ -860,6 +818,10 @@ const studentSchema =
       },
 
 
+      // ======================================
+      // AUDIT
+      // ======================================
+
       createdBy: {
         type: Schema.Types.ObjectId,
         ref: "User",
@@ -871,7 +833,6 @@ const studentSchema =
         type: Schema.Types.ObjectId,
         ref: "User",
       },
-
     },
     {
       timestamps: true,

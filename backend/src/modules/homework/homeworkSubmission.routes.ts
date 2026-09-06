@@ -1,94 +1,3 @@
-// import { Router } from "express";
-
-// import {
-//   authenticate,
-// } from "../../middlewares/auth.middleware";
-
-// import {
-//   authorize,
-// } from "../../middlewares/role.middleware";
-
-// import {
-//   UserRole,
-// } from "../../constants/roles";
-
-// import {
-//   createHomeworkSubmissionController,
-//   deleteHomeworkSubmissionController,
-//   getHomeworkSubmissionByIdController,
-//   getHomeworkSubmissionsController,
-//   getHomeworkSubmissionStatsController,
-//   getStudentHomeworkSubmissionController,
-//   reviewHomeworkSubmissionController,
-//   updateHomeworkSubmissionController,
-// } from "./homeworkSubmission.controller";
-
-// const router = Router();
-
-// router.use(
-//   authenticate,
-//   authorize(UserRole.SCHOOL_ADMIN)
-// );
-
-
-// // Create submission
-// router.post(
-//   "/",
-//   createHomeworkSubmissionController
-// );
-
-
-// // Homework-wise stats
-// router.get(
-//   "/homework/:homeworkId/stats",
-//   getHomeworkSubmissionStatsController
-// );
-
-
-// // Homework-wise submissions list
-// router.get(
-//   "/homework/:homeworkId",
-//   getHomeworkSubmissionsController
-// );
-
-
-// // Particular student submission
-// router.get(
-//   "/homework/:homeworkId/student/:studentId",
-//   getStudentHomeworkSubmissionController
-// );
-
-
-// // Single submission
-// router.get(
-//   "/:submissionId",
-//   getHomeworkSubmissionByIdController
-// );
-
-
-// // Update submission
-// router.put(
-//   "/:submissionId",
-//   updateHomeworkSubmissionController
-// );
-
-
-// // Review submission
-// router.patch(
-//   "/:submissionId/review",
-//   reviewHomeworkSubmissionController
-// );
-
-
-// // Delete submission
-// router.delete(
-//   "/:submissionId",
-//   deleteHomeworkSubmissionController
-// );
-
-
-// export default router;
-
 
 
 
@@ -180,6 +89,9 @@
 
 // // ============================================
 // // SCHOOL ADMIN - CREATE SUBMISSION
+// //
+// // Teacher ko manually student ki
+// // submission create nahi karni.
 // // ============================================
 
 // router.post(
@@ -194,14 +106,16 @@
 
 
 // // ============================================
-// // SCHOOL ADMIN - HOMEWORK-WISE STATS
+// // SCHOOL ADMIN + TEACHER
+// // HOMEWORK SUBMISSION STATS
 // // ============================================
 
 // router.get(
 //   "/homework/:homeworkId/stats",
 
 //   authorize(
-//     UserRole.SCHOOL_ADMIN
+//     UserRole.SCHOOL_ADMIN,
+//     UserRole.TEACHER
 //   ),
 
 //   getHomeworkSubmissionStatsController
@@ -209,14 +123,16 @@
 
 
 // // ============================================
-// // SCHOOL ADMIN - HOMEWORK-WISE SUBMISSIONS
+// // SCHOOL ADMIN + TEACHER
+// // HOMEWORK-WISE SUBMISSIONS
 // // ============================================
 
 // router.get(
 //   "/homework/:homeworkId",
 
 //   authorize(
-//     UserRole.SCHOOL_ADMIN
+//     UserRole.SCHOOL_ADMIN,
+//     UserRole.TEACHER
 //   ),
 
 //   getHomeworkSubmissionsController
@@ -224,14 +140,16 @@
 
 
 // // ============================================
-// // SCHOOL ADMIN - PARTICULAR STUDENT SUBMISSION
+// // SCHOOL ADMIN + TEACHER
+// // PARTICULAR STUDENT SUBMISSION
 // // ============================================
 
 // router.get(
 //   "/homework/:homeworkId/student/:studentId",
 
 //   authorize(
-//     UserRole.SCHOOL_ADMIN
+//     UserRole.SCHOOL_ADMIN,
+//     UserRole.TEACHER
 //   ),
 
 //   getStudentHomeworkSubmissionController
@@ -239,14 +157,16 @@
 
 
 // // ============================================
-// // SCHOOL ADMIN - SINGLE SUBMISSION
+// // SCHOOL ADMIN + TEACHER
+// // SINGLE SUBMISSION
 // // ============================================
 
 // router.get(
 //   "/:submissionId",
 
 //   authorize(
-//     UserRole.SCHOOL_ADMIN
+//     UserRole.SCHOOL_ADMIN,
+//     UserRole.TEACHER
 //   ),
 
 //   getHomeworkSubmissionByIdController
@@ -255,6 +175,9 @@
 
 // // ============================================
 // // SCHOOL ADMIN - UPDATE SUBMISSION
+// //
+// // Teacher student ka submitted answer
+// // edit nahi karega.
 // // ============================================
 
 // router.put(
@@ -269,14 +192,16 @@
 
 
 // // ============================================
-// // SCHOOL ADMIN - REVIEW SUBMISSION
+// // SCHOOL ADMIN + TEACHER
+// // REVIEW SUBMISSION
 // // ============================================
 
 // router.patch(
 //   "/:submissionId/review",
 
 //   authorize(
-//     UserRole.SCHOOL_ADMIN
+//     UserRole.SCHOOL_ADMIN,
+//     UserRole.TEACHER
 //   ),
 
 //   reviewHomeworkSubmissionController
@@ -285,6 +210,8 @@
 
 // // ============================================
 // // SCHOOL ADMIN - DELETE SUBMISSION
+// //
+// // Teacher delete nahi karega.
 // // ============================================
 
 // router.delete(
@@ -299,11 +226,6 @@
 
 
 // export default router;
-
-
-
-
-
 
 
 
@@ -325,6 +247,7 @@ import {
 } from "../../constants/roles";
 
 import {
+  bulkReviewHomeworkController,
   createHomeworkSubmissionController,
   createMyHomeworkSubmissionController,
   deleteHomeworkSubmissionController,
@@ -333,6 +256,7 @@ import {
   getHomeworkSubmissionStatsController,
   getMyHomeworkSubmissionsController,
   getStudentHomeworkSubmissionController,
+  markOfflineHomeworkController,
   reviewHomeworkSubmissionController,
   updateHomeworkSubmissionController,
   updateMyHomeworkSubmissionController,
@@ -356,7 +280,7 @@ router.use(
 // STUDENT ROUTES
 //
 // IMPORTANT:
-// /me routes must stay before /:submissionId
+// /me routes before /:submissionId
 // ============================================
 
 router.post(
@@ -394,9 +318,6 @@ router.put(
 
 // ============================================
 // SCHOOL ADMIN - CREATE SUBMISSION
-//
-// Teacher ko manually student ki
-// submission create nahi karni.
 // ============================================
 
 router.post(
@@ -429,18 +350,35 @@ router.get(
 
 // ============================================
 // SCHOOL ADMIN + TEACHER
-// HOMEWORK-WISE SUBMISSIONS
+// OFFLINE / NOTEBOOK REVIEW
 // ============================================
 
-router.get(
-  "/homework/:homeworkId",
+router.patch(
+  "/homework/:homeworkId/offline-review",
 
   authorize(
     UserRole.SCHOOL_ADMIN,
     UserRole.TEACHER
   ),
 
-  getHomeworkSubmissionsController
+  markOfflineHomeworkController
+);
+
+
+// ============================================
+// SCHOOL ADMIN + TEACHER
+// BULK REVIEW
+// ============================================
+
+router.patch(
+  "/homework/:homeworkId/bulk-review",
+
+  authorize(
+    UserRole.SCHOOL_ADMIN,
+    UserRole.TEACHER
+  ),
+
+  bulkReviewHomeworkController
 );
 
 
@@ -463,6 +401,23 @@ router.get(
 
 // ============================================
 // SCHOOL ADMIN + TEACHER
+// HOMEWORK-WISE SUBMISSIONS
+// ============================================
+
+router.get(
+  "/homework/:homeworkId",
+
+  authorize(
+    UserRole.SCHOOL_ADMIN,
+    UserRole.TEACHER
+  ),
+
+  getHomeworkSubmissionsController
+);
+
+
+// ============================================
+// SCHOOL ADMIN + TEACHER
 // SINGLE SUBMISSION
 // ============================================
 
@@ -480,9 +435,6 @@ router.get(
 
 // ============================================
 // SCHOOL ADMIN - UPDATE SUBMISSION
-//
-// Teacher student ka submitted answer
-// edit nahi karega.
 // ============================================
 
 router.put(
@@ -498,7 +450,7 @@ router.put(
 
 // ============================================
 // SCHOOL ADMIN + TEACHER
-// REVIEW SUBMISSION
+// REVIEW ONLINE SUBMISSION
 // ============================================
 
 router.patch(
@@ -515,8 +467,6 @@ router.patch(
 
 // ============================================
 // SCHOOL ADMIN - DELETE SUBMISSION
-//
-// Teacher delete nahi karega.
 // ============================================
 
 router.delete(
