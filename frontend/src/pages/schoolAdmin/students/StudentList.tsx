@@ -3786,39 +3786,21 @@ const StudentList: React.FC = () => {
 
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 
-        <div>
+        <div >
 
-          <div className="mb-1 flex items-center gap-2 text-sm text-[#6B7280]">
+         
 
-            <span>
-              Students
-            </span>
 
-            <Icon
-              icon="lucide:chevron-right"
-              className="text-sm"
-            />
+          <div>
+            <h1 className="text-2xl font-bold text-[#15243B] md:text-3xl">
 
-            <span className="text-[#15243B]">
-              All Students
-            </span>
+            All Students
 
+          </h1>
           </div>
 
 
-          <h1 className="text-2xl font-bold text-[#15243B] md:text-3xl">
-
-            Students
-
-          </h1>
-
-
-          <p className="mt-1 text-sm text-[#6B7280]">
-
-            View students for the
-            selected academic session.
-
-          </p>
+        
 
 
           {selectedSession && (
