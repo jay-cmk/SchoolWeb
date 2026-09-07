@@ -3,8 +3,10 @@
 // /* =====================================================
 //    COMMON STUDENT RELATION
 // ===================================================== */
+
 // export interface StudentRelation {
 //   _id: string;
+
 //   name?: string;
 // }
 
@@ -15,12 +17,16 @@
 
 // export interface StudentSession
 //   extends StudentRelation {
-
 //   schoolId?: string;
+
 //   startDate?: string;
+
 //   endDate?: string;
+
 //   isCurrent?: boolean;
+
 //   createdAt?: string;
+
 //   updatedAt?: string;
 // }
 
@@ -31,12 +37,16 @@
 
 // export interface StudentClass
 //   extends StudentRelation {
-
 //   schoolId?: string;
+
 //   sessionId?: string;
+
 //   order?: number;
+
 //   isActive?: boolean;
+
 //   createdAt?: string;
+
 //   updatedAt?: string;
 // }
 
@@ -47,14 +57,20 @@
 
 // export interface StudentSection
 //   extends StudentRelation {
-
 //   schoolId?: string;
+
 //   sessionId?: string;
+
 //   classId?: string;
+
 //   roomNumber?: string;
+
 //   capacity?: number;
+
 //   isActive?: boolean;
+
 //   createdAt?: string;
+
 //   updatedAt?: string;
 // }
 
@@ -111,15 +127,39 @@
 
 
 // /* =====================================================
+//    STUDENT ENROLLMENT TYPES
+// ===================================================== */
+
+// export type StudentEnrollmentStatus =
+//   | "ACTIVE"
+//   | "COMPLETED"
+//   | "CANCELLED";
+
+
+// export type StudentPromotionStatus =
+//   | "NOT_DECIDED"
+//   | "PROMOTED"
+//   | "RETAINED"
+//   | "TRANSFERRED"
+//   | "LEFT"
+//   | "GRADUATED";
+
+
+// /* =====================================================
 //    STUDENT ADDRESS
 // ===================================================== */
 
 // export interface StudentAddress {
 //   addressLine?: string;
+
 //   city?: string;
+
 //   district?: string;
+
 //   state?: string;
+
 //   pincode?: string;
+
 //   country?: string;
 // }
 
@@ -130,9 +170,39 @@
 
 // export interface StudentParentDetails {
 //   name?: string;
+
 //   mobile?: string;
+
 //   aadhaarNumber?: string;
+
 //   occupation?: string;
+// }
+
+
+// /* =====================================================
+//    STUDENT ENROLLMENT META
+
+//    Ye GET /students/enrollments se aayega.
+// ===================================================== */
+
+// export interface StudentEnrollmentMeta {
+//   _id: string;
+
+//   enrollmentStatus:
+//     StudentEnrollmentStatus;
+
+//   promotionStatus:
+//     StudentPromotionStatus;
+
+//   promotedFromEnrollmentId?: string;
+
+//   promotionDate?: string;
+
+//   remarks?: string;
+
+//   createdAt?: string;
+
+//   updatedAt?: string;
 // }
 
 
@@ -142,8 +212,19 @@
 
 // export interface Student {
 //   _id: string;
+
 //   schoolId: string;
+
 //   userId?: string;
+
+
+//   /*
+//    * Normal GET /students me ye current academic
+//    * snapshot hoga.
+//    *
+//    * GET /students/enrollments me ye selected
+//    * academic session ka enrollment hoga.
+//    */
 
 //   sessionId:
 //     | string
@@ -157,45 +238,77 @@
 //     | string
 //     | StudentSection;
 
+
 //   admissionNumber: string;
+
 //   rollNumber?: number;
 
+
 //   admissionType?: AdmissionType;
+
 //   admissionCategory?: AdmissionCategory;
+
 //   admissionDate?: string;
 
+
 //   name: string;
+
 //   dob?: string;
+
 //   gender?: StudentGender;
 
 //   bloodGroup?: StudentBloodGroup;
+
 //   religion?: string;
+
 //   category?: StudentCategory;
+
 //   caste?: string;
+
 //   aadhaarNumber?: string;
+
+//   apaarId?: string;
 
 //   photo?: string;
 
+
 //   mobile?: string;
+
 //   email?: string;
+
 
 //   // OLD FIELD - keep for existing records
 //   address?: StudentAddress;
 
 //   currentAddress?: StudentAddress;
+
 //   permanentAddress?: StudentAddress;
 
+
 //   father?: StudentParentDetails;
+
 //   mother?: StudentParentDetails;
 
 //   parentId?: string;
 
+
 //   status?: StudentStatus;
 
+
+//   /*
+//    * Available when student comes from:
+//    * GET /students/enrollments
+//    */
+
+//   enrollment?: StudentEnrollmentMeta;
+
+
 //   createdBy?: string;
+
 //   updatedBy?: string;
 
 //   createdAt?: string;
+
 //   updatedAt?: string;
 // }
 
@@ -206,40 +319,62 @@
 
 // export interface CreateStudentData {
 //   name: string;
-//   admissionNumber: string;
+
+//   admissionNumber?: string;
+
 
 //   sessionId: string;
+
 //   classId: string;
+
 //   sectionId: string;
+
 
 //   gender: StudentGender;
 
+
 //   rollNumber?: number;
 
+
 //   admissionType?: AdmissionType;
+
 //   admissionCategory?: AdmissionCategory;
+
 //   admissionDate?: string;
+
 
 //   dob?: string;
 
 //   bloodGroup?: StudentBloodGroup;
+
 //   religion?: string;
+
 //   category?: StudentCategory;
+
 //   caste?: string;
+
 //   aadhaarNumber?: string;
+
+//   apaarId?: string;
 
 //   photo?: File;
 
+
 //   mobile?: string;
+
 //   email?: string;
+
 
 //   // backward compatibility
 //   address?: StudentAddress;
 
 //   currentAddress?: StudentAddress;
+
 //   permanentAddress?: StudentAddress;
 
+
 //   father?: StudentParentDetails;
+
 //   mother?: StudentParentDetails;
 
 //   parentId?: string;
@@ -248,44 +383,70 @@
 
 // /* =====================================================
 //    UPDATE STUDENT DATA
+
+//    IMPORTANT:
+//    Academic movement generic student update se nahi
+//    hoga.
+
+//    sessionId
+//    classId
+//    sectionId
+//    rollNumber
+
+//    in fields ko enrollment/promotion APIs handle
+//    karenge.
 // ===================================================== */
 
 // export interface UpdateStudentData {
 //   name?: string;
+
 //   admissionNumber?: string;
 
-//   sessionId?: string;
-//   classId?: string;
-//   sectionId?: string;
-
-//   rollNumber?: number;
 
 //   admissionType?: AdmissionType;
+
 //   admissionCategory?: AdmissionCategory;
+
 //   admissionDate?: string;
 
+
 //   dob?: string;
+
 //   gender?: StudentGender;
 
 //   bloodGroup?: StudentBloodGroup;
+
 //   religion?: string;
+
 //   category?: StudentCategory;
+
 //   caste?: string;
+
 //   aadhaarNumber?: string;
+
+//   apaarId?: string;
 
 //   photo?: File;
 
+
 //   mobile?: string;
+
 //   email?: string;
 
+
 //   address?: StudentAddress;
+
 //   currentAddress?: StudentAddress;
+
 //   permanentAddress?: StudentAddress;
 
+
 //   father?: StudentParentDetails;
+
 //   mother?: StudentParentDetails;
 
 //   parentId?: string | null;
+
 
 //   status?: StudentStatus;
 // }
@@ -293,12 +454,43 @@
 
 // /* =====================================================
 //    STUDENT FILTERS
+
+//    Existing:
+//    GET /students
 // ===================================================== */
 
 // export interface StudentFilters {
+//   page?: number;
+
+//   limit?: number;
+
 //   sessionId?: string;
+
 //   classId?: string;
+
 //   sectionId?: string;
+
+//   search?: string;
+
+//   status?: StudentStatus;
+// }
+
+
+// /* =====================================================
+//    STUDENT ENROLLMENT FILTERS
+
+//    GET /students/enrollments
+
+//    sessionId required hai.
+// ===================================================== */
+
+// export interface StudentEnrollmentFilters {
+//   sessionId: string;
+
+//   classId?: string;
+
+//   sectionId?: string;
+
 //   search?: string;
 // }
 
@@ -309,20 +501,92 @@
 
 // export interface StudentPagination {
 //   page: number;
+
 //   limit: number;
+
 //   total: number;
+
 //   totalPages: number;
 // }
 
 
 // /* =====================================================
 //    STUDENTS RESPONSE
+
+//    Existing GET /students
 // ===================================================== */
 
 // export interface StudentsResponse {
 //   success: boolean;
+
 //   data: Student[];
+
 //   pagination?: StudentPagination;
+// }
+
+
+// /* =====================================================
+//    STUDENTS BY ENROLLMENT DATA
+
+//    Backend:
+
+//    GET /students/enrollments
+
+//    Response:
+
+//    {
+//      success: true,
+//      data: {
+//        session: {...},
+//        students: [...],
+//        total: number
+//      }
+//    }
+// ===================================================== */
+
+// export interface StudentsByEnrollmentData {
+//   session: StudentSession;
+
+//   students: Student[];
+
+//   total: number;
+// }
+
+
+// /* =====================================================
+//    CREATE STUDENT ACCOUNT DATA
+// ===================================================== */
+
+// export interface CreateStudentAccountData {
+//   email: string;
+
+//   password: string;
+// }
+
+
+// /* =====================================================
+//    CREATED STUDENT ACCOUNT
+// ===================================================== */
+
+// export interface CreatedStudentAccount {
+//   id: string;
+
+//   name: string;
+
+//   admissionNumber: string;
+
+//   userId: string;
+
+//   email: string;
+
+//   role: string;
+
+//   schoolId: string;
+// }
+
+
+// export interface CreateStudentAccountResult {
+//   student: CreatedStudentAccount;
 // }
 
 
@@ -332,10 +596,20 @@
 
 // export interface StudentState {
 //   students: Student[];
+
 //   selectedStudent: Student | null;
+
 //   loading: boolean;
+
 //   error: string | null;
 // }
+
+
+
+
+
+
+
 
 
 
@@ -484,6 +758,13 @@ export type StudentPromotionStatus =
   | "GRADUATED";
 
 
+export type StudentStream =
+  | "SCIENCE"
+  | "COMMERCE"
+  | "ARTS"
+  | "VOCATIONAL";
+
+
 /* =====================================================
    STUDENT ADDRESS
 ===================================================== */
@@ -495,11 +776,17 @@ export interface StudentAddress {
 
   district?: string;
 
+  districtCode?: string;
+
   state?: string;
+
+  stateCode?: string;
 
   pincode?: string;
 
   country?: string;
+
+  countryCode?: string;
 }
 
 
@@ -532,6 +819,8 @@ export interface StudentEnrollmentMeta {
 
   promotionStatus:
     StudentPromotionStatus;
+
+  stream?: StudentStream;
 
   promotedFromEnrollmentId?: string;
 
@@ -582,6 +871,8 @@ export interface Student {
 
   rollNumber?: number;
 
+  stream?: StudentStream;
+
 
   admissionType?: AdmissionType;
 
@@ -607,6 +898,8 @@ export interface Student {
   aadhaarNumber?: string;
 
   apaarId?: string;
+
+  penNumber?: string;
 
   photo?: string;
 
@@ -668,6 +961,8 @@ export interface CreateStudentData {
 
   sectionId: string;
 
+  stream?: StudentStream;
+
 
   gender: StudentGender;
 
@@ -695,6 +990,9 @@ export interface CreateStudentData {
   aadhaarNumber?: string;
 
   apaarId?: string;
+
+  penNumber?: string;
+
 
   photo?: File;
 
@@ -765,6 +1063,9 @@ export interface UpdateStudentData {
 
   apaarId?: string;
 
+  penNumber?: string;
+
+
   photo?: File;
 
 
@@ -809,6 +1110,8 @@ export interface StudentFilters {
 
   sectionId?: string;
 
+  stream?: StudentStream;
+
   search?: string;
 
   status?: StudentStatus;
@@ -829,6 +1132,8 @@ export interface StudentEnrollmentFilters {
   classId?: string;
 
   sectionId?: string;
+
+  stream?: StudentStream;
 
   search?: string;
 }
@@ -900,32 +1205,6 @@ export interface CreateStudentAccountData {
   email: string;
 
   password: string;
-}
-
-
-/* =====================================================
-   CREATED STUDENT ACCOUNT
-===================================================== */
-
-export interface CreatedStudentAccount {
-  id: string;
-
-  name: string;
-
-  admissionNumber: string;
-
-  userId: string;
-
-  email: string;
-
-  role: string;
-
-  schoolId: string;
-}
-
-
-export interface CreateStudentAccountResult {
-  student: CreatedStudentAccount;
 }
 
 

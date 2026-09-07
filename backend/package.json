@@ -7,7 +7,9 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "seed:super-admin": "tsx src/scripts/seedSuperAdmin.ts"
+    "seed:super-admin": "tsx src/scripts/seedSuperAdmin.ts",
+    "import:locations": "tsx src/modules/master/location/scripts/importLocations.ts",
+    "import:villages": "tsx src/modules/master/location/scripts/importVillages.ts"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +18,7 @@
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
+    "csv-parser": "^3.2.1",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "helmet": "^8.3.0",
@@ -23,6 +26,7 @@
     "mongoose": "^9.9.4",
     "morgan": "^1.11.0",
     "multer": "^2.3.0",
+    "xlsx": "^0.18.5",
     "zod": "^4.4.3"
   },
   "devDependencies": {

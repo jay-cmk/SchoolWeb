@@ -1,6 +1,5 @@
 
 
-
 // import mongoose, {
 //   Document,
 //   Schema,
@@ -9,6 +8,12 @@
 // } from "mongoose";
 
 // import type {
+//   AdmissionCategory,
+//   AdmissionType,
+//   IStudentAddress,
+//   IStudentParentDetails,
+//   StudentBloodGroup,
+//   StudentCategory,
 //   StudentGender,
 //   StudentStatus,
 // } from "./student.interface";
@@ -36,27 +41,72 @@
 
 //   rollNumber?: number;
 
+//   // ============================================
+//   // ADMISSION DETAILS
+//   // ============================================
+
+//   admissionType?: AdmissionType;
+
+//   admissionCategory?: AdmissionCategory;
+
+//   admissionDate: Date;
+
+//   // ============================================
+//   // BASIC DETAILS
+//   // ============================================
+
 //   name: string;
 
 //   dob?: Date;
 
 //   gender: StudentGender;
 
+//   bloodGroup?: StudentBloodGroup;
+
+//   religion?: string;
+
+//   category?: StudentCategory;
+
+//   caste?: string;
+
+//   aadhaarNumber?: string;
+
+//   apaarId?: string;
+
+//   photo?: string;
+
+//   // ============================================
+//   // CONTACT DETAILS
+//   // ============================================
+
 //   mobile?: string;
 
 //   email?: string;
 
-//   address?: {
-//     addressLine?: string;
-//     city?: string;
-//     district?: string;
-//     state?: string;
-//     pincode?: string;
-//   };
+//   // ============================================
+//   // ADDRESS DETAILS
+//   // ============================================
 
-//   admissionDate: Date;
+//   // Old field preserved for old records
+//   address?: IStudentAddress;
+
+//   currentAddress?: IStudentAddress;
+
+//   permanentAddress?: IStudentAddress;
+
+//   // ============================================
+//   // PARENT DETAILS
+//   // ============================================
+
+//   father?: IStudentParentDetails;
+
+//   mother?: IStudentParentDetails;
 
 //   parentId?: Types.ObjectId;
+
+//   // ============================================
+//   // STATUS
+//   // ============================================
 
 //   status: StudentStatus;
 
@@ -101,6 +151,44 @@
 //         type: String,
 //         trim: true,
 //       },
+
+//       country: {
+//         type: String,
+//         trim: true,
+//       },
+//     },
+//     {
+//       _id: false,
+//     }
+//   );
+
+
+// // ============================================
+// // PARENT DETAILS SCHEMA
+// // ============================================
+
+// const studentParentDetailsSchema =
+//   new Schema(
+//     {
+//       name: {
+//         type: String,
+//         trim: true,
+//       },
+
+//       mobile: {
+//         type: String,
+//         trim: true,
+//       },
+
+//       aadhaarNumber: {
+//         type: String,
+//         trim: true,
+//       },
+
+//       occupation: {
+//         type: String,
+//         trim: true,
+//       },
 //     },
 //     {
 //       _id: false,
@@ -115,7 +203,6 @@
 // const studentSchema =
 //   new Schema<IStudentDocument>(
 //     {
-
 //       schoolId: {
 //         type: Schema.Types.ObjectId,
 //         ref: "School",
@@ -133,6 +220,10 @@
 //         ref: "User",
 //       },
 
+
+//       // ======================================
+//       // ACADEMIC DETAILS
+//       // ======================================
 
 //       sessionId: {
 //         type: Schema.Types.ObjectId,
@@ -158,6 +249,10 @@
 //       },
 
 
+//       // ======================================
+//       // ADMISSION DETAILS
+//       // ======================================
+
 //       admissionNumber: {
 //         type: String,
 //         required: true,
@@ -171,6 +266,44 @@
 //         min: 1,
 //       },
 
+
+//       admissionType: {
+//         type: String,
+
+//         enum: [
+//           "NEW",
+//           "TRANSFER",
+//           "READMISSION",
+//         ],
+
+//         default: "NEW",
+//       },
+
+
+//       admissionCategory: {
+//         type: String,
+
+//         enum: [
+//           "REGULAR",
+//           "RTE",
+//           "EWS",
+//           "MANAGEMENT",
+//           "OTHER",
+//         ],
+
+//         default: "REGULAR",
+//       },
+
+
+//       admissionDate: {
+//         type: Date,
+//         default: Date.now,
+//       },
+
+
+//       // ======================================
+//       // BASIC STUDENT DETAILS
+//       // ======================================
 
 //       name: {
 //         type: String,
@@ -197,6 +330,74 @@
 //       },
 
 
+//       bloodGroup: {
+//         type: String,
+
+//         enum: [
+//           "A+",
+//           "A-",
+//           "B+",
+//           "B-",
+//           "AB+",
+//           "AB-",
+//           "O+",
+//           "O-",
+//         ],
+//       },
+
+
+//       religion: {
+//         type: String,
+//         trim: true,
+//       },
+
+
+//       category: {
+//         type: String,
+
+//         enum: [
+//           "GENERAL",
+//           "OBC",
+//           "SC",
+//           "ST",
+//           "OTHER",
+//         ],
+//       },
+
+
+//       caste: {
+//         type: String,
+//         trim: true,
+//       },
+
+
+//       aadhaarNumber: {
+//         type: String,
+//         trim: true,
+//       },
+
+
+//       apaarId: {
+//         type: String,
+//         trim: true,
+
+//         match: [
+//           /^\d{12}$/,
+//           "APAAR ID must be exactly 12 digits",
+//         ],
+//       },
+
+
+//       photo: {
+//         type: String,
+//         trim: true,
+//       },
+
+
+//       // ======================================
+//       // CONTACT DETAILS
+//       // ======================================
+
 //       mobile: {
 //         type: String,
 //         trim: true,
@@ -210,22 +411,51 @@
 //       },
 
 
+//       // ======================================
+//       // ADDRESS DETAILS
+//       // ======================================
+
+//       // Old field preserved so existing
+//       // student records continue working.
 //       address: {
 //         type: studentAddressSchema,
 //       },
 
 
-//       admissionDate: {
-//         type: Date,
-//         default: Date.now,
+//       currentAddress: {
+//         type: studentAddressSchema,
 //       },
 
 
+//       permanentAddress: {
+//         type: studentAddressSchema,
+//       },
+
+
+//       // ======================================
+//       // PARENT DETAILS
+//       // ======================================
+
+//       father: {
+//         type: studentParentDetailsSchema,
+//       },
+
+
+//       mother: {
+//         type: studentParentDetailsSchema,
+//       },
+
+
+//       // Existing Parent module relation
 //       parentId: {
 //         type: Schema.Types.ObjectId,
 //         ref: "Parent",
 //       },
 
+
+//       // ======================================
+//       // STUDENT STATUS
+//       // ======================================
 
 //       status: {
 //         type: String,
@@ -242,6 +472,10 @@
 //       },
 
 
+//       // ======================================
+//       // AUDIT
+//       // ======================================
+
 //       createdBy: {
 //         type: Schema.Types.ObjectId,
 //         ref: "User",
@@ -253,7 +487,6 @@
 //         type: Schema.Types.ObjectId,
 //         ref: "User",
 //       },
-
 //     },
 //     {
 //       timestamps: true,
@@ -278,6 +511,28 @@
 
 
 // // ============================================
+// // UNIQUE APAAR ID
+// // SCHOOL + APAAR ID
+// // ============================================
+
+// studentSchema.index(
+//   {
+//     schoolId: 1,
+//     apaarId: 1,
+//   },
+//   {
+//     unique: true,
+
+//     partialFilterExpression: {
+//       apaarId: {
+//         $type: "string",
+//       },
+//     },
+//   }
+// );
+
+
+// // ============================================
 // // UNIQUE ADMISSION NUMBER
 // // SCHOOL + SESSION
 // // ============================================
@@ -296,7 +551,10 @@
 
 // // ============================================
 // // UNIQUE ROLL NUMBER
-// // SCHOOL + SESSION + CLASS + SECTION
+// // SCHOOL + SESSION + CLASS
+// //
+// // Roll number poori class me unique rahega.
+// // Sections ke beech reset nahi hoga.
 // // ============================================
 
 // studentSchema.index(
@@ -304,7 +562,6 @@
 //     schoolId: 1,
 //     sessionId: 1,
 //     classId: 1,
-//     sectionId: 1,
 //     rollNumber: 1,
 //   },
 //   {
@@ -355,6 +612,11 @@
 // export { Student };
 
 // export default Student;
+
+
+
+
+
 
 
 
@@ -432,6 +694,8 @@ export interface IStudentDocument
   aadhaarNumber?: string;
 
   apaarId?: string;
+
+  penNumber?: string;
 
   photo?: string;
 
@@ -513,6 +777,22 @@ const studentAddressSchema =
       },
 
       country: {
+        type: String,
+        trim: true,
+      },
+
+      countryCode: {
+        type: String,
+        uppercase: true,
+        trim: true,
+      },
+
+      stateCode: {
+        type: String,
+        trim: true,
+      },
+
+      districtCode: {
         type: String,
         trim: true,
       },
@@ -748,6 +1028,17 @@ const studentSchema =
       },
 
 
+      penNumber: {
+        type: String,
+        trim: true,
+
+        match: [
+          /^\\d{11}$/,
+          "PEN Number must be exactly 11 digits",
+        ],
+      },
+
+
       photo: {
         type: String,
         trim: true,
@@ -885,6 +1176,28 @@ studentSchema.index(
 
     partialFilterExpression: {
       apaarId: {
+        $type: "string",
+      },
+    },
+  }
+);
+
+
+// ============================================
+// UNIQUE PEN NUMBER
+// SCHOOL + PEN NUMBER
+// ============================================
+
+studentSchema.index(
+  {
+    schoolId: 1,
+    penNumber: 1,
+  },
+  {
+    unique: true,
+
+    partialFilterExpression: {
+      penNumber: {
         $type: "string",
       },
     },

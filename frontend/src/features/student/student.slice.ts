@@ -1,17 +1,21 @@
 
 
-
 // import {
 //   createAsyncThunk,
 //   createSlice,
 // } from "@reduxjs/toolkit";
 
 // import {
+//   createStudentAccountApi,
 //   createStudentApi,
 //   getStudentByIdApi,
 //   getStudentsApi,
 //   getStudentsByEnrollmentApi,
 //   updateStudentApi,
+// } from "./student.api";
+
+// import type {
+//   CreateStudentAccountData,
 // } from "./student.api";
 
 // import type {
@@ -155,6 +159,44 @@
 //           error.response?.data?.message ||
 //             error.message ||
 //             "Failed to create student"
+//         );
+//       }
+//     }
+//   );
+
+
+// /* =====================================================
+//    CREATE STUDENT LOGIN ACCOUNT
+
+//    Student create hone ke baad returned studentId
+//    ke saath ye thunk dispatch hoga.
+// ===================================================== */
+
+// export const createStudentAccount =
+//   createAsyncThunk(
+//     "students/createStudentAccount",
+
+//     async (
+//       {
+//         studentId,
+//         data,
+//       }: {
+//         studentId: string;
+
+//         data: CreateStudentAccountData;
+//       },
+//       { rejectWithValue }
+//     ) => {
+//       try {
+//         return await createStudentAccountApi(
+//           studentId,
+//           data
+//         );
+//       } catch (error: any) {
+//         return rejectWithValue(
+//           error.response?.data?.message ||
+//             error.message ||
+//             "Failed to create student login account"
 //         );
 //       }
 //     }
@@ -399,6 +441,39 @@
 
 
 //         /* =============================================
+//            CREATE STUDENT LOGIN ACCOUNT
+//         ============================================= */
+
+//         builder
+//           .addCase(
+//             createStudentAccount.pending,
+//             (state) => {
+//               state.loading = true;
+
+//               state.error = null;
+//             }
+//           )
+
+//           .addCase(
+//             createStudentAccount.fulfilled,
+//             (state) => {
+//               state.loading = false;
+//             }
+//           )
+
+//           .addCase(
+//             createStudentAccount.rejected,
+//             (state, action) => {
+//               state.loading = false;
+
+//               state.error =
+//                 (action.payload as string) ||
+//                 "Failed to create student login account";
+//             }
+//           );
+
+
+//         /* =============================================
 //            UPDATE STUDENT
 //         ============================================= */
 
@@ -532,6 +607,7 @@ import {
   getStudentsApi,
   getStudentsByEnrollmentApi,
   updateStudentApi,
+  updateStudentStatusApi,
 } from "./student.api";
 
 import type {
@@ -543,6 +619,7 @@ import type {
   StudentEnrollmentFilters,
   StudentFilters,
   StudentState,
+  StudentStatus,
   UpdateStudentData,
 } from "./student.types";
 
@@ -762,6 +839,42 @@ export const updateStudent =
           error.response?.data?.message ||
             error.message ||
             "Failed to update student"
+        );
+      }
+    }
+  );
+
+
+/* =====================================================
+   UPDATE STUDENT STATUS
+
+   ACTIVE / INACTIVE status action.
+===================================================== */
+
+export const updateStudentStatus =
+  createAsyncThunk(
+    "students/updateStudentStatus",
+
+    async (
+      {
+        studentId,
+        status,
+      }: {
+        studentId: string;
+        status: StudentStatus;
+      },
+      { rejectWithValue }
+    ) => {
+      try {
+        return await updateStudentStatusApi(
+          studentId,
+          status
+        );
+      } catch (error: any) {
+        return rejectWithValue(
+          error.response?.data?.message ||
+            error.message ||
+            "Failed to update student status"
         );
       }
     }
@@ -1082,6 +1195,71 @@ const studentSlice =
               state.error =
                 (action.payload as string) ||
                 "Failed to update student";
+            }
+          );
+
+
+        /* =============================================
+           UPDATE STUDENT STATUS
+        ============================================= */
+
+        builder
+          .addCase(
+            updateStudentStatus.pending,
+            (state) => {
+              state.error = null;
+            }
+          )
+
+          .addCase(
+            updateStudentStatus.fulfilled,
+            (state, action) => {
+              const updatedStudent =
+                action.payload;
+
+              const updatedStatus =
+                updatedStudent.status ??
+                action.meta.arg.status;
+
+              const index =
+                state.students.findIndex(
+                  (student) =>
+                    student._id ===
+                    updatedStudent._id
+                );
+
+              if (index !== -1) {
+                const existingStudent =
+                  state.students[index];
+
+                if (existingStudent) {
+                  state.students[index] = {
+                    ...existingStudent,
+                    status:
+                      updatedStatus,
+                  };
+                }
+              }
+
+              if (
+                state.selectedStudent?._id ===
+                updatedStudent._id
+              ) {
+                state.selectedStudent = {
+                  ...state.selectedStudent,
+                  status:
+                    updatedStatus,
+                };
+              }
+            }
+          )
+
+          .addCase(
+            updateStudentStatus.rejected,
+            (state, action) => {
+              state.error =
+                (action.payload as string) ||
+                "Failed to update student status";
             }
           );
       },

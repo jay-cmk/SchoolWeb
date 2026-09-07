@@ -1193,16 +1193,6 @@
 
 // export default SchoolAdminDashboard;
 
-
-
-
-
-
-
-
-
-
-
 // Dashboard.tsx
 
 // import React, {
@@ -1225,12 +1215,6 @@
 // //   RootState,
 // // } from "../../../store/store";
 
-
-
-
-
-
-
 // import StatCard from "./StatCard";
 
 // import StudentStats from "./StudentStatus";
@@ -1248,7 +1232,6 @@
 // import QuickActionModal from "./QuickActionModel";
 // import type { RootState,AppDispatch } from "../../app/store";
 // import { getSchoolAdminDashboard } from "../../features/schoolAdminDashboard/schoolAdminDashboard.slice";
-
 
 // // ============================================
 // // TYPES
@@ -1270,7 +1253,6 @@
 //     | "accent";
 // }
 
-
 // interface ActivityItem {
 //   id: string;
 
@@ -1287,7 +1269,6 @@
 //   time: string;
 // }
 
-
 // interface NoticeItem {
 //   id: string;
 
@@ -1303,7 +1284,6 @@
 //   content: string;
 // }
 
-
 // // ============================================
 // // COMPONENT
 // // ============================================
@@ -1313,7 +1293,6 @@
 
 //     const dispatch =
 //       useDispatch<AppDispatch>();
-
 
 //     // ============================================
 //     // REDUX DASHBOARD DATA
@@ -1330,7 +1309,6 @@
 //         state.schoolAdminDashboard
 //     );
 
-
 //     // ============================================
 //     // LOCAL STATES
 //     // ============================================
@@ -1340,24 +1318,20 @@
 //       setSearchQuery,
 //     ] = useState("");
 
-
 //     const [
 //       selectedAcademicYear,
 //       setSelectedAcademicYear,
 //     ] = useState("");
-
 
 //     const [
 //       isQuickActionModalOpen,
 //       setIsQuickActionModalOpen,
 //     ] = useState(false);
 
-
 //     const [
 //       isExporting,
 //       setIsExporting,
 //     ] = useState(false);
-
 
 //     // ============================================
 //     // TEMPORARY ACTIVITY DATA
@@ -1403,7 +1377,6 @@
 //       },
 //     ]);
 
-
 //     // ============================================
 //     // TEMPORARY EVENTS
 //     //
@@ -1415,7 +1388,6 @@
 //       setEvents,
 //     ] = useState<EventItem[]>([]);
 
-
 //     // ============================================
 //     // TEMPORARY NOTICES
 //     //
@@ -1426,7 +1398,6 @@
 //     const [
 //       notices,
 //     ] = useState<NoticeItem[]>([]);
-
 
 //     // ============================================
 //     // FETCH DASHBOARD
@@ -1441,7 +1412,6 @@
 //     }, [
 //       dispatch,
 //     ]);
-
 
 //     // ============================================
 //     // CURRENT SESSION SYNC
@@ -1468,7 +1438,6 @@
 //         ?.currentSession
 //         ?.name,
 //     ]);
-
 
 //     // ============================================
 //     // DATE
@@ -1500,7 +1469,6 @@
 //         []
 //       );
 
-
 //     // ============================================
 //     // GREETING
 //     // ============================================
@@ -1513,7 +1481,6 @@
 //             new Date()
 //               .getHours();
 
-
 //           if (
 //             hour <
 //             12
@@ -1522,7 +1489,6 @@
 //             return "Good morning";
 
 //           }
-
 
 //           if (
 //             hour <
@@ -1533,13 +1499,11 @@
 
 //           }
 
-
 //           return "Good evening";
 
 //         },
 //         []
 //       );
-
 
 //     // ============================================
 //     // DASHBOARD VALUES
@@ -1549,89 +1513,74 @@
 //       dashboard
 //         ?.statistics;
 
-
 //     const attendance =
 //       statistics
 //         ?.attendance;
-
 
 //     const totalStudents =
 //       statistics
 //         ?.totalStudents ??
 //       0;
 
-
 //     const totalTeachers =
 //       statistics
 //         ?.totalTeachers ??
 //       0;
-
 
 //     const totalStaff =
 //       statistics
 //         ?.totalStaff ??
 //       0;
 
-
 //     const totalClasses =
 //       statistics
 //         ?.totalClasses ??
 //       0;
-
 
 //     const present =
 //       attendance
 //         ?.present ??
 //       0;
 
-
 //     const absent =
 //       attendance
 //         ?.absent ??
 //       0;
-
 
 //     const leave =
 //       attendance
 //         ?.leave ??
 //       0;
 
-
 //     const halfDay =
 //       attendance
 //         ?.halfDay ??
 //       0;
-
 
 //     const totalAttendanceMarked =
 //       attendance
 //         ?.totalMarked ??
 //       0;
 
-
 //     const attendancePercentage =
 //       attendance
 //         ?.percentage ??
 //       0;
-
 
 //     const pendingHomework =
 //       statistics
 //         ?.pendingHomework ??
 //       0;
 
-
 //     const pendingFees =
 //       statistics
 //         ?.pendingFees ??
 //       0;
 
-
 //     const upcomingExams =
 //       statistics
 //         ?.upcomingExams ??
 //       0;
-
 
 //     // ============================================
 //     // HANDLERS
@@ -1648,7 +1597,6 @@
 //         );
 //       };
 
-
 //     const handleExportReport =
 //       () => {
 
@@ -1656,14 +1604,12 @@
 //           true
 //         );
 
-
 //         setTimeout(
 //           () => {
 
 //             setIsExporting(
 //               false
 //             );
-
 
 //             alert(
 //               "Operational snapshot report export will be connected later."
@@ -1674,7 +1620,6 @@
 //         );
 //       };
 
-
 //     const handleQuickActionClick =
 //       () => {
 
@@ -1682,7 +1627,6 @@
 //           true
 //         );
 //       };
-
 
 //     const handleAcademicYearSelect =
 //       (
@@ -1694,7 +1638,6 @@
 //           year
 //         );
 //       };
-
 
 //     const handleQuickActionSubmit =
 //       (
@@ -1718,7 +1661,6 @@
 //             "homework",
 //           ];
 
-
 //         const activityType:
 //           ActivityItem["type"] =
 //           allowedTypes.includes(
@@ -1728,7 +1670,6 @@
 //                 data.type as ActivityItem["type"]
 //               )
 //             : "homework";
-
 
 //         const newActivity:
 //           ActivityItem = {
@@ -1750,7 +1691,6 @@
 //             "Just now",
 //         };
 
-
 //         setActivities(
 //           (
 //             previous
@@ -1761,7 +1701,6 @@
 //         );
 //       };
 
-
 //     const handleAddEvent =
 //       () => {
 
@@ -1770,11 +1709,9 @@
 //             "Enter event title:"
 //           );
 
-
 //         if (!title) {
 //           return;
 //         }
-
 
 //         const details =
 //           prompt(
@@ -1782,13 +1719,11 @@
 //           ) ||
 //           "TBD";
 
-
 //         const day =
 //           prompt(
 //             "Enter day (DD):"
 //           ) ||
 //           "25";
-
 
 //         const month =
 //           prompt(
@@ -1803,7 +1738,6 @@
 //               }
 //             )
 //             .toUpperCase();
-
 
 //         const newEvent:
 //           EventItem = {
@@ -1829,7 +1763,6 @@
 //               : "accent",
 //         };
 
-
 //         setEvents(
 //           (
 //             previous
@@ -1839,7 +1772,6 @@
 //           ]
 //         );
 //       };
-
 
 //     // ============================================
 //     // FILTER ACTIVITIES
@@ -1854,11 +1786,9 @@
 //               .trim()
 //               .toLowerCase();
 
-
 //           if (!query) {
 //             return activities;
 //           }
-
 
 //           return activities.filter(
 //             (
@@ -1884,7 +1814,6 @@
 //           searchQuery,
 //         ]
 //       );
-
 
 //     // ============================================
 //     // LOADING STATE
@@ -1936,7 +1865,6 @@
 //         </div>
 //       );
 //     }
-
 
 //     // ============================================
 //     // ERROR STATE
@@ -2035,7 +1963,6 @@
 //       );
 //     }
 
-
 //     // ============================================
 //     // UI
 //     // ============================================
@@ -2082,7 +2009,6 @@
 //                 {todayDate}
 //               </p>
 
-
 //               <h1
 //                 className="
 //                   mt-1
@@ -2098,7 +2024,6 @@
 //                   ?.name ??
 //                   "School Admin"}
 //               </h1>
-
 
 //               <p
 //                 className="
@@ -2124,7 +2049,6 @@
 
 //                 .
 //               </p>
-
 
 //               {dashboard
 //                 ?.currentSession
@@ -2155,7 +2079,6 @@
 //               )}
 
 //             </div>
-
 
 //             <div
 //               className="
@@ -2219,7 +2142,6 @@
 
 //               </button>
 
-
 //               <button
 //                 onClick={
 //                   handleQuickActionClick
@@ -2254,7 +2176,6 @@
 
 //             </div>
 //           </section>
-
 
 //           {/* ============================================
 //               STATS
@@ -2299,7 +2220,6 @@
 //               }
 //             />
 
-
 //             <StatCard
 //               icon="lucide:school"
 //               trend="Active"
@@ -2313,7 +2233,6 @@
 //               }
 //               subtext="Active teachers in school"
 //             />
-
 
 //             <StatCard
 //               icon="lucide:briefcase-business"
@@ -2339,7 +2258,6 @@
 //               }
 //             />
 
-
 //             <StatCard
 //               icon="lucide:building-2"
 //               trend={
@@ -2358,7 +2276,6 @@
 //               }
 //               subtext="Active classes in current session"
 //             />
-
 
 //             <StatCard
 //               icon="lucide:calendar-check"
@@ -2383,7 +2300,6 @@
 //               }
 //             />
 
-
 //             <StatCard
 //               icon="lucide:receipt-text"
 //               trend="Pending"
@@ -2399,7 +2315,6 @@
 //               }
 //               subtext="Fees module integration pending"
 //             />
-
 
 //             <StatCard
 //               icon="lucide:clipboard-pen-line"
@@ -2419,7 +2334,6 @@
 //               }
 //               subtext="Examination module integration pending"
 //             />
-
 
 //             <StatCard
 //               icon="lucide:book-marked"
@@ -2447,7 +2361,6 @@
 
 //           </section>
 
-
 //           {/* ============================================
 //               STUDENTS + ATTENDANCE
 //           ============================================ */}
@@ -2471,7 +2384,6 @@
 //               }
 //             />
 
-
 //             <AttendanceOverview
 //               present={
 //                 present
@@ -2486,7 +2398,6 @@
 //             />
 
 //           </section>
-
 
 //           {/* ============================================
 //               FEES + EVENTS
@@ -2518,7 +2429,6 @@
 //               }
 //             />
 
-
 //             <UpcomingEvents
 //               events={
 //                 events
@@ -2529,7 +2439,6 @@
 //             />
 
 //           </section>
-
 
 //           {/* ============================================
 //               ACTIVITIES + NOTICES
@@ -2556,7 +2465,6 @@
 //               }
 //             />
 
-
 //             <ImportantNotices
 //               notices={
 //                 notices
@@ -2566,7 +2474,6 @@
 //           </section>
 
 //         </div>
-
 
 //         {/* ============================================
 //             QUICK ACTION MODAL
@@ -2592,43 +2499,20 @@
 //     );
 //   };
 
-
 // export default SchoolAdminDashboard;
-
-
-
-
-
-
-
 
 // Dashboard.tsx
 
-import React, {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
-import {
-  Icon,
-} from "@iconify/react";
+import { Icon } from "@iconify/react";
 
-import {
-  useDispatch,
-  useSelector,
-} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 // import type {
 //   AppDispatch,
 //   RootState,
 // } from "../../../store/store";
-
-
-
-
-
-
 
 import StatCard from "./StatCard";
 
@@ -2645,12 +2529,11 @@ import RecentActivities from "./RecentActivities";
 import ImportantNotices from "./ImportantNotices";
 
 import QuickActionModal from "./QuickActionModel";
-import type { RootState,AppDispatch } from "../../app/store";
+import type { RootState, AppDispatch } from "../../app/store";
 import {
   clearSchoolAdminDashboard,
   getSchoolAdminDashboard,
 } from "../../features/schoolAdminDashboard/schoolAdminDashboard.slice";
-
 
 // ============================================
 // TYPES
@@ -2667,20 +2550,13 @@ interface EventItem {
 
   details: string;
 
-  type:
-    | "primary"
-    | "accent";
+  type: "primary" | "accent";
 }
-
 
 interface ActivityItem {
   id: string;
 
-  type:
-    | "admission"
-    | "fee"
-    | "teacher"
-    | "homework";
+  type: "admission" | "fee" | "teacher" | "homework";
 
   title: string;
 
@@ -2689,7 +2565,6 @@ interface ActivityItem {
   time: string;
 }
 
-
 interface NoticeItem {
   id: string;
 
@@ -2697,573 +2572,288 @@ interface NoticeItem {
 
   tag: string;
 
-  tagType:
-    | "action"
-    | "academic"
-    | "tomorrow";
+  tagType: "action" | "academic" | "tomorrow";
 
   content: string;
 }
-
 
 // ============================================
 // COMPONENT
 // ============================================
 
-const SchoolAdminDashboard:
-  React.FC = () => {
+const SchoolAdminDashboard: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
 
-    const dispatch =
-      useDispatch<AppDispatch>();
+  // ============================================
+  // REDUX DASHBOARD DATA
+  // ============================================
 
+  const { dashboard, loading, error } = useSelector(
+    (state: RootState) => state.schoolAdminDashboard,
+  );
 
-    // ============================================
-    // REDUX DASHBOARD DATA
-    // ============================================
+  const selectedSessionId = useSelector(
+    (state: RootState) => state.sessionSelection.selectedSessionId,
+  );
 
-    const {
-      dashboard,
-      loading,
-      error,
-    } = useSelector(
-      (
-        state: RootState
-      ) =>
-        state.schoolAdminDashboard
+  // ============================================
+  // LOCAL STATES
+  // ============================================
+
+  const [searchQuery] = useState("");
+
+  const [isQuickActionModalOpen, setIsQuickActionModalOpen] = useState(false);
+
+  const [isExporting, setIsExporting] = useState(false);
+
+  // ============================================
+  // TEMPORARY ACTIVITY DATA
+  //
+  // Activity API abhi nahi bani hai.
+  // Isko later real activity log API se replace karenge.
+  // ============================================
+
+  const [activities, setActivities] = useState<ActivityItem[]>([
+    {
+      id: "1",
+
+      type: "teacher",
+
+      title: "Teacher management",
+
+      detail: "Teacher activity will appear here",
+
+      time: "Recently",
+    },
+
+    {
+      id: "2",
+
+      type: "homework",
+
+      title: "Homework management",
+
+      detail: "Published homework activity will appear here",
+
+      time: "Recently",
+    },
+  ]);
+
+  // ============================================
+  // TEMPORARY EVENTS
+  //
+  // Event module abhi available nahi hai.
+  // ============================================
+
+  const [events, setEvents] = useState<EventItem[]>([]);
+
+  // ============================================
+  // TEMPORARY NOTICES
+  //
+  // Notice module complete hone ke baad
+  // API se load karenge.
+  // ============================================
+
+  const [notices] = useState<NoticeItem[]>([]);
+
+  // ============================================
+  // FETCH DASHBOARD
+  // ============================================
+
+  useEffect(() => {
+    if (!selectedSessionId) {
+      dispatch(clearSchoolAdminDashboard());
+
+      return;
+    }
+
+    dispatch(getSchoolAdminDashboard(selectedSessionId));
+  }, [dispatch, selectedSessionId]);
+
+  // ============================================
+  // DATE
+  // ============================================
+
+  const todayDate = useMemo(() => {
+    return new Date().toLocaleDateString("en-IN", {
+      weekday: "long",
+
+      day: "numeric",
+
+      month: "long",
+
+      year: "numeric",
+    });
+  }, []);
+
+  // ============================================
+  // GREETING
+  // ============================================
+
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours();
+
+    if (hour < 12) {
+      return "Good morning";
+    }
+
+    if (hour < 17) {
+      return "Good afternoon";
+    }
+
+    return "Good evening";
+  }, []);
+
+  // ============================================
+  // DASHBOARD VALUES
+  // ============================================
+
+  const statistics = dashboard?.statistics;
+
+  const attendance = statistics?.attendance;
+
+  const totalStudents = statistics?.totalStudents ?? 0;
+
+  const totalTeachers = statistics?.totalTeachers ?? 0;
+
+  const totalStaff = statistics?.totalStaff ?? 0;
+
+  const totalClasses = statistics?.totalClasses ?? 0;
+
+  const present = attendance?.present ?? 0;
+
+  const absent = attendance?.absent ?? 0;
+
+  const leave = attendance?.leave ?? 0;
+
+  const halfDay = attendance?.halfDay ?? 0;
+
+  const totalAttendanceMarked = attendance?.totalMarked ?? 0;
+
+  const attendancePercentage = attendance?.percentage ?? 0;
+
+  const pendingHomework = statistics?.pendingHomework ?? 0;
+
+  const pendingFees = statistics?.pendingFees ?? 0;
+
+  const upcomingExams = statistics?.upcomingExams ?? 0;
+
+  // ============================================
+  // HANDLERS
+  // ============================================
+
+  const handleExportReport = () => {
+    setIsExporting(true);
+
+    setTimeout(() => {
+      setIsExporting(false);
+
+      alert("Operational snapshot report export will be connected later.");
+    }, 1000);
+  };
+
+  const handleQuickActionClick = () => {
+    setIsQuickActionModalOpen(true);
+  };
+
+  const handleQuickActionSubmit = (data: {
+    type: string;
+
+    title: string;
+
+    detail: string;
+  }) => {
+    const allowedTypes: ActivityItem["type"][] = [
+      "admission",
+      "fee",
+      "teacher",
+      "homework",
+    ];
+
+    const activityType: ActivityItem["type"] = allowedTypes.includes(
+      data.type as ActivityItem["type"],
+    )
+      ? (data.type as ActivityItem["type"])
+      : "homework";
+
+    const newActivity: ActivityItem = {
+      id: Date.now().toString(),
+
+      type: activityType,
+
+      title: data.title,
+
+      detail: data.detail,
+
+      time: "Just now",
+    };
+
+    setActivities((previous) => [newActivity, ...previous]);
+  };
+
+  const handleAddEvent = () => {
+    const title = prompt("Enter event title:");
+
+    if (!title) {
+      return;
+    }
+
+    const details =
+      prompt("Enter event details (e.g., Auditorium · 10:00 AM):") || "TBD";
+
+    const day = prompt("Enter day (DD):") || "25";
+
+    const month =
+      prompt("Enter month (MMM):") ||
+      new Date()
+        .toLocaleString("en-US", {
+          month: "short",
+        })
+        .toUpperCase();
+
+    const newEvent: EventItem = {
+      id: Date.now().toString(),
+
+      month: month.toUpperCase(),
+
+      day,
+
+      title,
+
+      details,
+
+      type: Math.random() > 0.5 ? "primary" : "accent",
+    };
+
+    setEvents((previous) => [...previous, newEvent]);
+  };
+
+  // ============================================
+  // FILTER ACTIVITIES
+  // ============================================
+
+  const filteredActivities = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    if (!query) {
+      return activities;
+    }
+
+    return activities.filter(
+      (activity) =>
+        activity.title.toLowerCase().includes(query) ||
+        activity.detail.toLowerCase().includes(query),
     );
-
-
-    const selectedSessionId =
-      useSelector(
-        (
-          state: RootState
-        ) =>
-          state.sessionSelection
-            .selectedSessionId
-      );
-
-
-    // ============================================
-    // LOCAL STATES
-    // ============================================
-
-    const [
-      searchQuery,
-    ] = useState("");
-
-
-    const [
-      isQuickActionModalOpen,
-      setIsQuickActionModalOpen,
-    ] = useState(false);
-
-
-    const [
-      isExporting,
-      setIsExporting,
-    ] = useState(false);
-
-
-    // ============================================
-    // TEMPORARY ACTIVITY DATA
-    //
-    // Activity API abhi nahi bani hai.
-    // Isko later real activity log API se replace karenge.
-    // ============================================
-
-    const [
-      activities,
-      setActivities,
-    ] = useState<ActivityItem[]>([
-      {
-        id: "1",
-
-        type:
-          "teacher",
-
-        title:
-          "Teacher management",
-
-        detail:
-          "Teacher activity will appear here",
-
-        time:
-          "Recently",
-      },
-
-      {
-        id: "2",
-
-        type:
-          "homework",
-
-        title:
-          "Homework management",
-
-        detail:
-          "Published homework activity will appear here",
-
-        time:
-          "Recently",
-      },
-    ]);
-
-
-    // ============================================
-    // TEMPORARY EVENTS
-    //
-    // Event module abhi available nahi hai.
-    // ============================================
-
-    const [
-      events,
-      setEvents,
-    ] = useState<EventItem[]>([]);
-
-
-    // ============================================
-    // TEMPORARY NOTICES
-    //
-    // Notice module complete hone ke baad
-    // API se load karenge.
-    // ============================================
-
-    const [
-      notices,
-    ] = useState<NoticeItem[]>([]);
-
-
-    // ============================================
-    // FETCH DASHBOARD
-    // ============================================
-
-    useEffect(() => {
-
-      if (!selectedSessionId) {
-
-        dispatch(
-          clearSchoolAdminDashboard()
-        );
-
-        return;
-      }
-
-      dispatch(
-        getSchoolAdminDashboard(
-          selectedSessionId
-        )
-      );
-
-    }, [
-      dispatch,
-      selectedSessionId,
-    ]);
-
-
-    // ============================================
-    // DATE
-    // ============================================
-
-    const todayDate =
-      useMemo(
-        () => {
-
-          return new Date()
-            .toLocaleDateString(
-              "en-IN",
-              {
-                weekday:
-                  "long",
-
-                day:
-                  "numeric",
-
-                month:
-                  "long",
-
-                year:
-                  "numeric",
-              }
-            );
-
-        },
-        []
-      );
-
-
-    // ============================================
-    // GREETING
-    // ============================================
-
-    const greeting =
-      useMemo(
-        () => {
-
-          const hour =
-            new Date()
-              .getHours();
-
-
-          if (
-            hour <
-            12
-          ) {
-
-            return "Good morning";
-
-          }
-
-
-          if (
-            hour <
-            17
-          ) {
-
-            return "Good afternoon";
-
-          }
-
-
-          return "Good evening";
-
-        },
-        []
-      );
-
-
-    // ============================================
-    // DASHBOARD VALUES
-    // ============================================
-
-    const statistics =
-      dashboard
-        ?.statistics;
-
-
-    const attendance =
-      statistics
-        ?.attendance;
-
-
-    const totalStudents =
-      statistics
-        ?.totalStudents ??
-      0;
-
-
-    const totalTeachers =
-      statistics
-        ?.totalTeachers ??
-      0;
-
-
-    const totalStaff =
-      statistics
-        ?.totalStaff ??
-      0;
-
-
-    const totalClasses =
-      statistics
-        ?.totalClasses ??
-      0;
-
-
-    const present =
-      attendance
-        ?.present ??
-      0;
-
-
-    const absent =
-      attendance
-        ?.absent ??
-      0;
-
-
-    const leave =
-      attendance
-        ?.leave ??
-      0;
-
-
-    const halfDay =
-      attendance
-        ?.halfDay ??
-      0;
-
-
-    const totalAttendanceMarked =
-      attendance
-        ?.totalMarked ??
-      0;
-
-
-    const attendancePercentage =
-      attendance
-        ?.percentage ??
-      0;
-
-
-    const pendingHomework =
-      statistics
-        ?.pendingHomework ??
-      0;
-
-
-    const pendingFees =
-      statistics
-        ?.pendingFees ??
-      0;
-
-
-    const upcomingExams =
-      statistics
-        ?.upcomingExams ??
-      0;
-
-
-    // ============================================
-    // HANDLERS
-    // ============================================
-
-    const handleExportReport =
-      () => {
-
-        setIsExporting(
-          true
-        );
-
-
-        setTimeout(
-          () => {
-
-            setIsExporting(
-              false
-            );
-
-
-            alert(
-              "Operational snapshot report export will be connected later."
-            );
-
-          },
-          1000
-        );
-      };
-
-
-    const handleQuickActionClick =
-      () => {
-
-        setIsQuickActionModalOpen(
-          true
-        );
-      };
-
-
-    const handleQuickActionSubmit =
-      (
-        data: {
-          type:
-            string;
-
-          title:
-            string;
-
-          detail:
-            string;
-        }
-      ) => {
-
-        const allowedTypes:
-          ActivityItem["type"][] = [
-            "admission",
-            "fee",
-            "teacher",
-            "homework",
-          ];
-
-
-        const activityType:
-          ActivityItem["type"] =
-          allowedTypes.includes(
-            data.type as ActivityItem["type"]
-          )
-            ? (
-                data.type as ActivityItem["type"]
-              )
-            : "homework";
-
-
-        const newActivity:
-          ActivityItem = {
-
-          id:
-            Date.now()
-              .toString(),
-
-          type:
-            activityType,
-
-          title:
-            data.title,
-
-          detail:
-            data.detail,
-
-          time:
-            "Just now",
-        };
-
-
-        setActivities(
-          (
-            previous
-          ) => [
-            newActivity,
-            ...previous,
-          ]
-        );
-      };
-
-
-    const handleAddEvent =
-      () => {
-
-        const title =
-          prompt(
-            "Enter event title:"
-          );
-
-
-        if (!title) {
-          return;
-        }
-
-
-        const details =
-          prompt(
-            "Enter event details (e.g., Auditorium · 10:00 AM):"
-          ) ||
-          "TBD";
-
-
-        const day =
-          prompt(
-            "Enter day (DD):"
-          ) ||
-          "25";
-
-
-        const month =
-          prompt(
-            "Enter month (MMM):"
-          ) ||
-          new Date()
-            .toLocaleString(
-              "en-US",
-              {
-                month:
-                  "short",
-              }
-            )
-            .toUpperCase();
-
-
-        const newEvent:
-          EventItem = {
-
-          id:
-            Date.now()
-              .toString(),
-
-          month:
-            month
-              .toUpperCase(),
-
-          day,
-
-          title,
-
-          details,
-
-          type:
-            Math.random() >
-            0.5
-              ? "primary"
-              : "accent",
-        };
-
-
-        setEvents(
-          (
-            previous
-          ) => [
-            ...previous,
-            newEvent,
-          ]
-        );
-      };
-
-
-    // ============================================
-    // FILTER ACTIVITIES
-    // ============================================
-
-    const filteredActivities =
-      useMemo(
-        () => {
-
-          const query =
-            searchQuery
-              .trim()
-              .toLowerCase();
-
-
-          if (!query) {
-            return activities;
-          }
-
-
-          return activities.filter(
-            (
-              activity
-            ) =>
-
-              activity.title
-                .toLowerCase()
-                .includes(
-                  query
-                ) ||
-
-              activity.detail
-                .toLowerCase()
-                .includes(
-                  query
-                )
-          );
-
-        },
-        [
-          activities,
-          searchQuery,
-        ]
-      );
-
-
-    // ============================================
-    // LOADING STATE
-    // ============================================
-
-    if (
-      loading &&
-      !dashboard
-    ) {
-
-      return (
-        <div
-          className="
+  }, [activities, searchQuery]);
+
+  // ============================================
+  // LOADING STATE
+  // ============================================
+
+  if (loading && !dashboard) {
+    return (
+      <div
+        className="
             flex
             min-h-[70vh]
             w-full
@@ -3271,51 +2861,46 @@ const SchoolAdminDashboard:
             justify-center
             bg-[#F7F9FC]
           "
-        >
-          <div
-            className="
+      >
+        <div
+          className="
               flex
               flex-col
               items-center
               gap-3
             "
-          >
-            <Icon
-              icon="lucide:loader-2"
-              className="
+        >
+          <Icon
+            icon="lucide:loader-2"
+            className="
                 animate-spin
                 text-4xl
                 text-[#1F5FAE]
               "
-            />
+          />
 
-            <p
-              className="
+          <p
+            className="
                 text-sm
                 font-medium
                 text-[#6B7280]
               "
-            >
-              Loading dashboard...
-            </p>
-          </div>
+          >
+            Loading dashboard...
+          </p>
         </div>
-      );
-    }
+      </div>
+    );
+  }
 
+  // ============================================
+  // ERROR STATE
+  // ============================================
 
-    // ============================================
-    // ERROR STATE
-    // ============================================
-
-    if (
-      error &&
-      !dashboard
-    ) {
-
-      return (
-        <div
-          className="
+  if (error && !dashboard) {
+    return (
+      <div
+        className="
             flex
             min-h-[70vh]
             w-full
@@ -3324,9 +2909,9 @@ const SchoolAdminDashboard:
             bg-[#F7F9FC]
             p-5
           "
-        >
-          <div
-            className="
+      >
+        <div
+          className="
               w-full
               max-w-md
               rounded-xl
@@ -3337,50 +2922,44 @@ const SchoolAdminDashboard:
               text-center
               shadow-sm
             "
-          >
-            <Icon
-              icon="lucide:circle-alert"
-              className="
+        >
+          <Icon
+            icon="lucide:circle-alert"
+            className="
                 mx-auto
                 text-4xl
                 text-red-500
               "
-            />
+          />
 
-            <h2
-              className="
+          <h2
+            className="
                 mt-3
                 text-lg
                 font-bold
                 text-[#15243B]
               "
-            >
-              Dashboard load nahi hua
-            </h2>
+          >
+            Dashboard load nahi hua
+          </h2>
 
-            <p
-              className="
+          <p
+            className="
                 mt-2
                 text-sm
                 text-[#6B7280]
               "
-            >
-              {error}
-            </p>
+          >
+            {error}
+          </p>
 
-            <button
-              onClick={() => {
-                if (
-                  selectedSessionId
-                ) {
-                  dispatch(
-                    getSchoolAdminDashboard(
-                      selectedSessionId
-                    )
-                  );
-                }
-              }}
-              className="
+          <button
+            onClick={() => {
+              if (selectedSessionId) {
+                dispatch(getSchoolAdminDashboard(selectedSessionId));
+              }
+            }}
+            className="
                 mt-5
                 inline-flex
                 min-h-10
@@ -3394,44 +2973,38 @@ const SchoolAdminDashboard:
                 text-white
                 hover:bg-[#174d90]
               "
-            >
-              <Icon
-                icon="lucide:refresh-cw"
-                className="mr-2"
-              />
-
-              Retry
-            </button>
-          </div>
+          >
+            <Icon icon="lucide:refresh-cw" className="mr-2" />
+            Retry
+          </button>
         </div>
-      );
-    }
+      </div>
+    );
+  }
 
+  // ============================================
+  // UI
+  // ============================================
 
-    // ============================================
-    // UI
-    // ============================================
-
-    return (
-      <div
-        className="
+  return (
+    <div
+      className="
           w-full
           bg-[#F7F9FC]
         "
-      >
-        <div
-          className="
+    >
+      <div
+        className="
             p-5
             lg:p-8
           "
-        >
-
-          {/* ============================================
+      >
+        {/* ============================================
               WELCOME SECTION
           ============================================ */}
 
-          <section
-            className="
+        <section
+          className="
               mb-7
               flex
               flex-col
@@ -3440,110 +3013,79 @@ const SchoolAdminDashboard:
               md:flex-row
               md:items-end
             "
-          >
-
-            <div>
-
-              <p
-                className="
+        >
+          <div>
+            <p
+              className="
                   text-sm
                   font-semibold
                   text-[#1F5FAE]
                 "
-              >
-                {todayDate}
-              </p>
+            >
+              {todayDate}
+            </p>
 
-
-              <h1
-                className="
+            <h1
+              className="
                   mt-1
                   text-2xl
                   font-bold
                   text-[#15243B]
                 "
-              >
-                {greeting},{" "}
+            >
+              {greeting}, {dashboard?.admin?.name ?? "School Admin"}
+            </h1>
 
-                {dashboard
-                  ?.admin
-                  ?.name ??
-                  "School Admin"}
-              </h1>
-
-
-              <p
-                className="
+            <p
+              className="
                   mt-1
                   text-sm
                   text-[#6B7280]
                 "
-              >
-                Here is the operational
-                snapshot for{" "}
-
-                <span
-                  className="
+            >
+              Here is the operational snapshot for{" "}
+              <span
+                className="
                     font-semibold
                     text-[#15243B]
                   "
-                >
-                  {dashboard
-                    ?.school
-                    ?.name ??
-                    "your school"}
-                </span>
+              >
+                {dashboard?.school?.name ?? "your school"}
+              </span>
+              .
+            </p>
 
-                .
-              </p>
-
-
-              {dashboard
-                ?.currentSession
-                ?.name && (
-
-                <p
-                  className="
+            {dashboard?.currentSession?.name && (
+              <p
+                className="
                     mt-1
                     text-xs
                     font-medium
                     text-[#6B7280]
                   "
-                >
-                  Current Academic Session:{" "}
-
-                  <span
-                    className="
+              >
+                Current Academic Session:{" "}
+                <span
+                  className="
                       text-[#1F5FAE]
                     "
-                  >
-                    {
-                      dashboard
-                        .currentSession
-                        .name
-                    }
-                  </span>
-                </p>
-              )}
+                >
+                  {dashboard.currentSession.name}
+                </span>
+              </p>
+            )}
+          </div>
 
-            </div>
-
-
-            <div
-              className="
+          <div
+            className="
                 flex
                 gap-3
               "
-            >
-
-              <button
-                onClick={
-                  handleExportReport
-                }
-                disabled={
-                  isExporting
-                }
-                className="
+          >
+            <button
+              onClick={handleExportReport}
+              disabled={isExporting}
+              className="
                   flex
                   min-h-11
                   items-center
@@ -3560,43 +3102,36 @@ const SchoolAdminDashboard:
                   hover:bg-[#F9FAFB]
                   disabled:opacity-50
                 "
-              >
-
-                {isExporting ? (
-                  <>
-                    <Icon
-                      icon="lucide:loader-2"
-                      className="
+            >
+              {isExporting ? (
+                <>
+                  <Icon
+                    icon="lucide:loader-2"
+                    className="
                         mr-2
                         animate-spin
                         text-lg
                       "
-                    />
-
-                    Exporting...
-                  </>
-                ) : (
-                  <>
-                    <Icon
-                      icon="lucide:download"
-                      className="
+                  />
+                  Exporting...
+                </>
+              ) : (
+                <>
+                  <Icon
+                    icon="lucide:download"
+                    className="
                         mr-2
                         text-lg
                       "
-                    />
+                  />
+                  Export report
+                </>
+              )}
+            </button>
 
-                    Export report
-                  </>
-                )}
-
-              </button>
-
-
-              <button
-                onClick={
-                  handleQuickActionClick
-                }
-                className="
+            <button
+              onClick={handleQuickActionClick}
+              className="
                   flex
                   min-h-11
                   items-center
@@ -3612,378 +3147,205 @@ const SchoolAdminDashboard:
                   hover:bg-[#1F5FAE]/90
                   hover:shadow-lg
                 "
-              >
-                <Icon
-                  icon="lucide:plus"
-                  className="
+            >
+              <Icon
+                icon="lucide:plus"
+                className="
                     mr-2
                     text-lg
                   "
-                />
+              />
+              Quick action
+            </button>
+          </div>
+        </section>
 
-                Quick action
-              </button>
-
-            </div>
-          </section>
-
-
-          {/* ============================================
+        {/* ============================================
               STATS
           ============================================ */}
 
-          <section
-            className="
+        <section
+          className="
               grid
               grid-cols-1
               gap-4
               sm:grid-cols-2
               xl:grid-cols-4
             "
-          >
+        >
+          <StatCard
+            icon="lucide:graduation-cap"
+            trend={totalStudents > 0 ? "Active" : "Pending"}
+            trendType={totalStudents > 0 ? "positive" : "neutral"}
+            label="Total Students"
+            value={totalStudents.toLocaleString("en-IN")}
+            subtext={
+              totalStudents > 0
+                ? "Active enrolled students"
+                : "Student module integration pending"
+            }
+          />
 
-            <StatCard
-              icon="lucide:graduation-cap"
-              trend={
-                totalStudents >
-                0
-                  ? "Active"
-                  : "Pending"
-              }
-              trendType={
-                totalStudents >
-                0
-                  ? "positive"
-                  : "neutral"
-              }
-              label="Total Students"
-              value={
-                totalStudents
-                  .toLocaleString(
-                    "en-IN"
-                  )
-              }
-              subtext={
-                totalStudents >
-                0
-                  ? "Active enrolled students"
-                  : "Student module integration pending"
-              }
-            />
+          <StatCard
+            icon="lucide:school"
+            trend="Active"
+            trendType="positive"
+            label="Total Teachers"
+            value={totalTeachers.toLocaleString("en-IN")}
+            subtext="Active teachers in school"
+          />
 
+          <StatCard
+            icon="lucide:briefcase-business"
+            trend={totalStaff > 0 ? "Active" : "Pending"}
+            trendType="neutral"
+            label="Total Staff"
+            value={totalStaff.toLocaleString("en-IN")}
+            subtext={
+              totalStaff > 0
+                ? "Administration & support"
+                : "Staff module integration pending"
+            }
+          />
 
-            <StatCard
-              icon="lucide:school"
-              trend="Active"
-              trendType="positive"
-              label="Total Teachers"
-              value={
-                totalTeachers
-                  .toLocaleString(
-                    "en-IN"
-                  )
-              }
-              subtext="Active teachers in school"
-            />
+          <StatCard
+            icon="lucide:building-2"
+            trend={dashboard?.currentSession?.name ?? "Current"}
+            trendType="neutral"
+            label="Total Classes"
+            value={totalClasses.toLocaleString("en-IN")}
+            subtext="Active classes in current session"
+          />
 
+          <StatCard
+            icon="lucide:calendar-check"
+            trend={`${attendancePercentage}%`}
+            trendType={attendancePercentage >= 75 ? "positive" : "accent"}
+            label="Today’s Attendance"
+            value={present.toLocaleString("en-IN")}
+            subtext={`${totalAttendanceMarked.toLocaleString(
+              "en-IN",
+            )} attendance records marked today`}
+          />
 
-            <StatCard
-              icon="lucide:briefcase-business"
-              trend={
-                totalStaff >
-                0
-                  ? "Active"
-                  : "Pending"
-              }
-              trendType="neutral"
-              label="Total Staff"
-              value={
-                totalStaff
-                  .toLocaleString(
-                    "en-IN"
-                  )
-              }
-              subtext={
-                totalStaff >
-                0
-                  ? "Administration & support"
-                  : "Staff module integration pending"
-              }
-            />
+          <StatCard
+            icon="lucide:receipt-text"
+            trend="Pending"
+            trendType="accent"
+            label="Pending Fees"
+            value={
+              pendingFees > 0 ? `₹${pendingFees.toLocaleString("en-IN")}` : "₹0"
+            }
+            subtext="Fees module integration pending"
+          />
 
+          <StatCard
+            icon="lucide:clipboard-pen-line"
+            trend={upcomingExams > 0 ? "Scheduled" : "Pending"}
+            trendType="neutral"
+            label="Upcoming Exams"
+            value={upcomingExams.toLocaleString("en-IN")}
+            subtext="Examination module integration pending"
+          />
 
-            <StatCard
-              icon="lucide:building-2"
-              trend={
-                dashboard
-                  ?.currentSession
-                  ?.name ??
-                "Current"
-              }
-              trendType="neutral"
-              label="Total Classes"
-              value={
-                totalClasses
-                  .toLocaleString(
-                    "en-IN"
-                  )
-              }
-              subtext="Active classes in current session"
-            />
+          <StatCard
+            icon="lucide:book-marked"
+            trend={pendingHomework > 0 ? "Published" : "Clear"}
+            trendType={pendingHomework > 0 ? "neutral" : "positive"}
+            label="Pending Homework"
+            value={pendingHomework.toLocaleString("en-IN")}
+            subtext="Published homework currently pending"
+          />
+        </section>
 
-
-            <StatCard
-              icon="lucide:calendar-check"
-              trend={`${attendancePercentage}%`}
-              trendType={
-                attendancePercentage >=
-                75
-                  ? "positive"
-                  : "accent"
-              }
-              label="Today’s Attendance"
-              value={
-                present
-                  .toLocaleString(
-                    "en-IN"
-                  )
-              }
-              subtext={
-                `${totalAttendanceMarked.toLocaleString(
-                  "en-IN"
-                )} attendance records marked today`
-              }
-            />
-
-
-            <StatCard
-              icon="lucide:receipt-text"
-              trend="Pending"
-              trendType="accent"
-              label="Pending Fees"
-              value={
-                pendingFees >
-                0
-                  ? `₹${pendingFees.toLocaleString(
-                      "en-IN"
-                    )}`
-                  : "₹0"
-              }
-              subtext="Fees module integration pending"
-            />
-
-
-            <StatCard
-              icon="lucide:clipboard-pen-line"
-              trend={
-                upcomingExams >
-                0
-                  ? "Scheduled"
-                  : "Pending"
-              }
-              trendType="neutral"
-              label="Upcoming Exams"
-              value={
-                upcomingExams
-                  .toLocaleString(
-                    "en-IN"
-                  )
-              }
-              subtext="Examination module integration pending"
-            />
-
-
-            <StatCard
-              icon="lucide:book-marked"
-              trend={
-                pendingHomework >
-                0
-                  ? "Published"
-                  : "Clear"
-              }
-              trendType={
-                pendingHomework >
-                0
-                  ? "neutral"
-                  : "positive"
-              }
-              label="Pending Homework"
-              value={
-                pendingHomework
-                  .toLocaleString(
-                    "en-IN"
-                  )
-              }
-              subtext="Published homework currently pending"
-            />
-
-          </section>
-
-
-          {/* ============================================
+        {/* ============================================
               STUDENTS + ATTENDANCE
           ============================================ */}
 
-          <section
-            className="
+        <section
+          className="
               mt-7
               grid
               grid-cols-1
               gap-6
               xl:grid-cols-3
             "
-          >
+        >
+          <StudentStats
+            sessionName={dashboard?.currentSession?.name ?? ""}
+            totalStudents={totalStudents}
+            maleStudents={statistics?.studentStatistics?.male ?? 0}
+            femaleStudents={statistics?.studentStatistics?.female ?? 0}
+            classWiseStudents={statistics?.studentStatistics?.classWise ?? []}
+          />
 
-            <StudentStats
-              sessionName={
-                dashboard
-                  ?.currentSession
-                  ?.name ??
-                ""
-              }
-              totalStudents={
-                totalStudents
-              }
-              maleStudents={
-                statistics
-                  ?.studentStatistics
-                  ?.male ??
-                0
-              }
-              femaleStudents={
-                statistics
-                  ?.studentStatistics
-                  ?.female ??
-                0
-              }
-              classWiseStudents={
-                statistics
-                  ?.studentStatistics
-                  ?.classWise ??
-                []
-              }
-            />
+          <AttendanceOverview
+            present={present}
+            absent={absent}
+            onLeave={leave + halfDay}
+          />
+        </section>
 
-
-            <AttendanceOverview
-              present={
-                present
-              }
-              absent={
-                absent
-              }
-              onLeave={
-                leave +
-                halfDay
-              }
-            />
-
-          </section>
-
-
-          {/* ============================================
+        {/* ============================================
               FEES + EVENTS
           ============================================ */}
 
-          <section
-            className="
+        <section
+          className="
               mt-7
               grid
               grid-cols-1
               gap-6
               xl:grid-cols-3
             "
-          >
+        >
+          <FeeOverview
+            total="₹0"
+            collected="₹0"
+            pending={
+              pendingFees > 0 ? `₹${pendingFees.toLocaleString("en-IN")}` : "₹0"
+            }
+            percentage={0}
+          />
 
-            <FeeOverview
-              total="₹0"
-              collected="₹0"
-              pending={
-                pendingFees >
-                0
-                  ? `₹${pendingFees.toLocaleString(
-                      "en-IN"
-                    )}`
-                  : "₹0"
-              }
-              percentage={
-                0
-              }
-            />
+          <UpcomingEvents events={events} onAddEvent={handleAddEvent} />
+        </section>
 
-
-            <UpcomingEvents
-              events={
-                events
-              }
-              onAddEvent={
-                handleAddEvent
-              }
-            />
-
-          </section>
-
-
-          {/* ============================================
+        {/* ============================================
               ACTIVITIES + NOTICES
           ============================================ */}
 
-          <section
-            className="
+        <section
+          className="
               mt-7
               grid
               grid-cols-1
               gap-6
               xl:grid-cols-5
             "
-          >
+        >
+          <RecentActivities
+            activities={filteredActivities}
+            onViewAll={() =>
+              alert("Activity log module will be connected later.")
+            }
+          />
 
-            <RecentActivities
-              activities={
-                filteredActivities
-              }
-              onViewAll={() =>
-                alert(
-                  "Activity log module will be connected later."
-                )
-              }
-            />
+          <ImportantNotices notices={notices} />
+        </section>
+      </div>
 
-
-            <ImportantNotices
-              notices={
-                notices
-              }
-            />
-
-          </section>
-
-        </div>
-
-
-        {/* ============================================
+      {/* ============================================
             QUICK ACTION MODAL
         ============================================ */}
 
-        <QuickActionModal
-          isOpen={
-            isQuickActionModalOpen
-          }
-
-          onClose={() =>
-            setIsQuickActionModalOpen(
-              false
-            )
-          }
-
-          onSubmit={
-            handleQuickActionSubmit
-          }
-        />
-
-      </div>
-    );
-  };
-
+      <QuickActionModal
+        isOpen={isQuickActionModalOpen}
+        onClose={() => setIsQuickActionModalOpen(false)}
+        onSubmit={handleQuickActionSubmit}
+      />
+    </div>
+  );
+};
 
 export default SchoolAdminDashboard;

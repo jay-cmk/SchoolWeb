@@ -1,4 +1,10 @@
 
+
+
+
+
+
+
 // import type {
 //   AdmissionCategory,
 //   AdmissionType,
@@ -12,6 +18,7 @@
 
 
 // export interface ICreateStudentRequest {
+
 //   // ============================================
 //   // ACADEMIC DETAILS
 //   // ============================================
@@ -21,6 +28,7 @@
 //   classId: string;
 
 //   sectionId: string;
+
 
 //   // ============================================
 //   // ADMISSION DETAILS
@@ -35,6 +43,7 @@
 //   admissionCategory?: AdmissionCategory;
 
 //   admissionDate?: string | Date;
+
 
 //   // ============================================
 //   // BASIC DETAILS
@@ -56,7 +65,10 @@
 
 //   aadhaarNumber?: string;
 
+//   apaarId?: string;
+
 //   photo?: string;
+
 
 //   // ============================================
 //   // CONTACT DETAILS
@@ -66,16 +78,19 @@
 
 //   email?: string;
 
+
 //   // ============================================
 //   // ADDRESS
 //   // ============================================
 
 //   // Old API compatibility
+
 //   address?: IStudentAddress;
 
 //   currentAddress?: IStudentAddress;
 
 //   permanentAddress?: IStudentAddress;
+
 
 //   // ============================================
 //   // PARENT DETAILS
@@ -86,11 +101,13 @@
 //   mother?: IStudentParentDetails;
 
 //   // Existing Parent module relation
+
 //   parentId?: string;
 // }
 
 
 // export interface IUpdateStudentRequest {
+
 //   // ============================================
 //   // ACADEMIC DETAILS
 //   // ============================================
@@ -100,6 +117,7 @@
 //   classId?: string;
 
 //   sectionId?: string;
+
 
 //   // ============================================
 //   // ADMISSION DETAILS
@@ -114,6 +132,7 @@
 //   admissionCategory?: AdmissionCategory;
 
 //   admissionDate?: string | Date;
+
 
 //   // ============================================
 //   // BASIC DETAILS
@@ -135,7 +154,10 @@
 
 //   aadhaarNumber?: string;
 
+//   apaarId?: string;
+
 //   photo?: string;
+
 
 //   // ============================================
 //   // CONTACT DETAILS
@@ -144,6 +166,7 @@
 //   mobile?: string;
 
 //   email?: string;
+
 
 //   // ============================================
 //   // ADDRESS
@@ -155,6 +178,7 @@
 
 //   permanentAddress?: IStudentAddress;
 
+
 //   // ============================================
 //   // PARENT DETAILS
 //   // ============================================
@@ -165,6 +189,7 @@
 
 //   parentId?: string | null;
 
+
 //   // ============================================
 //   // STATUS
 //   // ============================================
@@ -174,6 +199,7 @@
 
 
 // export interface IStudentQuery {
+
 //   page?: number | string;
 
 //   limit?: number | string;
@@ -191,11 +217,11 @@
 
 
 // export interface ICreateStudentAccountRequest {
+
 //   email: string;
 
 //   password: string;
 // }
-
 
 
 
@@ -215,9 +241,12 @@ import type {
   StudentStatus,
 } from "./student.interface";
 
+import type {
+  StudentStream,
+} from "./studentEnrollment.types";
+
 
 export interface ICreateStudentRequest {
-
   // ============================================
   // ACADEMIC DETAILS
   // ============================================
@@ -228,13 +257,27 @@ export interface ICreateStudentRequest {
 
   sectionId: string;
 
+  /*
+   * Sirf Class 11 aur Class 12 ke liye.
+   * Service isko StudentEnrollment me save karegi.
+   */
+  stream?: StudentStream;
+
 
   // ============================================
   // ADMISSION DETAILS
   // ============================================
 
-  admissionNumber: string;
+  /*
+   * Backend automatically generate karta hai.
+   * Optional field old API compatibility ke liye hai.
+   */
+  admissionNumber?: string;
 
+  /*
+   * Backend class-wise automatically generate
+   * karta hai. Section change hone par reset nahi hoga.
+   */
   rollNumber?: number;
 
   admissionType?: AdmissionType;
@@ -266,6 +309,8 @@ export interface ICreateStudentRequest {
 
   apaarId?: string;
 
+  penNumber?: string;
+
   photo?: string;
 
 
@@ -283,7 +328,6 @@ export interface ICreateStudentRequest {
   // ============================================
 
   // Old API compatibility
-
   address?: IStudentAddress;
 
   currentAddress?: IStudentAddress;
@@ -300,15 +344,17 @@ export interface ICreateStudentRequest {
   mother?: IStudentParentDetails;
 
   // Existing Parent module relation
-
   parentId?: string;
 }
 
 
 export interface IUpdateStudentRequest {
-
   // ============================================
   // ACADEMIC DETAILS
+  //
+  // Existing compatibility ke liye retained.
+  // Academic movement enrollment/promotion APIs
+  // ke through handle hona chahiye.
   // ============================================
 
   sessionId?: string;
@@ -355,6 +401,8 @@ export interface IUpdateStudentRequest {
 
   apaarId?: string;
 
+  penNumber?: string;
+
   photo?: string;
 
 
@@ -398,7 +446,6 @@ export interface IUpdateStudentRequest {
 
 
 export interface IStudentQuery {
-
   page?: number | string;
 
   limit?: number | string;
@@ -411,12 +458,13 @@ export interface IStudentQuery {
 
   sectionId?: string;
 
+  stream?: StudentStream | string;
+
   status?: StudentStatus | string;
 }
 
 
 export interface ICreateStudentAccountRequest {
-
   email: string;
 
   password: string;
