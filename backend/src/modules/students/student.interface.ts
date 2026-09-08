@@ -1,6 +1,8 @@
 
 
-// import { Types } from "mongoose";
+// import {
+//   Types,
+// } from "mongoose";
 
 
 // export type StudentGender =
@@ -51,28 +53,52 @@
 
 
 // export interface IStudentAddress {
+
 //   addressLine?: string;
+
 //   city?: string;
+
 //   district?: string;
+
 //   state?: string;
+
 //   pincode?: string;
+
 //   country?: string;
 // }
 
 
 // export interface IStudentParentDetails {
+
 //   name?: string;
+
 //   mobile?: string;
+
 //   aadhaarNumber?: string;
+
 //   occupation?: string;
 // }
 
 
 // export interface IStudent {
+
+//   // ============================================
+//   // TENANT
+//   // ============================================
+
 //   schoolId: Types.ObjectId;
 
-//   // Student login account
+
+//   // ============================================
+//   // STUDENT LOGIN ACCOUNT
+//   // ============================================
+
 //   userId?: Types.ObjectId;
+
+
+//   // ============================================
+//   // ACADEMIC DETAILS
+//   // ============================================
 
 //   sessionId: Types.ObjectId;
 
@@ -80,19 +106,21 @@
 
 //   sectionId: Types.ObjectId;
 
-//   admissionNumber: string;
-
-//   rollNumber?: number;
 
 //   // ============================================
 //   // ADMISSION DETAILS
 //   // ============================================
+
+//   admissionNumber: string;
+
+//   rollNumber?: number;
 
 //   admissionType?: AdmissionType;
 
 //   admissionCategory?: AdmissionCategory;
 
 //   admissionDate: Date;
+
 
 //   // ============================================
 //   // BASIC DETAILS
@@ -114,7 +142,10 @@
 
 //   aadhaarNumber?: string;
 
+//   apaarId?: string;
+
 //   photo?: string;
+
 
 //   // ============================================
 //   // CONTACT DETAILS
@@ -124,16 +155,19 @@
 
 //   email?: string;
 
+
 //   // ============================================
 //   // ADDRESS
 //   // ============================================
 
 //   // Kept for old student records compatibility
+
 //   address?: IStudentAddress;
 
 //   currentAddress?: IStudentAddress;
 
 //   permanentAddress?: IStudentAddress;
+
 
 //   // ============================================
 //   // PARENT DETAILS
@@ -144,13 +178,20 @@
 //   mother?: IStudentParentDetails;
 
 //   // Existing Parent module relation
+
 //   parentId?: Types.ObjectId;
+
 
 //   // ============================================
 //   // STATUS
 //   // ============================================
 
 //   status: StudentStatus;
+
+
+//   // ============================================
+//   // AUDIT
+//   // ============================================
 
 //   createdBy: Types.ObjectId;
 
@@ -164,7 +205,10 @@
 
 
 
-import {
+
+
+
+import type {
   Types,
 } from "mongoose";
 
@@ -217,23 +261,27 @@ export type AdmissionCategory =
 
 
 export interface IStudentAddress {
-
   addressLine?: string;
 
   city?: string;
 
   district?: string;
 
+  districtCode?: string;
+
   state?: string;
+
+  stateCode?: string;
 
   pincode?: string;
 
   country?: string;
+
+  countryCode?: string;
 }
 
 
 export interface IStudentParentDetails {
-
   name?: string;
 
   mobile?: string;
@@ -245,7 +293,6 @@ export interface IStudentParentDetails {
 
 
 export interface IStudent {
-
   // ============================================
   // TENANT
   // ============================================
@@ -308,6 +355,8 @@ export interface IStudent {
 
   apaarId?: string;
 
+  penNumber?: string;
+
   photo?: string;
 
 
@@ -325,7 +374,6 @@ export interface IStudent {
   // ============================================
 
   // Kept for old student records compatibility
-
   address?: IStudentAddress;
 
   currentAddress?: IStudentAddress;
@@ -342,7 +390,6 @@ export interface IStudent {
   mother?: IStudentParentDetails;
 
   // Existing Parent module relation
-
   parentId?: Types.ObjectId;
 
 

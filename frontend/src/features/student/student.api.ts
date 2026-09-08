@@ -1,3 +1,6 @@
+
+
+
 // import api from "../../api/axios";
 
 // import type {
@@ -5,9 +8,34 @@
 //   Student,
 //   StudentEnrollmentFilters,
 //   StudentFilters,
+//   StudentStatus,
 //   StudentsByEnrollmentData,
 //   UpdateStudentData,
 // } from "./student.types";
+
+// /* =====================================================
+//    STUDENT ACCOUNT TYPES
+// ===================================================== */
+
+// export interface CreateStudentAccountData {
+//   email: string;
+//   password: string;
+// }
+
+// export interface CreatedStudentAccount {
+//   id: string;
+//   name: string;
+//   admissionNumber: string;
+//   userId: string;
+//   email: string;
+//   role: string;
+//   schoolId: string;
+// }
+
+// export interface CreateStudentAccountResult {
+//   student: CreatedStudentAccount;
+// }
+
 
 // /* =====================================================
 //    BUILD STUDENT FORM DATA
@@ -18,13 +46,11 @@
 //     | CreateStudentData
 //     | UpdateStudentData
 // ): FormData => {
-
 //   const formData =
 //     new FormData();
 
 //   Object.entries(data).forEach(
 //     ([key, value]) => {
-
 //       if (
 //         value === undefined ||
 //         value === null ||
@@ -37,7 +63,6 @@
 //         key === "photo" &&
 //         value instanceof File
 //       ) {
-
 //         formData.append(
 //           "photo",
 //           value
@@ -53,7 +78,6 @@
 //         key === "father" ||
 //         key === "mother"
 //       ) {
-
 //         formData.append(
 //           key,
 //           JSON.stringify(value)
@@ -71,6 +95,7 @@
 
 //   return formData;
 // };
+
 
 // /* =====================================================
 //    GET STUDENTS
@@ -92,7 +117,6 @@
 // export const getStudentsApi = async (
 //   filters?: StudentFilters
 // ): Promise<Student[]> => {
-
 //   const params:
 //     Record<string, string> = {};
 
@@ -147,7 +171,6 @@
 //     response.data?.data;
 
 //   if (!Array.isArray(students)) {
-
 //     console.error(
 //       "Students API data is not an array:",
 //       response.data
@@ -159,6 +182,7 @@
 //   return students;
 // };
 
+
 // /* =====================================================
 //    GET STUDENTS BY ENROLLMENT
 
@@ -167,7 +191,6 @@
 //    GET /students/enrollments
 
 //    sessionId = required
-
 //    classId   = optional
 //    sectionId = optional
 //    search    = optional
@@ -185,7 +208,6 @@
 //   async (
 //     filters: StudentEnrollmentFilters
 //   ): Promise<StudentsByEnrollmentData> => {
-
 //     const params:
 //       Record<string, string> = {
 //         sessionId:
@@ -222,7 +244,6 @@
 //       !data ||
 //       !Array.isArray(data.students)
 //     ) {
-
 //       console.error(
 //         "Students Enrollment API response is invalid:",
 //         response.data
@@ -235,16 +256,15 @@
 
 //     return {
 //       session: data.session,
-
 //       students:
 //         data.students,
-
 //       total:
 //         typeof data.total === "number"
 //           ? data.total
 //           : data.students.length,
 //     };
 //   };
+
 
 // /* =====================================================
 //    GET STUDENT BY ID
@@ -254,7 +274,6 @@
 //   async (
 //     studentId: string
 //   ): Promise<Student> => {
-
 //     const response =
 //       await api.get(
 //         `/students/${studentId}`
@@ -263,6 +282,7 @@
 //     return response.data
 //       .data as Student;
 //   };
+
 
 // /* =====================================================
 //    CREATE STUDENT
@@ -276,13 +296,15 @@
 //    rollNumber
 
 //    are valid during initial admission.
+
+//    apaarId is automatically included in
+//    FormData when present in CreateStudentData.
 // ===================================================== */
 
 // export const createStudentApi =
 //   async (
 //     data: CreateStudentData
 //   ): Promise<Student> => {
-
 //     const formData =
 //       buildStudentFormData(data);
 
@@ -295,6 +317,31 @@
 //     return response.data
 //       .data as Student;
 //   };
+
+
+// /* =====================================================
+//    CREATE STUDENT LOGIN ACCOUNT
+
+//    Call after createStudentApi succeeds.
+
+//    POST /students/:studentId/account
+// ===================================================== */
+
+// export const createStudentAccountApi =
+//   async (
+//     studentId: string,
+//     data: CreateStudentAccountData
+//   ): Promise<CreateStudentAccountResult> => {
+//     const response =
+//       await api.post(
+//         `/students/${studentId}/account`,
+//         data
+//       );
+
+//     return response.data
+//       .data as CreateStudentAccountResult;
+//   };
+
 
 // /* =====================================================
 //    UPDATE STUDENT
@@ -310,6 +357,9 @@
 
 //    is handled through enrollment /
 //    promotion APIs.
+
+//    apaarId is automatically included in
+//    FormData when present in UpdateStudentData.
 // ===================================================== */
 
 // export const updateStudentApi =
@@ -317,7 +367,6 @@
 //     studentId: string,
 //     data: UpdateStudentData
 //   ): Promise<Student> => {
-
 //     const formData =
 //       buildStudentFormData(data);
 
@@ -330,6 +379,31 @@
 //     return response.data
 //       .data as Student;
 //   };
+
+
+// /* =====================================================
+//    UPDATE STUDENT STATUS
+
+//    PATCH /students/:studentId/status
+// ===================================================== */
+
+// export const updateStudentStatusApi =
+//   async (
+//     studentId: string,
+//     status: StudentStatus
+//   ): Promise<Student> => {
+//     const response =
+//       await api.patch(
+//         `/students/${studentId}/status`,
+//         {
+//           status,
+//         }
+//       );
+
+//     return response.data
+//       .data as Student;
+//   };
+
 
 // /* =====================================================
 //    DELETE STUDENT
@@ -356,13 +430,16 @@
 //   async (
 //     studentId: string
 //   ): Promise<string> => {
-
 //     await api.delete(
 //       `/students/${studentId}`
 //     );
 
 //     return studentId;
 //   };
+
+
+
+
 
 import api from "../../api/axios";
 
@@ -371,6 +448,7 @@ import type {
   Student,
   StudentEnrollmentFilters,
   StudentFilters,
+  StudentStatus,
   StudentsByEnrollmentData,
   UpdateStudentData,
 } from "./student.types";
@@ -398,43 +476,66 @@ export interface CreateStudentAccountResult {
   student: CreatedStudentAccount;
 }
 
+
 /* =====================================================
    BUILD STUDENT FORM DATA
 ===================================================== */
 
 const buildStudentFormData = (
-  data: CreateStudentData | UpdateStudentData,
+  data:
+    | CreateStudentData
+    | UpdateStudentData
 ): FormData => {
-  const formData = new FormData();
+  const formData =
+    new FormData();
 
-  Object.entries(data).forEach(([key, value]) => {
-    if (value === undefined || value === null || value === "") {
-      return;
+  Object.entries(data).forEach(
+    ([key, value]) => {
+      if (
+        value === undefined ||
+        value === null ||
+        value === ""
+      ) {
+        return;
+      }
+
+      if (
+        key === "photo" &&
+        value instanceof File
+      ) {
+        formData.append(
+          "photo",
+          value
+        );
+
+        return;
+      }
+
+      if (
+        key === "address" ||
+        key === "currentAddress" ||
+        key === "permanentAddress" ||
+        key === "father" ||
+        key === "mother"
+      ) {
+        formData.append(
+          key,
+          JSON.stringify(value)
+        );
+
+        return;
+      }
+
+      formData.append(
+        key,
+        String(value)
+      );
     }
-
-    if (key === "photo" && value instanceof File) {
-      formData.append("photo", value);
-
-      return;
-    }
-
-    if (
-      key === "address" ||
-      key === "currentAddress" ||
-      key === "permanentAddress" ||
-      key === "father" ||
-      key === "mother"
-    ) {
-      formData.append(key, JSON.stringify(value));
-
-      return;
-    }
-
-    formData.append(key, String(value));
-  });
+  );
 
   return formData;
 };
+
 
 /* =====================================================
    GET STUDENTS
@@ -454,52 +555,73 @@ const buildStudentFormData = (
 ===================================================== */
 
 export const getStudentsApi = async (
-  filters?: StudentFilters,
+  filters?: StudentFilters
 ): Promise<Student[]> => {
-  const params: Record<string, string> = {};
+  const params:
+    Record<string, string> = {};
 
-  if (filters?.page !== undefined) {
-    params.page = String(filters.page);
+  if (
+    filters?.page !== undefined
+  ) {
+    params.page =
+      String(filters.page);
   }
 
-  if (filters?.limit !== undefined) {
-    params.limit = String(filters.limit);
+  if (
+    filters?.limit !== undefined
+  ) {
+    params.limit =
+      String(filters.limit);
   }
 
   if (filters?.sessionId) {
-    params.sessionId = filters.sessionId;
+    params.sessionId =
+      filters.sessionId;
   }
 
   if (filters?.classId) {
-    params.classId = filters.classId;
+    params.classId =
+      filters.classId;
   }
 
   if (filters?.sectionId) {
-    params.sectionId = filters.sectionId;
+    params.sectionId =
+      filters.sectionId;
   }
 
   if (filters?.search) {
-    params.search = filters.search;
+    params.search =
+      filters.search;
   }
 
   if (filters?.status) {
-    params.status = filters.status;
+    params.status =
+      filters.status;
   }
 
-  const response = await api.get("/students", {
-    params,
-  });
+  const response =
+    await api.get(
+      "/students",
+      {
+        params,
+      }
+    );
 
-  const students = response.data?.data;
+  const students =
+    response.data?.data;
 
   if (!Array.isArray(students)) {
-    console.error("Students API data is not an array:", response.data);
+    console.error(
+      "Students API data is not an array:",
+      response.data
+    );
 
     return [];
   }
 
   return students;
 };
+
 
 /* =====================================================
    GET STUDENTS BY ENROLLMENT
@@ -522,58 +644,85 @@ export const getStudentsApi = async (
    visible after promotion.
 ===================================================== */
 
-export const getStudentsByEnrollmentApi = async (
-  filters: StudentEnrollmentFilters,
-): Promise<StudentsByEnrollmentData> => {
-  const params: Record<string, string> = {
-    sessionId: filters.sessionId,
+export const getStudentsByEnrollmentApi =
+  async (
+    filters: StudentEnrollmentFilters
+  ): Promise<StudentsByEnrollmentData> => {
+    const params:
+      Record<string, string> = {
+        sessionId:
+          filters.sessionId,
+      };
+
+    if (filters.classId) {
+      params.classId =
+        filters.classId;
+    }
+
+    if (filters.sectionId) {
+      params.sectionId =
+        filters.sectionId;
+    }
+
+    if (filters.search) {
+      params.search =
+        filters.search;
+    }
+
+    const response =
+      await api.get(
+        "/students/enrollments",
+        {
+          params,
+        }
+      );
+
+    const data =
+      response.data?.data;
+
+    if (
+      !data ||
+      !Array.isArray(data.students)
+    ) {
+      console.error(
+        "Students Enrollment API response is invalid:",
+        response.data
+      );
+
+      throw new Error(
+        "Invalid students enrollment response"
+      );
+    }
+
+    return {
+      session: data.session,
+      students:
+        data.students,
+      total:
+        typeof data.total === "number"
+          ? data.total
+          : data.students.length,
+    };
   };
 
-  if (filters.classId) {
-    params.classId = filters.classId;
-  }
-
-  if (filters.sectionId) {
-    params.sectionId = filters.sectionId;
-  }
-
-  if (filters.search) {
-    params.search = filters.search;
-  }
-
-  const response = await api.get("/students/enrollments", {
-    params,
-  });
-
-  const data = response.data?.data;
-
-  if (!data || !Array.isArray(data.students)) {
-    console.error(
-      "Students Enrollment API response is invalid:",
-      response.data,
-    );
-
-    throw new Error("Invalid students enrollment response");
-  }
-
-  return {
-    session: data.session,
-    students: data.students,
-    total: typeof data.total === "number" ? data.total : data.students.length,
-  };
-};
 
 /* =====================================================
    GET STUDENT BY ID
 ===================================================== */
 
-export const getStudentByIdApi = async (
-  studentId: string,
-): Promise<Student> => {
-  const response = await api.get(`/students/${studentId}`);
+export const getStudentByIdApi =
+  async (
+    studentId: string
+  ): Promise<Student> => {
+    const response =
+      await api.get(
+        `/students/${studentId}`
+      );
 
-  return response.data.data as Student;
-};
+    return response.data
+      .data as Student;
+  };
+
 
 /* =====================================================
    CREATE STUDENT
@@ -588,19 +737,32 @@ export const getStudentByIdApi = async (
 
    are valid during initial admission.
 
-   apaarId is automatically included in
-   FormData when present in CreateStudentData.
+   apaarId, penNumber and stream are
+   automatically included in FormData when
+   present in CreateStudentData.
+
+   Address objects are JSON serialized, so
+   countryCode, stateCode and districtCode
+   are also preserved.
 ===================================================== */
 
-export const createStudentApi = async (
-  data: CreateStudentData,
-): Promise<Student> => {
-  const formData = buildStudentFormData(data);
+export const createStudentApi =
+  async (
+    data: CreateStudentData
+  ): Promise<Student> => {
+    const formData =
+      buildStudentFormData(data);
 
-  const response = await api.post("/students", formData);
+    const response =
+      await api.post(
+        "/students",
+        formData
+      );
 
-  return response.data.data as Student;
-};
+    return response.data
+      .data as Student;
+  };
+
 
 /* =====================================================
    CREATE STUDENT LOGIN ACCOUNT
@@ -610,14 +772,21 @@ export const createStudentApi = async (
    POST /students/:studentId/account
 ===================================================== */
 
-export const createStudentAccountApi = async (
-  studentId: string,
-  data: CreateStudentAccountData,
-): Promise<CreateStudentAccountResult> => {
-  const response = await api.post(`/students/${studentId}/account`, data);
+export const createStudentAccountApi =
+  async (
+    studentId: string,
+    data: CreateStudentAccountData
+  ): Promise<CreateStudentAccountResult> => {
+    const response =
+      await api.post(
+        `/students/${studentId}/account`,
+        data
+      );
 
-  return response.data.data as CreateStudentAccountResult;
-};
+    return response.data
+      .data as CreateStudentAccountResult;
+  };
+
 
 /* =====================================================
    UPDATE STUDENT
@@ -634,20 +803,56 @@ export const createStudentAccountApi = async (
    is handled through enrollment /
    promotion APIs.
 
-   apaarId is automatically included in
-   FormData when present in UpdateStudentData.
+   apaarId and penNumber are automatically
+   included in FormData when present in
+   UpdateStudentData.
+
+   Updated address objects preserve location
+   names and their master codes.
 ===================================================== */
 
-export const updateStudentApi = async (
-  studentId: string,
-  data: UpdateStudentData,
-): Promise<Student> => {
-  const formData = buildStudentFormData(data);
+export const updateStudentApi =
+  async (
+    studentId: string,
+    data: UpdateStudentData
+  ): Promise<Student> => {
+    const formData =
+      buildStudentFormData(data);
 
-  const response = await api.patch(`/students/${studentId}`, formData);
+    const response =
+      await api.patch(
+        `/students/${studentId}`,
+        formData
+      );
 
-  return response.data.data as Student;
-};
+    return response.data
+      .data as Student;
+  };
+
+
+/* =====================================================
+   UPDATE STUDENT STATUS
+
+   PATCH /students/:studentId/status
+===================================================== */
+
+export const updateStudentStatusApi =
+  async (
+    studentId: string,
+    status: StudentStatus
+  ): Promise<Student> => {
+    const response =
+      await api.patch(
+        `/students/${studentId}/status`,
+        {
+          status,
+        }
+      );
+
+    return response.data
+      .data as Student;
+  };
+
 
 /* =====================================================
    DELETE STUDENT
@@ -670,8 +875,13 @@ export const updateStudentApi = async (
  * this function can also be removed completely.
  */
 
-export const deleteStudentApi = async (studentId: string): Promise<string> => {
-  await api.delete(`/students/${studentId}`);
+export const deleteStudentApi =
+  async (
+    studentId: string
+  ): Promise<string> => {
+    await api.delete(
+      `/students/${studentId}`
+    );
 
-  return studentId;
-};
+    return studentId;
+  };

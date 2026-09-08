@@ -400,6 +400,8 @@ import feeRoutes from "./modules/fees/fee.routes";
 import studentPromotionRoutes
   from "./modules/students/studentPromotion.routes";
 
+import locationRoutes from "./modules/master/location/location.routes";  
+
 
 // ============================================
 // APP
@@ -573,6 +575,10 @@ app.use(
 );
 
 
+app.use(
+  "/api/v1/master/locations",
+  locationRoutes
+);
 // ============================================
 // FEES
 // ============================================

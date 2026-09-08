@@ -1,3 +1,344 @@
+// import mongoose, {
+//   Schema,
+// } from "mongoose";
+
+// import type {
+//   IStudentEnrollment,
+// } from "./studentEnrollment.types";
+
+
+// /* =====================================================
+//    CONSTANTS
+// ===================================================== */
+
+// const ENROLLMENT_STATUSES = [
+//   "ACTIVE",
+//   "COMPLETED",
+//   "CANCELLED",
+// ] as const;
+
+
+// const PROMOTION_STATUSES = [
+//   "NOT_DECIDED",
+//   "PROMOTED",
+//   "RETAINED",
+//   "TRANSFERRED",
+//   "LEFT",
+//   "GRADUATED",
+// ] as const;
+
+
+// /* =====================================================
+//    SCHEMA
+// ===================================================== */
+
+// const studentEnrollmentSchema =
+//   new Schema<IStudentEnrollment>(
+//     {
+
+//       /* ===============================================
+//          TENANT
+//       =============================================== */
+
+//       schoolId: {
+
+//         type:
+//           Schema.Types.ObjectId,
+
+//         ref:
+//           "School",
+
+//         required: true,
+
+//         index: true,
+//       },
+
+
+//       /* ===============================================
+//          STUDENT
+//       =============================================== */
+
+//       studentId: {
+
+//         type:
+//           Schema.Types.ObjectId,
+
+//         ref:
+//           "Student",
+
+//         required: true,
+
+//         index: true,
+//       },
+
+
+//       /* ===============================================
+//          ACADEMIC SESSION
+//       =============================================== */
+
+//       sessionId: {
+
+//         type:
+//           Schema.Types.ObjectId,
+
+//         ref:
+//           "AcademicSession",
+
+//         required: true,
+
+//         index: true,
+//       },
+
+
+//       /* ===============================================
+//          CLASS
+//       =============================================== */
+
+//       classId: {
+
+//         type:
+//           Schema.Types.ObjectId,
+
+//         ref:
+//           "Class",
+
+//         required: true,
+
+//         index: true,
+//       },
+
+
+//       /* ===============================================
+//          SECTION
+//       =============================================== */
+
+//       sectionId: {
+
+//         type:
+//           Schema.Types.ObjectId,
+
+//         ref:
+//           "Section",
+
+//         required: true,
+
+//         index: true,
+//       },
+
+
+//       /* ===============================================
+//          ROLL NUMBER
+//       =============================================== */
+
+//       rollNumber: {
+
+//         type: Number,
+
+//         min: 1,
+//       },
+
+
+//       /* ===============================================
+//          ENROLLMENT STATUS
+//       =============================================== */
+
+//       enrollmentStatus: {
+
+//         type: String,
+
+//         enum:
+//           ENROLLMENT_STATUSES,
+
+//         default:
+//           "ACTIVE",
+
+//         required: true,
+
+//         index: true,
+//       },
+
+
+//       /* ===============================================
+//          PROMOTION STATUS
+//       =============================================== */
+
+//       promotionStatus: {
+
+//         type: String,
+
+//         enum:
+//           PROMOTION_STATUSES,
+
+//         default:
+//           "NOT_DECIDED",
+
+//         required: true,
+
+//         index: true,
+//       },
+
+
+//       /* ===============================================
+//          PROMOTION SOURCE
+//       =============================================== */
+
+//       promotedFromEnrollmentId: {
+
+//         type:
+//           Schema.Types.ObjectId,
+
+//         ref:
+//           "StudentEnrollment",
+
+//         default:
+//           undefined,
+//       },
+
+
+//       /* ===============================================
+//          PROMOTION DATE
+//       =============================================== */
+
+//       promotionDate: {
+
+//         type: Date,
+
+//         default:
+//           undefined,
+//       },
+
+
+//       /* ===============================================
+//          REMARKS
+//       =============================================== */
+
+//       remarks: {
+
+//         type: String,
+
+//         trim: true,
+
+//         maxlength: 1000,
+//       },
+
+
+//       /* ===============================================
+//          CREATED BY
+//       =============================================== */
+
+//       createdBy: {
+
+//         type:
+//           Schema.Types.ObjectId,
+
+//         ref:
+//           "User",
+
+//         required: true,
+//       },
+
+
+//       /* ===============================================
+//          UPDATED BY
+//       =============================================== */
+
+//       updatedBy: {
+
+//         type:
+//           Schema.Types.ObjectId,
+
+//         ref:
+//           "User",
+
+//         default:
+//           undefined,
+//       },
+//     },
+
+//     {
+//       timestamps: true,
+//     }
+//   );
+
+
+// /* =====================================================
+//    UNIQUE STUDENT + SESSION
+
+//    Ek student ka ek academic session me
+//    sirf ek enrollment record hoga.
+// ===================================================== */
+
+// studentEnrollmentSchema.index(
+//   {
+//     schoolId: 1,
+//     studentId: 1,
+//     sessionId: 1,
+//   },
+//   {
+//     unique: true,
+//   }
+// );
+
+
+// /* =====================================================
+//    CLASS / SECTION LOOKUP INDEX
+// ===================================================== */
+
+// studentEnrollmentSchema.index(
+//   {
+//     schoolId: 1,
+//     sessionId: 1,
+//     classId: 1,
+//     sectionId: 1,
+//     enrollmentStatus: 1,
+//   }
+// );
+
+
+// /* =====================================================
+//    STUDENT HISTORY INDEX
+// ===================================================== */
+
+// studentEnrollmentSchema.index(
+//   {
+//     schoolId: 1,
+//     studentId: 1,
+//     createdAt: -1,
+//   }
+// );
+
+
+// /* =====================================================
+//    PROMOTION CANDIDATE INDEX
+// ===================================================== */
+
+// studentEnrollmentSchema.index(
+//   {
+//     schoolId: 1,
+//     sessionId: 1,
+//     enrollmentStatus: 1,
+//     promotionStatus: 1,
+//   }
+// );
+
+
+// /* =====================================================
+//    MODEL
+// ===================================================== */
+
+// export const StudentEnrollment =
+//   mongoose.model<IStudentEnrollment>(
+//     "StudentEnrollment",
+//     studentEnrollmentSchema
+//   );
+
+
+
+
+
+
+
+
 import mongoose, {
   Schema,
 } from "mongoose";
@@ -28,6 +369,14 @@ const PROMOTION_STATUSES = [
 ] as const;
 
 
+const STUDENT_STREAMS = [
+  "SCIENCE",
+  "COMMERCE",
+  "ARTS",
+  "VOCATIONAL",
+] as const;
+
+
 /* =====================================================
    SCHEMA
 ===================================================== */
@@ -35,226 +384,107 @@ const PROMOTION_STATUSES = [
 const studentEnrollmentSchema =
   new Schema<IStudentEnrollment>(
     {
-
-      /* ===============================================
-         TENANT
-      =============================================== */
-
       schoolId: {
-
-        type:
-          Schema.Types.ObjectId,
-
-        ref:
-          "School",
-
+        type: Schema.Types.ObjectId,
+        ref: "School",
         required: true,
-
         index: true,
       },
-
-
-      /* ===============================================
-         STUDENT
-      =============================================== */
 
       studentId: {
-
-        type:
-          Schema.Types.ObjectId,
-
-        ref:
-          "Student",
-
+        type: Schema.Types.ObjectId,
+        ref: "Student",
         required: true,
-
         index: true,
       },
-
-
-      /* ===============================================
-         ACADEMIC SESSION
-      =============================================== */
 
       sessionId: {
-
-        type:
-          Schema.Types.ObjectId,
-
-        ref:
-          "AcademicSession",
-
+        type: Schema.Types.ObjectId,
+        ref: "AcademicSession",
         required: true,
-
         index: true,
       },
-
-
-      /* ===============================================
-         CLASS
-      =============================================== */
 
       classId: {
-
-        type:
-          Schema.Types.ObjectId,
-
-        ref:
-          "Class",
-
+        type: Schema.Types.ObjectId,
+        ref: "Class",
         required: true,
-
         index: true,
       },
-
-
-      /* ===============================================
-         SECTION
-      =============================================== */
 
       sectionId: {
-
-        type:
-          Schema.Types.ObjectId,
-
-        ref:
-          "Section",
-
+        type: Schema.Types.ObjectId,
+        ref: "Section",
         required: true,
-
         index: true,
       },
 
-
-      /* ===============================================
-         ROLL NUMBER
-      =============================================== */
-
       rollNumber: {
-
         type: Number,
-
         min: 1,
       },
 
-
       /* ===============================================
-         ENROLLMENT STATUS
+         STREAM
+
+         Service Class 11/12 ke liye is field ko
+         validate karegi. Baaki classes me undefined.
       =============================================== */
+
+      stream: {
+        type: String,
+        enum: STUDENT_STREAMS,
+        trim: true,
+        uppercase: true,
+        default: undefined,
+        index: true,
+      },
 
       enrollmentStatus: {
-
         type: String,
-
-        enum:
-          ENROLLMENT_STATUSES,
-
-        default:
-          "ACTIVE",
-
+        enum: ENROLLMENT_STATUSES,
+        default: "ACTIVE",
         required: true,
-
         index: true,
       },
-
-
-      /* ===============================================
-         PROMOTION STATUS
-      =============================================== */
 
       promotionStatus: {
-
         type: String,
-
-        enum:
-          PROMOTION_STATUSES,
-
-        default:
-          "NOT_DECIDED",
-
+        enum: PROMOTION_STATUSES,
+        default: "NOT_DECIDED",
         required: true,
-
         index: true,
       },
 
-
-      /* ===============================================
-         PROMOTION SOURCE
-      =============================================== */
-
       promotedFromEnrollmentId: {
-
-        type:
-          Schema.Types.ObjectId,
-
-        ref:
-          "StudentEnrollment",
-
-        default:
-          undefined,
+        type: Schema.Types.ObjectId,
+        ref: "StudentEnrollment",
+        default: undefined,
       },
-
-
-      /* ===============================================
-         PROMOTION DATE
-      =============================================== */
 
       promotionDate: {
-
         type: Date,
-
-        default:
-          undefined,
+        default: undefined,
       },
 
-
-      /* ===============================================
-         REMARKS
-      =============================================== */
-
       remarks: {
-
         type: String,
-
         trim: true,
-
         maxlength: 1000,
       },
 
-
-      /* ===============================================
-         CREATED BY
-      =============================================== */
-
       createdBy: {
-
-        type:
-          Schema.Types.ObjectId,
-
-        ref:
-          "User",
-
+        type: Schema.Types.ObjectId,
+        ref: "User",
         required: true,
       },
 
-
-      /* ===============================================
-         UPDATED BY
-      =============================================== */
-
       updatedBy: {
-
-        type:
-          Schema.Types.ObjectId,
-
-        ref:
-          "User",
-
-        default:
-          undefined,
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        default: undefined,
       },
     },
-
     {
       timestamps: true,
     }
@@ -263,9 +493,6 @@ const studentEnrollmentSchema =
 
 /* =====================================================
    UNIQUE STUDENT + SESSION
-
-   Ek student ka ek academic session me
-   sirf ek enrollment record hoga.
 ===================================================== */
 
 studentEnrollmentSchema.index(
@@ -281,6 +508,31 @@ studentEnrollmentSchema.index(
 
 
 /* =====================================================
+   UNIQUE CLASS ROLL NUMBER PER SESSION
+
+   Roll number poori class me unique rahega,
+   section-wise reset nahi hoga.
+===================================================== */
+
+studentEnrollmentSchema.index(
+  {
+    schoolId: 1,
+    sessionId: 1,
+    classId: 1,
+    rollNumber: 1,
+  },
+  {
+    unique: true,
+    partialFilterExpression: {
+      rollNumber: {
+        $type: "number",
+      },
+    },
+  }
+);
+
+
+/* =====================================================
    CLASS / SECTION LOOKUP INDEX
 ===================================================== */
 
@@ -290,6 +542,21 @@ studentEnrollmentSchema.index(
     sessionId: 1,
     classId: 1,
     sectionId: 1,
+    enrollmentStatus: 1,
+  }
+);
+
+
+/* =====================================================
+   CLASS / STREAM LOOKUP INDEX
+===================================================== */
+
+studentEnrollmentSchema.index(
+  {
+    schoolId: 1,
+    sessionId: 1,
+    classId: 1,
+    stream: 1,
     enrollmentStatus: 1,
   }
 );
