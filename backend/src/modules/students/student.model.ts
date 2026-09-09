@@ -1028,15 +1028,31 @@ const studentSchema =
       },
 
 
-      penNumber: {
-        type: String,
-        trim: true,
+      // penNumber: {
+      //   type: String,
+      //   trim: true,
 
-        match: [
-          /^\\d{11}$/,
-          "PEN Number must be exactly 11 digits",
-        ],
-      },
+      //   match: [
+      //     /^\\d{11}$/,
+      //     "PEN Number must be exactly 11 digits",
+      //   ],
+      // },
+
+      penNumber: {
+  type: String,
+  trim: true,
+  validate: {
+    validator: (value?: string) => {
+      if (!value) return true;
+
+      return /^\d{11}$/.test(
+        value.trim()
+      );
+    },
+    message:
+      "PEN Number must be exactly 11 digits",
+  },
+},
 
 
       photo: {

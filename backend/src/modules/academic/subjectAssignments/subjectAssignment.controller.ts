@@ -1,3 +1,5 @@
+
+
 // import {
 //   Request,
 //   Response,
@@ -6,6 +8,7 @@
 // import {
 //   createSubjectAssignment,
 //   getSubjectAssignments,
+//   getMySubjectAssignments,
 //   getSubjectAssignmentById,
 //   updateSubjectAssignment,
 //   updateSubjectAssignmentStatus,
@@ -21,12 +24,15 @@
 //     req: Request,
 //     res: Response
 //   ): Promise<void> => {
+
 //     try {
+
 //       const schoolId =
 //         req.user?.schoolId;
 
 
 //       if (!schoolId) {
+
 //         res.status(403).json({
 //           success: false,
 
@@ -48,10 +54,6 @@
 //       } = req.body;
 
 
-//       // ========================================
-//       // REQUIRED FIELDS
-//       // ========================================
-
 //       if (
 //         !sessionId ||
 //         !subjectId ||
@@ -60,6 +62,7 @@
 //         !teacherId ||
 //         weeklyPeriods === undefined
 //       ) {
+
 //         res.status(400).json({
 //           success: false,
 
@@ -97,6 +100,7 @@
 //       });
 
 //     } catch (error) {
+
 //       res.status(400).json({
 //         success: false,
 
@@ -118,12 +122,15 @@
 //     req: Request,
 //     res: Response
 //   ): Promise<void> => {
+
 //     try {
+
 //       const schoolId =
 //         req.user?.schoolId;
 
 
 //       if (!schoolId) {
+
 //         res.status(403).json({
 //           success: false,
 
@@ -135,23 +142,16 @@
 //       }
 
 
-//       // ========================================
-//       // HELPER
-//       // ========================================
-
 //       const getStringQuery = (
 //         value: unknown
 //       ): string | undefined => {
+
 //         return typeof value ===
 //           "string"
 //           ? value
 //           : undefined;
 //       };
 
-
-//       // ========================================
-//       // READ QUERY PARAMS
-//       // ========================================
 
 //       const sessionId =
 //         getStringQuery(
@@ -179,10 +179,6 @@
 //         );
 
 
-//       // ========================================
-//       // STATUS FILTER
-//       // ========================================
-
 //       let isActive:
 //         | boolean
 //         | undefined;
@@ -203,14 +199,6 @@
 //         isActive = false;
 //       }
 
-
-//       // ========================================
-//       // BUILD FILTERS
-//       //
-//       // exactOptionalPropertyTypes: true
-//       // ke liye undefined properties object
-//       // me explicitly nahi bhejenge
-//       // ========================================
 
 //       const filters: {
 //         sessionId?: string;
@@ -265,10 +253,6 @@
 //       }
 
 
-//       // ========================================
-//       // GET DATA
-//       // ========================================
-
 //       const assignments =
 //         await getSubjectAssignments(
 //           schoolId,
@@ -288,6 +272,7 @@
 //       });
 
 //     } catch (error) {
+
 //       res.status(400).json({
 //         success: false,
 
@@ -295,6 +280,76 @@
 //           error instanceof Error
 //             ? error.message
 //             : "Failed to fetch subject assignments",
+//       });
+//     }
+//   };
+
+
+// // ============================================
+// // TEACHER - MY SUBJECTS / CLASSES
+// // ============================================
+
+// export const getMySubjectAssignmentsController =
+//   async (
+//     req: Request,
+//     res: Response
+//   ): Promise<void> => {
+
+//     try {
+
+//       const schoolId =
+//         req.user?.schoolId;
+
+//       const teacherId =
+//         req.user?.teacherId;
+
+//       const userId =
+//         req.user?.userId;
+
+
+//       if (
+//         !schoolId ||
+//         !teacherId ||
+//         !userId
+//       ) {
+
+//         res.status(403).json({
+//           success: false,
+
+//           message:
+//             "Teacher access required",
+//         });
+
+//         return;
+//       }
+
+
+//       const result =
+//         await getMySubjectAssignments(
+//           schoolId,
+//           teacherId,
+//           userId
+//         );
+
+
+//       res.status(200).json({
+//         success: true,
+
+//         message:
+//           "Teacher subject assignments fetched successfully",
+
+//         data: result,
+//       });
+
+//     } catch (error) {
+
+//       res.status(400).json({
+//         success: false,
+
+//         message:
+//           error instanceof Error
+//             ? error.message
+//             : "Failed to fetch teacher assignments",
 //       });
 //     }
 //   };
@@ -309,7 +364,9 @@
 //     req: Request,
 //     res: Response
 //   ): Promise<void> => {
+
 //     try {
+
 //       const schoolId =
 //         req.user?.schoolId;
 
@@ -320,6 +377,7 @@
 
 
 //       if (!schoolId) {
+
 //         res.status(403).json({
 //           success: false,
 
@@ -335,6 +393,7 @@
 //         typeof assignmentId !==
 //           "string"
 //       ) {
+
 //         res.status(400).json({
 //           success: false,
 
@@ -365,6 +424,7 @@
 //       });
 
 //     } catch (error) {
+
 //       res.status(404).json({
 //         success: false,
 
@@ -386,7 +446,9 @@
 //     req: Request,
 //     res: Response
 //   ): Promise<void> => {
+
 //     try {
+
 //       const schoolId =
 //         req.user?.schoolId;
 
@@ -397,6 +459,7 @@
 
 
 //       if (!schoolId) {
+
 //         res.status(403).json({
 //           success: false,
 
@@ -412,6 +475,7 @@
 //         typeof assignmentId !==
 //           "string"
 //       ) {
+
 //         res.status(400).json({
 //           success: false,
 
@@ -428,10 +492,6 @@
 //         weeklyPeriods,
 //       } = req.body;
 
-
-//       // ========================================
-//       // BUILD UPDATE DATA SAFELY
-//       // ========================================
 
 //       const updateData: {
 //         teacherId?: string;
@@ -458,15 +518,12 @@
 //       }
 
 
-//       // ========================================
-//       // EMPTY UPDATE CHECK
-//       // ========================================
-
 //       if (
 //         Object.keys(
 //           updateData
 //         ).length === 0
 //       ) {
+
 //         res.status(400).json({
 //           success: false,
 
@@ -498,6 +555,7 @@
 //       });
 
 //     } catch (error) {
+
 //       res.status(400).json({
 //         success: false,
 
@@ -519,7 +577,9 @@
 //     req: Request,
 //     res: Response
 //   ): Promise<void> => {
+
 //     try {
+
 //       const schoolId =
 //         req.user?.schoolId;
 
@@ -535,6 +595,7 @@
 
 
 //       if (!schoolId) {
+
 //         res.status(403).json({
 //           success: false,
 
@@ -550,6 +611,7 @@
 //         typeof assignmentId !==
 //           "string"
 //       ) {
+
 //         res.status(400).json({
 //           success: false,
 
@@ -565,6 +627,7 @@
 //         typeof isActive !==
 //           "boolean"
 //       ) {
+
 //         res.status(400).json({
 //           success: false,
 
@@ -596,6 +659,7 @@
 //       });
 
 //     } catch (error) {
+
 //       res.status(400).json({
 //         success: false,
 
@@ -606,6 +670,13 @@
 //       });
 //     }
 //   };
+
+
+
+
+
+
+
 
 
 
@@ -626,6 +697,65 @@ import {
   updateSubjectAssignment,
   updateSubjectAssignmentStatus,
 } from "./subjectAssignment.service";
+
+import type {
+  CreateSubjectAssignmentData,
+  GetSubjectAssignmentsFilters,
+  SubjectAssignmentStream,
+  SubjectAssignmentType,
+  UpdateSubjectAssignmentData,
+} from "./subjectAssignment.types";
+
+const ASSIGNMENT_TYPES: SubjectAssignmentType[] = [
+  "CLASS",
+  "STREAM",
+];
+
+const STUDENT_STREAMS: SubjectAssignmentStream[] = [
+  "SCIENCE",
+  "COMMERCE",
+  "ARTS",
+  "VOCATIONAL",
+];
+
+const getStringQuery = (value: unknown): string | undefined =>
+  typeof value === "string" && value.trim()
+    ? value.trim()
+    : undefined;
+
+const parseAssignmentType = (
+  value: unknown,
+): SubjectAssignmentType | undefined => {
+  if (value === undefined || value === null || value === "") return undefined;
+  if (typeof value !== "string") {
+    throw new Error("Assignment type must be a string");
+  }
+
+  const normalized = value.trim().toUpperCase() as SubjectAssignmentType;
+  if (!ASSIGNMENT_TYPES.includes(normalized)) {
+    throw new Error("Assignment type must be CLASS or STREAM");
+  }
+  return normalized;
+};
+
+const parseStream = (
+  value: unknown,
+  allowNull = false,
+): SubjectAssignmentStream | null | undefined => {
+  if (allowNull && value === null) return null;
+  if (value === undefined || value === "") return undefined;
+  if (typeof value !== "string") {
+    throw new Error("Stream must be a string");
+  }
+
+  const normalized = value.trim().toUpperCase() as SubjectAssignmentStream;
+  if (!STUDENT_STREAMS.includes(normalized)) {
+    throw new Error(
+      "Stream must be SCIENCE, COMMERCE, ARTS or VOCATIONAL",
+    );
+  }
+  return normalized;
+};
 
 
 // ============================================
@@ -663,6 +793,8 @@ export const createSubjectAssignmentController =
         classId,
         sectionId,
         teacherId,
+        assignmentType: assignmentTypeValue,
+        stream: streamValue,
         weeklyPeriods,
       } = req.body;
 
@@ -687,17 +819,24 @@ export const createSubjectAssignmentController =
       }
 
 
+      const assignmentType = parseAssignmentType(assignmentTypeValue);
+      const stream = parseStream(streamValue);
+
+      const createData: CreateSubjectAssignmentData = {
+        sessionId,
+        subjectId,
+        classId,
+        sectionId,
+        teacherId,
+        weeklyPeriods,
+        ...(assignmentType ? { assignmentType } : {}),
+        ...(stream ? { stream } : {}),
+      };
+
       const assignment =
         await createSubjectAssignment(
           schoolId,
-          {
-            sessionId,
-            subjectId,
-            classId,
-            sectionId,
-            teacherId,
-            weeklyPeriods,
-          }
+          createData
         );
 
 
@@ -755,17 +894,6 @@ export const getSubjectAssignmentsController =
       }
 
 
-      const getStringQuery = (
-        value: unknown
-      ): string | undefined => {
-
-        return typeof value ===
-          "string"
-          ? value
-          : undefined;
-      };
-
-
       const sessionId =
         getStringQuery(
           req.query.sessionId
@@ -791,6 +919,16 @@ export const getSubjectAssignmentsController =
           req.query.teacherId
         );
 
+      const assignmentType =
+        parseAssignmentType(
+          req.query.assignmentType
+        );
+
+      const stream =
+        parseStream(
+          req.query.stream
+        );
+
 
       let isActive:
         | boolean
@@ -813,19 +951,8 @@ export const getSubjectAssignmentsController =
       }
 
 
-      const filters: {
-        sessionId?: string;
-
-        subjectId?: string;
-
-        classId?: string;
-
-        sectionId?: string;
-
-        teacherId?: string;
-
-        isActive?: boolean;
-      } = {};
+      const filters:
+        GetSubjectAssignmentsFilters = {};
 
 
       if (sessionId) {
@@ -855,6 +982,15 @@ export const getSubjectAssignmentsController =
       if (teacherId) {
         filters.teacherId =
           teacherId;
+      }
+
+      if (assignmentType) {
+        filters.assignmentType =
+          assignmentType;
+      }
+
+      if (stream) {
+        filters.stream = stream;
       }
 
 
@@ -1102,15 +1238,13 @@ export const updateSubjectAssignmentController =
 
       const {
         teacherId,
+        assignmentType: assignmentTypeValue,
+        stream: streamValue,
         weeklyPeriods,
       } = req.body;
 
-
-      const updateData: {
-        teacherId?: string;
-
-        weeklyPeriods?: number;
-      } = {};
+      const updateData:
+        UpdateSubjectAssignmentData = {};
 
 
       if (
@@ -1128,6 +1262,26 @@ export const updateSubjectAssignmentController =
       ) {
         updateData.weeklyPeriods =
           weeklyPeriods;
+      }
+
+      const assignmentType =
+        parseAssignmentType(
+          assignmentTypeValue
+        );
+
+      const stream =
+        parseStream(
+          streamValue,
+          true
+        );
+
+      if (assignmentType) {
+        updateData.assignmentType =
+          assignmentType;
+      }
+
+      if (stream !== undefined) {
+        updateData.stream = stream;
       }
 
 

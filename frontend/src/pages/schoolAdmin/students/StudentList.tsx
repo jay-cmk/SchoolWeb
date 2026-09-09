@@ -3817,6 +3817,1939 @@
 
 
 
+// import React, { useEffect, useMemo, useState } from "react";
+// import { Icon } from "@iconify/react";
+// import { useNavigate } from "react-router-dom";
+
+// import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+// import { getClasses } from "../../../features/academic/classes/class.slice";
+// import { getSections } from "../../../features/academic/sections/section.slice";
+// import { getSessions } from "../../../features/academic/sessions/session.slice";
+// import {
+//   clearStudents,
+//   getStudentsByEnrollment,
+// } from "../../../features/student/student.slice";
+// import type { Student } from "../../../features/student/student.types";
+
+// type Relation = string | { _id: string; name?: string };
+// type StudentWithStream = Student & {
+//   stream?: string;
+//   enrollment?: Student["enrollment"] & {
+//     rollNumber?: number;
+//     stream?: string;
+//   };
+// };
+
+// const relationId = (value?: Relation): string => {
+//   if (!value) return "";
+//   return typeof value === "string" ? value : value._id;
+// };
+
+// const relationName = (value?: Relation): string => {
+//   if (!value) return "—";
+//   return typeof value === "string" ? "—" : value.name || "—";
+// };
+
+// const prettyText = (value?: string): string => {
+//   if (!value) return "—";
+//   return value
+//     .toLowerCase()
+//     .replaceAll("_", " ")
+//     .replace(/\b\w/g, (letter) => letter.toUpperCase());
+// };
+
+// const StudentList: React.FC = () => {
+//   const dispatch = useAppDispatch();
+//   const navigate = useNavigate();
+
+//   const { students, loading, error } = useAppSelector(
+//     (state) => state.students,
+//   );
+//   const { sessions } = useAppSelector((state) => state.sessions);
+//   const { classes } = useAppSelector((state) => state.classes);
+//   const { sections } = useAppSelector((state) => state.sections);
+//   const { selectedSessionId } = useAppSelector(
+//     (state) => state.sessionSelection,
+//   );
+
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const [classFilter, setClassFilter] = useState("ALL");
+//   const [sectionFilter, setSectionFilter] = useState("ALL");
+
+//   const studentList: Student[] = Array.isArray(students) ? students : [];
+
+//   useEffect(() => {
+//     if (sessions.length === 0) {
+//       dispatch(getSessions());
+//     }
+//   }, [dispatch, sessions.length]);
+
+//   useEffect(() => {
+//     dispatch(clearStudents());
+//     setClassFilter("ALL");
+//     setSectionFilter("ALL");
+
+//     if (selectedSessionId) {
+//       dispatch(getClasses({ sessionId: selectedSessionId }));
+//     }
+//   }, [dispatch, selectedSessionId]);
+
+//   useEffect(() => {
+//     setSectionFilter("ALL");
+
+//     if (selectedSessionId && classFilter !== "ALL") {
+//       dispatch(
+//         getSections({
+//           sessionId: selectedSessionId,
+//           classId: classFilter,
+//         }),
+//       );
+//     }
+//   }, [dispatch, selectedSessionId, classFilter]);
+
+//   useEffect(() => {
+//     if (!selectedSessionId) return;
+
+//     dispatch(
+//       getStudentsByEnrollment({
+//         sessionId: selectedSessionId,
+//         ...(classFilter !== "ALL" ? { classId: classFilter } : {}),
+//         ...(sectionFilter !== "ALL" ? { sectionId: sectionFilter } : {}),
+//       }),
+//     );
+//   }, [dispatch, selectedSessionId, classFilter, sectionFilter]);
+
+//   const selectedSession = useMemo(
+//     () => sessions.find((session) => session._id === selectedSessionId) ?? null,
+//     [sessions, selectedSessionId],
+//   );
+
+//   const sessionClasses = useMemo(
+//     () =>
+//       !selectedSessionId
+//         ? []
+//         : classes.filter(
+//             (classItem) =>
+//               relationId(classItem.sessionId as Relation) === selectedSessionId,
+//           ),
+//     [classes, selectedSessionId],
+//   );
+
+//   const classSections = useMemo(
+//     () =>
+//       !selectedSessionId || classFilter === "ALL"
+//         ? []
+//         : sections.filter(
+//             (section) =>
+//               relationId(section.sessionId as Relation) === selectedSessionId &&
+//               relationId(section.classId as Relation) === classFilter,
+//           ),
+//     [sections, selectedSessionId, classFilter],
+//   );
+
+//   // Explicitly inactive student master records should not appear in active lists.
+//   const activeStudents = useMemo(
+//     () => studentList.filter((student) => student.status !== "INACTIVE"),
+//     [studentList],
+//   );
+
+//   const filteredStudents = useMemo(() => {
+//     const query = searchQuery.trim().toLowerCase();
+//     if (!query) return activeStudents;
+
+//     return activeStudents.filter((student) => {
+//       const record = student as StudentWithStream;
+//       const values = [
+//         student.name,
+//         student.admissionNumber,
+//         student.email,
+//         student.mobile,
+//         student.rollNumber,
+//         student.penNumber,
+//         student.apaarId,
+//         relationName(student.classId),
+//         relationName(student.sectionId),
+//         record.enrollment?.stream,
+//         record.stream,
+//       ];
+
+//       return values.some((value) =>
+//         String(value ?? "")
+//           .toLowerCase()
+//           .includes(query),
+//       );
+//     });
+//   }, [activeStudents, searchQuery]);
+
+//   const classCount = useMemo(
+//     () =>
+//       new Set(
+//         activeStudents
+//           .map((student) => relationId(student.classId))
+//           .filter(Boolean),
+//       ).size,
+//     [activeStudents],
+//   );
+
+//   const sectionCount = useMemo(
+//     () =>
+//       new Set(
+//         activeStudents
+//           .map((student) => relationId(student.sectionId))
+//           .filter(Boolean),
+//       ).size,
+//     [activeStudents],
+//   );
+
+//   const hasFilters =
+//     classFilter !== "ALL" ||
+//     sectionFilter !== "ALL" ||
+//     searchQuery.trim() !== "";
+
+//   const resetFilters = () => {
+//     setSearchQuery("");
+//     setClassFilter("ALL");
+//     setSectionFilter("ALL");
+//   };
+
+//   const handleRetry = () => {
+//     if (!selectedSessionId) return;
+
+//     dispatch(
+//       getStudentsByEnrollment({
+//         sessionId: selectedSessionId,
+//         ...(classFilter !== "ALL" ? { classId: classFilter } : {}),
+//         ...(sectionFilter !== "ALL" ? { sectionId: sectionFilter } : {}),
+//       }),
+//     );
+//   };
+
+//   if (!selectedSessionId) {
+//     return (
+//       <PageState
+//         icon="lucide:calendar-search"
+//         title="Select an academic session"
+//         message="Select the required academic session from the topbar to view its students."
+//       />
+//     );
+//   }
+
+//   if (loading && studentList.length === 0) {
+//     return (
+//       <PageState
+//         icon="lucide:loader-circle"
+//         title="Loading students"
+//         message="Please wait while student records are being prepared."
+//         spin
+//       />
+//     );
+//   }
+
+//   return (
+//     <div className="min-h-full bg-slate-50 px-4 py-5 md:px-6 md:py-7 lg:px-8">
+//       <div className="mx-auto max-w-[1440px]">
+//         <section className="relative overflow-hidden rounded-2xl border border-blue-900/10 bg-gradient-to-br from-[#102A56] via-[#174F91] to-[#2874C6] p-5 text-white shadow-[0_18px_45px_rgba(15,42,86,0.16)] md:p-7">
+//           <div className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full bg-white/10" />
+//           <div className="pointer-events-none absolute -bottom-28 right-52 h-52 w-52 rounded-full bg-cyan-300/10" />
+
+//           <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+//             <div>
+//               <div className="flex items-center gap-2 text-sm font-medium text-blue-100">
+//                 <Icon icon="lucide:users-round" className="h-4 w-4" />
+//                 Student Management
+//               </div>
+//               <h1 className="mt-2 text-2xl font-bold md:text-3xl">
+//                 All Students
+//               </h1>
+//               <p className="mt-2 max-w-2xl text-sm leading-6 text-blue-100">
+//                 View and manage active students for the selected academic
+//                 session.
+//               </p>
+//               {selectedSession && (
+//                 <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-bold backdrop-blur">
+//                   <Icon icon="lucide:calendar-days" className="h-4 w-4" />
+//                   {selectedSession.name}
+//                   {selectedSession.isCurrent && (
+//                     <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-emerald-100">
+//                       Current
+//                     </span>
+//                   )}
+//                 </div>
+//               )}
+//             </div>
+
+//             <button
+//               type="button"
+//               onClick={() => navigate("/school-admin/students/add")}
+//               className="inline-flex min-h-11 w-fit items-center justify-center gap-2 rounded-xl bg-white px-5 text-sm font-bold text-blue-700 shadow-sm transition hover:bg-blue-50"
+//             >
+//               <Icon icon="lucide:user-plus" className="h-5 w-5" />
+//               Add Student
+//             </button>
+//           </div>
+//         </section>
+
+//         {error && (
+//           <div className="mt-5 flex flex-col gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4 sm:flex-row sm:items-center">
+//             <Icon
+//               icon="lucide:circle-alert"
+//               className="h-5 w-5 shrink-0 text-rose-600"
+//             />
+//             <div className="flex-1">
+//               <p className="text-sm font-bold text-rose-800">
+//                 Failed to load students
+//               </p>
+//               <p className="mt-1 text-sm text-rose-700">{error}</p>
+//             </div>
+//             <button
+//               type="button"
+//               onClick={handleRetry}
+//               className="text-sm font-bold text-rose-700 hover:underline"
+//             >
+//               Retry
+//             </button>
+//           </div>
+//         )}
+
+//         <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+//           <SummaryCard
+//             icon="lucide:users"
+//             label="Active Students"
+//             value={activeStudents.length}
+//             tone="blue"
+//           />
+//           <SummaryCard
+//             icon="lucide:school"
+//             label="Classes"
+//             value={classCount}
+//             tone="violet"
+//           />
+//           <SummaryCard
+//             icon="lucide:layers-3"
+//             label="Sections"
+//             value={sectionCount}
+//             tone="amber"
+//           />
+//           <SummaryCard
+//             icon="lucide:list-filter"
+//             label="Showing"
+//             value={filteredStudents.length}
+//             tone="emerald"
+//           />
+//         </div>
+
+//         <section className="mt-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:p-5">
+//           <div className="mb-4 flex items-center justify-between gap-3">
+//             <div>
+//               <h2 className="font-bold text-slate-900">Find Students</h2>
+//               <p className="mt-0.5 text-xs text-slate-500">
+//                 Filter by class and section, or search a student record.
+//               </p>
+//             </div>
+//             {hasFilters && (
+//               <button
+//                 type="button"
+//                 onClick={resetFilters}
+//                 className="inline-flex items-center gap-1.5 text-sm font-bold text-blue-700 hover:text-blue-800"
+//               >
+//                 <Icon icon="lucide:rotate-ccw" className="h-4 w-4" />
+//                 Reset
+//               </button>
+//             )}
+//           </div>
+
+//           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+//             <FilterSelect
+//               label="Class"
+//               icon="lucide:school"
+//               value={classFilter}
+//               onChange={(value) => setClassFilter(value)}
+//             >
+//               <option value="ALL">All Classes</option>
+//               {sessionClasses.map((classItem) => (
+//                 <option key={classItem._id} value={classItem._id}>
+//                   {classItem.name}
+//                 </option>
+//               ))}
+//             </FilterSelect>
+
+//             <FilterSelect
+//               label="Section"
+//               icon="lucide:layers-3"
+//               value={sectionFilter}
+//               disabled={classFilter === "ALL"}
+//               onChange={(value) => setSectionFilter(value)}
+//             >
+//               <option value="ALL">
+//                 {classFilter === "ALL"
+//                   ? "Select class first"
+//                   : "All Sections"}
+//               </option>
+//               {classSections.map((section) => (
+//                 <option key={section._id} value={section._id}>
+//                   {section.name}
+//                 </option>
+//               ))}
+//             </FilterSelect>
+
+//             <div>
+//               <label className="mb-1.5 block text-xs font-bold text-slate-600">
+//                 Search
+//               </label>
+//               <div className="relative">
+//                 <Icon
+//                   icon="lucide:search"
+//                   className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+//                 />
+//                 <input
+//                   type="search"
+//                   value={searchQuery}
+//                   onChange={(event) => setSearchQuery(event.target.value)}
+//                   placeholder="Name, admission, PEN, APAAR..."
+//                   className="min-h-11 w-full rounded-xl border border-slate-300 bg-white pl-10 pr-10 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+//                 />
+//                 {searchQuery && (
+//                   <button
+//                     type="button"
+//                     onClick={() => setSearchQuery("")}
+//                     aria-label="Clear search"
+//                     className="absolute right-3 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+//                   >
+//                     <Icon icon="lucide:x" className="h-4 w-4" />
+//                   </button>
+//                 )}
+//               </div>
+//             </div>
+//           </div>
+//         </section>
+
+//         <section className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+//           <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-5 py-4 md:px-6">
+//             <div>
+//               <h2 className="font-bold text-slate-900">Student Records</h2>
+//               <p className="mt-0.5 text-xs text-slate-500">
+//                 {filteredStudents.length} active{" "}
+//                 {filteredStudents.length === 1 ? "student" : "students"}
+//               </p>
+//             </div>
+//             {loading && (
+//               <Icon
+//                 icon="lucide:loader-circle"
+//                 className="h-5 w-5 animate-spin text-blue-700"
+//               />
+//             )}
+//           </div>
+
+//           {filteredStudents.length > 0 ? (
+//             <>
+//               <div className="divide-y divide-slate-200 md:hidden">
+//                 {filteredStudents.map((student) => (
+//                   <StudentMobileCard
+//                     key={student._id}
+//                     student={student}
+//                     onView={() =>
+//                       navigate(`/school-admin/students/${student._id}`)
+//                     }
+//                     onEdit={() =>
+//                       navigate(`/school-admin/students/${student._id}/edit`)
+//                     }
+//                   />
+//                 ))}
+//               </div>
+
+//               <div className="hidden overflow-x-auto md:block">
+//                 <table className="w-full min-w-[1120px] text-left">
+//                   <thead className="bg-slate-50">
+//                     <tr className="border-b border-slate-200">
+//                       {[
+//                         "Student",
+//                         "Admission / PEN",
+//                         "Roll No.",
+//                         "Class & Section",
+//                         "Stream",
+//                         "Enrollment",
+//                         "Contact",
+//                         "Actions",
+//                       ].map((heading) => (
+//                         <th
+//                           key={heading}
+//                           className={`px-5 py-3.5 text-[11px] font-extrabold uppercase tracking-wide text-slate-500 ${
+//                             heading === "Actions" ? "text-right" : ""
+//                           }`}
+//                         >
+//                           {heading}
+//                         </th>
+//                       ))}
+//                     </tr>
+//                   </thead>
+//                   <tbody className="divide-y divide-slate-200">
+//                     {filteredStudents.map((student) => (
+//                       <StudentTableRow
+//                         key={student._id}
+//                         student={student}
+//                         onView={() =>
+//                           navigate(`/school-admin/students/${student._id}`)
+//                         }
+//                         onEdit={() =>
+//                           navigate(
+//                             `/school-admin/students/${student._id}/edit`,
+//                           )
+//                         }
+//                       />
+//                     ))}
+//                   </tbody>
+//                 </table>
+//               </div>
+//             </>
+//           ) : (
+//             <EmptyState
+//               filtered={hasFilters}
+//               sessionName={selectedSession?.name}
+//               onReset={resetFilters}
+//               onAdd={() => navigate("/school-admin/students/add")}
+//             />
+//           )}
+//         </section>
+//       </div>
+//     </div>
+//   );
+// };
+
+// const PageState = ({
+//   icon,
+//   title,
+//   message,
+//   spin = false,
+// }: {
+//   icon: string;
+//   title: string;
+//   message: string;
+//   spin?: boolean;
+// }) => (
+//   <div className="flex min-h-[520px] items-center justify-center bg-slate-50 p-5">
+//     <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+//       <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+//         <Icon icon={icon} className={`h-7 w-7 ${spin ? "animate-spin" : ""}`} />
+//       </div>
+//       <h2 className="mt-5 text-xl font-bold text-slate-900">{title}</h2>
+//       <p className="mt-2 text-sm leading-6 text-slate-500">{message}</p>
+//     </div>
+//   </div>
+// );
+
+// const SummaryCard = ({
+//   icon,
+//   label,
+//   value,
+//   tone,
+// }: {
+//   icon: string;
+//   label: string;
+//   value: number;
+//   tone: "blue" | "violet" | "amber" | "emerald";
+// }) => {
+//   const tones = {
+//     blue: "bg-blue-50 text-blue-700",
+//     violet: "bg-violet-50 text-violet-700",
+//     amber: "bg-amber-50 text-amber-700",
+//     emerald: "bg-emerald-50 text-emerald-700",
+//   };
+
+//   return (
+//     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:p-5">
+//       <div className="flex items-center gap-3">
+//         <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${tones[tone]}`}>
+//           <Icon icon={icon} className="h-5 w-5" />
+//         </div>
+//         <div>
+//           <p className="text-xs font-semibold text-slate-500">{label}</p>
+//           <p className="mt-0.5 text-2xl font-extrabold text-slate-900">{value}</p>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// const FilterSelect = ({
+//   label,
+//   icon,
+//   value,
+//   disabled = false,
+//   onChange,
+//   children,
+// }: {
+//   label: string;
+//   icon: string;
+//   value: string;
+//   disabled?: boolean;
+//   onChange: (value: string) => void;
+//   children: React.ReactNode;
+// }) => (
+//   <div>
+//     <label className="mb-1.5 block text-xs font-bold text-slate-600">{label}</label>
+//     <div className="relative">
+//       <Icon
+//         icon={icon}
+//         className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+//       />
+//       <select
+//         value={value}
+//         disabled={disabled}
+//         onChange={(event) => onChange(event.target.value)}
+//         className="min-h-11 w-full appearance-none rounded-xl border border-slate-300 bg-white pl-10 pr-9 text-sm font-medium text-slate-900 outline-none transition disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+//       >
+//         {children}
+//       </select>
+//       <Icon
+//         icon="lucide:chevron-down"
+//         className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+//       />
+//     </div>
+//   </div>
+// );
+
+// const StudentAvatar = ({ student }: { student: Student }) => {
+//   const initial = student.name?.trim().charAt(0).toUpperCase() || "S";
+
+//   return (
+//     <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-blue-100 bg-blue-50 text-sm font-extrabold text-blue-700">
+//       {student.photo ? (
+//         <img
+//           src={student.photo}
+//           alt={student.name || "Student"}
+//           className="h-full w-full object-cover"
+//         />
+//       ) : (
+//         initial
+//       )}
+//     </div>
+//   );
+// };
+
+// const enrollmentStatus = (student: Student): string =>
+//   student.enrollment?.enrollmentStatus ?? "ACTIVE";
+
+// const EnrollmentBadge = ({ student }: { student: Student }) => {
+//   const status = enrollmentStatus(student);
+//   const tone =
+//     status === "ACTIVE"
+//       ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+//       : status === "COMPLETED"
+//         ? "border-blue-200 bg-blue-50 text-blue-700"
+//         : "border-slate-200 bg-slate-100 text-slate-600";
+
+//   return (
+//     <div>
+//       <span className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-extrabold ${tone}`}>
+//         {prettyText(status)}
+//       </span>
+//       {student.enrollment?.promotionStatus &&
+//         student.enrollment.promotionStatus !== "NOT_DECIDED" && (
+//           <p className="mt-1 text-[11px] font-semibold text-slate-500">
+//             {prettyText(student.enrollment.promotionStatus)}
+//           </p>
+//         )}
+//     </div>
+//   );
+// };
+
+// const getStudentRoll = (student: Student): number | undefined => {
+//   const record = student as StudentWithStream;
+//   return record.enrollment?.rollNumber ?? student.rollNumber;
+// };
+
+// const getStudentStream = (student: Student): string | undefined => {
+//   const record = student as StudentWithStream;
+//   return record.enrollment?.stream ?? record.stream;
+// };
+
+// const StudentTableRow = ({
+//   student,
+//   onView,
+//   onEdit,
+// }: {
+//   student: Student;
+//   onView: () => void;
+//   onEdit: () => void;
+// }) => (
+//   <tr className="transition hover:bg-blue-50/30">
+//     <td className="px-5 py-4">
+//       <div className="flex items-center gap-3">
+//         <StudentAvatar student={student} />
+//         <div className="min-w-0">
+//           <p className="max-w-[210px] truncate text-sm font-bold text-slate-900">
+//             {student.name || "Unnamed Student"}
+//           </p>
+//           <p className="mt-0.5 max-w-[210px] truncate text-xs text-slate-500">
+//             {student.email || "No email"}
+//           </p>
+//         </div>
+//       </div>
+//     </td>
+//     <td className="px-5 py-4">
+//       <p className="text-sm font-bold text-slate-800">
+//         {student.admissionNumber || "—"}
+//       </p>
+//       <p className="mt-1 text-xs text-slate-500">
+//         PEN: {student.penNumber || "—"}
+//       </p>
+//     </td>
+//     <td className="px-5 py-4 text-sm font-semibold text-slate-700">
+//       {getStudentRoll(student) ?? "—"}
+//     </td>
+//     <td className="px-5 py-4">
+//       <p className="text-sm font-bold text-slate-800">
+//         {relationName(student.classId)}
+//       </p>
+//       <p className="mt-1 text-xs text-slate-500">
+//         Section {relationName(student.sectionId)}
+//       </p>
+//     </td>
+//     <td className="px-5 py-4 text-sm font-semibold text-slate-700">
+//       {prettyText(getStudentStream(student))}
+//     </td>
+//     <td className="px-5 py-4">
+//       <EnrollmentBadge student={student} />
+//     </td>
+//     <td className="px-5 py-4">
+//       <p className="text-sm font-semibold text-slate-700">
+//         {student.mobile || "—"}
+//       </p>
+//       <p className="mt-1 max-w-[180px] truncate text-xs text-slate-500">
+//         APAAR: {student.apaarId || "—"}
+//       </p>
+//     </td>
+//     <td className="px-5 py-4">
+//       <div className="flex items-center justify-end gap-2">
+//         <ActionButton icon="lucide:eye" label="View student" onClick={onView} />
+//         <ActionButton icon="lucide:pencil" label="Edit student" onClick={onEdit} />
+//       </div>
+//     </td>
+//   </tr>
+// );
+
+// const StudentMobileCard = ({
+//   student,
+//   onView,
+//   onEdit,
+// }: {
+//   student: Student;
+//   onView: () => void;
+//   onEdit: () => void;
+// }) => (
+//   <article className="p-4">
+//     <div className="flex items-start gap-3">
+//       <StudentAvatar student={student} />
+//       <div className="min-w-0 flex-1">
+//         <div className="flex items-start justify-between gap-2">
+//           <div className="min-w-0">
+//             <h3 className="truncate text-sm font-bold text-slate-900">
+//               {student.name || "Unnamed Student"}
+//             </h3>
+//             <p className="mt-0.5 truncate text-xs text-slate-500">
+//               {student.admissionNumber || "No admission number"}
+//             </p>
+//           </div>
+//           <EnrollmentBadge student={student} />
+//         </div>
+
+//         <div className="mt-4 grid grid-cols-2 gap-3 rounded-xl bg-slate-50 p-3 text-xs">
+//           <MobileValue
+//             label="Class"
+//             value={`${relationName(student.classId)} - ${relationName(
+//               student.sectionId,
+//             )}`}
+//           />
+//           <MobileValue label="Roll No." value={getStudentRoll(student) ?? "—"} />
+//           <MobileValue label="Stream" value={prettyText(getStudentStream(student))} />
+//           <MobileValue label="Mobile" value={student.mobile || "—"} />
+//         </div>
+
+//         <div className="mt-3 flex gap-2">
+//           <button
+//             type="button"
+//             onClick={onView}
+//             className="inline-flex min-h-9 flex-1 items-center justify-center gap-2 rounded-lg border border-blue-200 bg-blue-50 text-xs font-bold text-blue-700"
+//           >
+//             <Icon icon="lucide:eye" className="h-4 w-4" />
+//             View
+//           </button>
+//           <button
+//             type="button"
+//             onClick={onEdit}
+//             className="inline-flex min-h-9 flex-1 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-700"
+//           >
+//             <Icon icon="lucide:pencil" className="h-4 w-4" />
+//             Edit
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   </article>
+// );
+
+// const MobileValue = ({
+//   label,
+//   value,
+// }: {
+//   label: string;
+//   value: string | number;
+// }) => (
+//   <div className="min-w-0">
+//     <p className="text-slate-500">{label}</p>
+//     <p className="mt-1 truncate font-bold text-slate-800">{value}</p>
+//   </div>
+// );
+
+// const ActionButton = ({
+//   icon,
+//   label,
+//   onClick,
+// }: {
+//   icon: string;
+//   label: string;
+//   onClick: () => void;
+// }) => (
+//   <button
+//     type="button"
+//     onClick={onClick}
+//     title={label}
+//     aria-label={label}
+//     className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+//   >
+//     <Icon icon={icon} className="h-4 w-4" />
+//   </button>
+// );
+
+// const EmptyState = ({
+//   filtered,
+//   sessionName,
+//   onReset,
+//   onAdd,
+// }: {
+//   filtered: boolean;
+//   sessionName?: string;
+//   onReset: () => void;
+//   onAdd: () => void;
+// }) => (
+//   <div className="flex min-h-[340px] items-center justify-center p-6">
+//     <div className="max-w-sm text-center">
+//       <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+//         <Icon icon={filtered ? "lucide:search-x" : "lucide:users"} className="h-7 w-7" />
+//       </div>
+//       <h3 className="mt-4 text-lg font-bold text-slate-900">
+//         {filtered ? "No matching students" : "No active students found"}
+//       </h3>
+//       <p className="mt-2 text-sm leading-6 text-slate-500">
+//         {filtered
+//           ? "Try changing the search text, class or section filter."
+//           : `No active student is enrolled in ${sessionName || "this session"}.`}
+//       </p>
+//       <button
+//         type="button"
+//         onClick={filtered ? onReset : onAdd}
+//         className="mt-5 inline-flex min-h-10 items-center gap-2 rounded-lg bg-blue-700 px-4 text-sm font-bold text-white transition hover:bg-blue-800"
+//       >
+//         <Icon icon={filtered ? "lucide:rotate-ccw" : "lucide:user-plus"} className="h-4 w-4" />
+//         {filtered ? "Reset Filters" : "Add Student"}
+//       </button>
+//     </div>
+//   </div>
+// );
+
+// export default StudentList;
+
+
+
+
+
+
+
+
+
+
+// import React, { useEffect, useMemo, useState } from "react";
+// import { Icon } from "@iconify/react";
+// import { useNavigate } from "react-router-dom";
+
+// import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+// import { getClasses } from "../../../features/academic/classes/class.slice";
+// import { getSections } from "../../../features/academic/sections/section.slice";
+// import { getSessions } from "../../../features/academic/sessions/session.slice";
+// import {
+//   clearStudents,
+//   getStudentsByEnrollment,
+//   updateStudentStatus,
+// } from "../../../features/student/student.slice";
+// import type {
+//   Student,
+//   StudentStatus,
+// } from "../../../features/student/student.types";
+
+// type Relation = string | { _id: string; name?: string };
+// type StudentWithStream = Student & {
+//   stream?: string;
+//   enrollment?: Student["enrollment"] & {
+//     rollNumber?: number;
+//     stream?: string;
+//   };
+// };
+
+// const relationId = (value?: Relation): string => {
+//   if (!value) return "";
+//   return typeof value === "string" ? value : value._id;
+// };
+
+// const relationName = (value?: Relation): string => {
+//   if (!value) return "—";
+//   return typeof value === "string" ? "—" : value.name || "—";
+// };
+
+// const prettyText = (value?: string): string => {
+//   if (!value) return "—";
+//   return value
+//     .toLowerCase()
+//     .replaceAll("_", " ")
+//     .replace(/\b\w/g, (letter) => letter.toUpperCase());
+// };
+
+// const getStudentStatus = (student: Student): StudentStatus =>
+//   student.status ?? "ACTIVE";
+
+// const StudentList: React.FC = () => {
+//   const dispatch = useAppDispatch();
+//   const navigate = useNavigate();
+
+//   const { students, loading, error } = useAppSelector(
+//     (state) => state.students,
+//   );
+//   const { sessions } = useAppSelector((state) => state.sessions);
+//   const { classes } = useAppSelector((state) => state.classes);
+//   const { sections } = useAppSelector((state) => state.sections);
+//   const { selectedSessionId } = useAppSelector(
+//     (state) => state.sessionSelection,
+//   );
+
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const [classFilter, setClassFilter] = useState("ALL");
+//   const [sectionFilter, setSectionFilter] = useState("ALL");
+//   const [statusFilter, setStatusFilter] = useState<
+//     "ALL" | "ACTIVE" | "INACTIVE"
+//   >("ACTIVE");
+//   const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(null);
+//   const [pendingStatusStudent, setPendingStatusStudent] =
+//     useState<Student | null>(null);
+
+//   const studentList: Student[] = Array.isArray(students) ? students : [];
+
+//   useEffect(() => {
+//     if (sessions.length === 0) {
+//       dispatch(getSessions());
+//     }
+//   }, [dispatch, sessions.length]);
+
+//   useEffect(() => {
+//     dispatch(clearStudents());
+//     setClassFilter("ALL");
+//     setSectionFilter("ALL");
+
+//     if (selectedSessionId) {
+//       dispatch(getClasses({ sessionId: selectedSessionId }));
+//     }
+//   }, [dispatch, selectedSessionId]);
+
+//   useEffect(() => {
+//     setSectionFilter("ALL");
+
+//     if (selectedSessionId && classFilter !== "ALL") {
+//       dispatch(
+//         getSections({
+//           sessionId: selectedSessionId,
+//           classId: classFilter,
+//         }),
+//       );
+//     }
+//   }, [dispatch, selectedSessionId, classFilter]);
+
+//   useEffect(() => {
+//     if (!selectedSessionId) return;
+
+//     dispatch(
+//       getStudentsByEnrollment({
+//         sessionId: selectedSessionId,
+//         ...(classFilter !== "ALL" ? { classId: classFilter } : {}),
+//         ...(sectionFilter !== "ALL" ? { sectionId: sectionFilter } : {}),
+//       }),
+//     );
+//   }, [dispatch, selectedSessionId, classFilter, sectionFilter]);
+
+//   const selectedSession = useMemo(
+//     () => sessions.find((session) => session._id === selectedSessionId) ?? null,
+//     [sessions, selectedSessionId],
+//   );
+
+//   const sessionClasses = useMemo(
+//     () =>
+//       !selectedSessionId
+//         ? []
+//         : classes.filter(
+//             (classItem) =>
+//               relationId(classItem.sessionId as Relation) === selectedSessionId,
+//           ),
+//     [classes, selectedSessionId],
+//   );
+
+//   const classSections = useMemo(
+//     () =>
+//       !selectedSessionId || classFilter === "ALL"
+//         ? []
+//         : sections.filter(
+//             (section) =>
+//               relationId(section.sessionId as Relation) === selectedSessionId &&
+//               relationId(section.classId as Relation) === classFilter,
+//           ),
+//     [sections, selectedSessionId, classFilter],
+//   );
+
+//   const activeCount = useMemo(
+//     () =>
+//       studentList.filter((student) => getStudentStatus(student) === "ACTIVE")
+//         .length,
+//     [studentList],
+//   );
+
+//   const inactiveCount = useMemo(
+//     () =>
+//       studentList.filter((student) => getStudentStatus(student) === "INACTIVE")
+//         .length,
+//     [studentList],
+//   );
+
+//   const statusFilteredStudents = useMemo(
+//     () =>
+//       statusFilter === "ALL"
+//         ? studentList
+//         : studentList.filter(
+//             (student) => getStudentStatus(student) === statusFilter,
+//           ),
+//     [studentList, statusFilter],
+//   );
+
+//   const filteredStudents = useMemo(() => {
+//     const query = searchQuery.trim().toLowerCase();
+//     if (!query) return statusFilteredStudents;
+
+//     return statusFilteredStudents.filter((student) => {
+//       const record = student as StudentWithStream;
+//       const values = [
+//         student.name,
+//         student.admissionNumber,
+//         student.email,
+//         student.mobile,
+//         student.rollNumber,
+//         student.penNumber,
+//         student.apaarId,
+//         relationName(student.classId),
+//         relationName(student.sectionId),
+//         record.enrollment?.stream,
+//         record.stream,
+//       ];
+
+//       return values.some((value) =>
+//         String(value ?? "")
+//           .toLowerCase()
+//           .includes(query),
+//       );
+//     });
+//   }, [statusFilteredStudents, searchQuery]);
+
+//   const classCount = useMemo(
+//     () =>
+//       new Set(
+//         studentList
+//           .map((student) => relationId(student.classId))
+//           .filter(Boolean),
+//       ).size,
+//     [studentList],
+//   );
+
+//   const hasFilters =
+//     classFilter !== "ALL" ||
+//     sectionFilter !== "ALL" ||
+//     statusFilter !== "ACTIVE" ||
+//     searchQuery.trim() !== "";
+
+//   const resetFilters = () => {
+//     setSearchQuery("");
+//     setClassFilter("ALL");
+//     setSectionFilter("ALL");
+//     setStatusFilter("ACTIVE");
+//   };
+
+//   const handleConfirmStatusChange = async () => {
+//     if (!pendingStatusStudent || statusUpdatingId) return;
+
+//     const nextStatus: StudentStatus =
+//       getStudentStatus(pendingStatusStudent) === "ACTIVE"
+//         ? "INACTIVE"
+//         : "ACTIVE";
+
+//     try {
+//       setStatusUpdatingId(pendingStatusStudent._id);
+
+//       await dispatch(
+//         updateStudentStatus({
+//           studentId: pendingStatusStudent._id,
+//           status: nextStatus,
+//         }),
+//       ).unwrap();
+
+//       setPendingStatusStudent(null);
+//     } finally {
+//       setStatusUpdatingId(null);
+//     }
+//   };
+
+//   const handleRetry = () => {
+//     if (!selectedSessionId) return;
+
+//     dispatch(
+//       getStudentsByEnrollment({
+//         sessionId: selectedSessionId,
+//         ...(classFilter !== "ALL" ? { classId: classFilter } : {}),
+//         ...(sectionFilter !== "ALL" ? { sectionId: sectionFilter } : {}),
+//       }),
+//     );
+//   };
+
+//   if (!selectedSessionId) {
+//     return (
+//       <PageState
+//         icon="lucide:calendar-search"
+//         title="Select an academic session"
+//         message="Select the required academic session from the topbar to view its students."
+//       />
+//     );
+//   }
+
+//   if (loading && studentList.length === 0) {
+//     return (
+//       <PageState
+//         icon="lucide:loader-circle"
+//         title="Loading students"
+//         message="Please wait while student records are being prepared."
+//         spin
+//       />
+//     );
+//   }
+
+//   return (
+//     <div className="min-h-full bg-slate-50 px-4 py-5 md:px-6 md:py-7 lg:px-8">
+//       <div className="mx-auto max-w-[1440px]">
+//         <section className="relative overflow-hidden rounded-2xl border border-blue-900/10 bg-gradient-to-br from-[#102A56] via-[#174F91] to-[#2874C6] p-5 text-white shadow-[0_18px_45px_rgba(15,42,86,0.16)] md:p-7">
+//           <div className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full bg-white/10" />
+//           <div className="pointer-events-none absolute -bottom-28 right-52 h-52 w-52 rounded-full bg-cyan-300/10" />
+
+//           <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+//             <div>
+//               <div className="flex items-center gap-2 text-sm font-medium text-blue-100">
+//                 <Icon icon="lucide:users-round" className="h-4 w-4" />
+//                 Student Management
+//               </div>
+//               <h1 className="mt-2 text-2xl font-bold md:text-3xl">
+//                 All Students
+//               </h1>
+//               <p className="mt-2 max-w-2xl text-sm leading-6 text-blue-100">
+//                 View and manage active students for the selected academic
+//                 session.
+//               </p>
+//               {selectedSession && (
+//                 <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-bold backdrop-blur">
+//                   <Icon icon="lucide:calendar-days" className="h-4 w-4" />
+//                   {selectedSession.name}
+//                   {selectedSession.isCurrent && (
+//                     <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-emerald-100">
+//                       Current
+//                     </span>
+//                   )}
+//                 </div>
+//               )}
+//             </div>
+
+//             <button
+//               type="button"
+//               onClick={() => navigate("/school-admin/students/add")}
+//               className="inline-flex min-h-11 w-fit items-center justify-center gap-2 rounded-xl bg-white px-5 text-sm font-bold text-blue-700 shadow-sm transition hover:bg-blue-50"
+//             >
+//               <Icon icon="lucide:user-plus" className="h-5 w-5" />
+//               Add Student
+//             </button>
+//           </div>
+//         </section>
+
+//         {error && (
+//           <div className="mt-5 flex flex-col gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4 sm:flex-row sm:items-center">
+//             <Icon
+//               icon="lucide:circle-alert"
+//               className="h-5 w-5 shrink-0 text-rose-600"
+//             />
+//             <div className="flex-1">
+//               <p className="text-sm font-bold text-rose-800">
+//                 Failed to load students
+//               </p>
+//               <p className="mt-1 text-sm text-rose-700">{error}</p>
+//             </div>
+//             <button
+//               type="button"
+//               onClick={handleRetry}
+//               className="text-sm font-bold text-rose-700 hover:underline"
+//             >
+//               Retry
+//             </button>
+//           </div>
+//         )}
+
+//         <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+//           <SummaryCard
+//             icon="lucide:users"
+//             label="Active Students"
+//             value={activeCount}
+//             tone="blue"
+//           />
+//           <SummaryCard
+//             icon="lucide:user-x"
+//             label="Inactive Students"
+//             value={inactiveCount}
+//             tone="rose"
+//           />
+//           <SummaryCard
+//             icon="lucide:school"
+//             label="Classes"
+//             value={classCount}
+//             tone="violet"
+//           />
+//           <SummaryCard
+//             icon="lucide:list-filter"
+//             label="Showing"
+//             value={filteredStudents.length}
+//             tone="emerald"
+//           />
+//         </div>
+
+//         <section className="mt-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:p-5">
+//           <div className="mb-4 flex items-center justify-between gap-3">
+//             <div>
+//               <h2 className="font-bold text-slate-900">Find Students</h2>
+//               <p className="mt-0.5 text-xs text-slate-500">
+//                 Filter by class and section, or search a student record.
+//               </p>
+//             </div>
+//             {hasFilters && (
+//               <button
+//                 type="button"
+//                 onClick={resetFilters}
+//                 className="inline-flex items-center gap-1.5 text-sm font-bold text-blue-700 hover:text-blue-800"
+//               >
+//                 <Icon icon="lucide:rotate-ccw" className="h-4 w-4" />
+//                 Reset
+//               </button>
+//             )}
+//           </div>
+
+//           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+//             <FilterSelect
+//               label="Class"
+//               icon="lucide:school"
+//               value={classFilter}
+//               onChange={(value) => setClassFilter(value)}
+//             >
+//               <option value="ALL">All Classes</option>
+//               {sessionClasses.map((classItem) => (
+//                 <option key={classItem._id} value={classItem._id}>
+//                   {classItem.name}
+//                 </option>
+//               ))}
+//             </FilterSelect>
+
+//             <FilterSelect
+//               label="Student Status"
+//               icon="lucide:activity"
+//               value={statusFilter}
+//               onChange={(value) =>
+//                 setStatusFilter(
+//                   value as "ALL" | "ACTIVE" | "INACTIVE",
+//                 )
+//               }
+//             >
+//               <option value="ACTIVE">Active Students</option>
+//               <option value="INACTIVE">Inactive Students</option>
+//               <option value="ALL">All Students</option>
+//             </FilterSelect>
+
+//             <FilterSelect
+//               label="Section"
+//               icon="lucide:layers-3"
+//               value={sectionFilter}
+//               disabled={classFilter === "ALL"}
+//               onChange={(value) => setSectionFilter(value)}
+//             >
+//               <option value="ALL">
+//                 {classFilter === "ALL"
+//                   ? "Select class first"
+//                   : "All Sections"}
+//               </option>
+//               {classSections.map((section) => (
+//                 <option key={section._id} value={section._id}>
+//                   {section.name}
+//                 </option>
+//               ))}
+//             </FilterSelect>
+
+//             <div>
+//               <label className="mb-1.5 block text-xs font-bold text-slate-600">
+//                 Search
+//               </label>
+//               <div className="relative">
+//                 <Icon
+//                   icon="lucide:search"
+//                   className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+//                 />
+//                 <input
+//                   type="search"
+//                   value={searchQuery}
+//                   onChange={(event) => setSearchQuery(event.target.value)}
+//                   placeholder="Name, admission, PEN, APAAR..."
+//                   className="min-h-11 w-full rounded-xl border border-slate-300 bg-white pl-10 pr-10 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+//                 />
+//                 {searchQuery && (
+//                   <button
+//                     type="button"
+//                     onClick={() => setSearchQuery("")}
+//                     aria-label="Clear search"
+//                     className="absolute right-3 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+//                   >
+//                     <Icon icon="lucide:x" className="h-4 w-4" />
+//                   </button>
+//                 )}
+//               </div>
+//             </div>
+//           </div>
+//         </section>
+
+//         <section className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+//           <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-5 py-4 md:px-6">
+//             <div>
+//               <h2 className="font-bold text-slate-900">Student Records</h2>
+//               <p className="mt-0.5 text-xs text-slate-500">
+//                 {filteredStudents.length}{" "}
+//                 {filteredStudents.length === 1 ? "student" : "students"}
+//               </p>
+//             </div>
+//             {loading && (
+//               <Icon
+//                 icon="lucide:loader-circle"
+//                 className="h-5 w-5 animate-spin text-blue-700"
+//               />
+//             )}
+//           </div>
+
+//           {filteredStudents.length > 0 ? (
+//             <>
+//               <div className="divide-y divide-slate-200 md:hidden">
+//                 {filteredStudents.map((student) => (
+//                   <StudentMobileCard
+//                     key={student._id}
+//                     student={student}
+//                     onView={() =>
+//                       navigate(`/school-admin/students/${student._id}`)
+//                     }
+//                     onEdit={() =>
+//                       navigate(`/school-admin/students/${student._id}/edit`)
+//                     }
+//                     onToggleStatus={() => setPendingStatusStudent(student)}
+//                     statusUpdating={statusUpdatingId === student._id}
+//                   />
+//                 ))}
+//               </div>
+
+//               <div className="hidden overflow-x-auto md:block">
+//                 <table className="w-full min-w-[1120px] text-left">
+//                   <thead className="bg-slate-50">
+//                     <tr className="border-b border-slate-200">
+//                       {[
+//                         "Student",
+//                         "Admission / PEN",
+//                         "Roll No.",
+//                         "Class & Section",
+//                         "Stream",
+//                         "Enrollment",
+//                         "Contact",
+//                         "Actions",
+//                       ].map((heading) => (
+//                         <th
+//                           key={heading}
+//                           className={`px-5 py-3.5 text-[11px] font-extrabold uppercase tracking-wide text-slate-500 ${
+//                             heading === "Actions" ? "text-right" : ""
+//                           }`}
+//                         >
+//                           {heading}
+//                         </th>
+//                       ))}
+//                     </tr>
+//                   </thead>
+//                   <tbody className="divide-y divide-slate-200">
+//                     {filteredStudents.map((student) => (
+//                       <StudentTableRow
+//                         key={student._id}
+//                         student={student}
+//                         onView={() =>
+//                           navigate(`/school-admin/students/${student._id}`)
+//                         }
+//                         onEdit={() =>
+//                           navigate(
+//                             `/school-admin/students/${student._id}/edit`,
+//                           )
+//                         }
+//                         onToggleStatus={() => setPendingStatusStudent(student)}
+//                         statusUpdating={statusUpdatingId === student._id}
+//                       />
+//                     ))}
+//                   </tbody>
+//                 </table>
+//               </div>
+//             </>
+//           ) : (
+//             <EmptyState
+//               filtered={hasFilters}
+//               sessionName={selectedSession?.name}
+//               onReset={resetFilters}
+//               onAdd={() => navigate("/school-admin/students/add")}
+//             />
+//           )}
+//         </section>
+
+//         <StatusConfirmModal
+//           student={pendingStatusStudent}
+//           updating={
+//             Boolean(pendingStatusStudent) &&
+//             statusUpdatingId === pendingStatusStudent?._id
+//           }
+//           onClose={() => {
+//             if (!statusUpdatingId) setPendingStatusStudent(null);
+//           }}
+//           onConfirm={handleConfirmStatusChange}
+//         />
+//       </div>
+//     </div>
+//   );
+// };
+
+// const PageState = ({
+//   icon,
+//   title,
+//   message,
+//   spin = false,
+// }: {
+//   icon: string;
+//   title: string;
+//   message: string;
+//   spin?: boolean;
+// }) => (
+//   <div className="flex min-h-[520px] items-center justify-center bg-slate-50 p-5">
+//     <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+//       <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+//         <Icon icon={icon} className={`h-7 w-7 ${spin ? "animate-spin" : ""}`} />
+//       </div>
+//       <h2 className="mt-5 text-xl font-bold text-slate-900">{title}</h2>
+//       <p className="mt-2 text-sm leading-6 text-slate-500">{message}</p>
+//     </div>
+//   </div>
+// );
+
+// const SummaryCard = ({
+//   icon,
+//   label,
+//   value,
+//   tone,
+// }: {
+//   icon: string;
+//   label: string;
+//   value: number;
+//   tone: "blue" | "violet" | "amber" | "emerald" | "rose";
+// }) => {
+//   const tones = {
+//     blue: "bg-blue-50 text-blue-700",
+//     violet: "bg-violet-50 text-violet-700",
+//     amber: "bg-amber-50 text-amber-700",
+//     emerald: "bg-emerald-50 text-emerald-700",
+//     rose: "bg-rose-50 text-rose-700",
+//   };
+
+//   return (
+//     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:p-5">
+//       <div className="flex items-center gap-3">
+//         <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${tones[tone]}`}>
+//           <Icon icon={icon} className="h-5 w-5" />
+//         </div>
+//         <div>
+//           <p className="text-xs font-semibold text-slate-500">{label}</p>
+//           <p className="mt-0.5 text-2xl font-extrabold text-slate-900">{value}</p>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// const FilterSelect = ({
+//   label,
+//   icon,
+//   value,
+//   disabled = false,
+//   onChange,
+//   children,
+// }: {
+//   label: string;
+//   icon: string;
+//   value: string;
+//   disabled?: boolean;
+//   onChange: (value: string) => void;
+//   children: React.ReactNode;
+// }) => (
+//   <div>
+//     <label className="mb-1.5 block text-xs font-bold text-slate-600">{label}</label>
+//     <div className="relative">
+//       <Icon
+//         icon={icon}
+//         className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+//       />
+//       <select
+//         value={value}
+//         disabled={disabled}
+//         onChange={(event) => onChange(event.target.value)}
+//         className="min-h-11 w-full appearance-none rounded-xl border border-slate-300 bg-white pl-10 pr-9 text-sm font-medium text-slate-900 outline-none transition disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+//       >
+//         {children}
+//       </select>
+//       <Icon
+//         icon="lucide:chevron-down"
+//         className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+//       />
+//     </div>
+//   </div>
+// );
+
+// const StudentAvatar = ({ student }: { student: Student }) => {
+//   const initial = student.name?.trim().charAt(0).toUpperCase() || "S";
+
+//   return (
+//     <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-blue-100 bg-blue-50 text-sm font-extrabold text-blue-700">
+//       {student.photo ? (
+//         <img
+//           src={student.photo}
+//           alt={student.name || "Student"}
+//           className="h-full w-full object-cover"
+//         />
+//       ) : (
+//         initial
+//       )}
+//     </div>
+//   );
+// };
+
+// const enrollmentStatus = (student: Student): string =>
+//   student.enrollment?.enrollmentStatus ?? "ACTIVE";
+
+// const EnrollmentBadge = ({ student }: { student: Student }) => {
+//   const status = enrollmentStatus(student);
+//   const tone =
+//     status === "ACTIVE"
+//       ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+//       : status === "COMPLETED"
+//         ? "border-blue-200 bg-blue-50 text-blue-700"
+//         : "border-slate-200 bg-slate-100 text-slate-600";
+
+//   return (
+//     <div>
+//       <span className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-extrabold ${tone}`}>
+//         {prettyText(status)}
+//       </span>
+//       {student.enrollment?.promotionStatus &&
+//         student.enrollment.promotionStatus !== "NOT_DECIDED" && (
+//           <p className="mt-1 text-[11px] font-semibold text-slate-500">
+//             {prettyText(student.enrollment.promotionStatus)}
+//           </p>
+//         )}
+//     </div>
+//   );
+// };
+
+// const getStudentRoll = (student: Student): number | undefined => {
+//   const record = student as StudentWithStream;
+//   return record.enrollment?.rollNumber ?? student.rollNumber;
+// };
+
+// const getStudentStream = (student: Student): string | undefined => {
+//   const record = student as StudentWithStream;
+//   return record.enrollment?.stream ?? record.stream;
+// };
+
+// const StudentTableRow = ({
+//   student,
+//   onView,
+//   onEdit,
+//   onToggleStatus,
+//   statusUpdating,
+// }: {
+//   student: Student;
+//   onView: () => void;
+//   onEdit: () => void;
+//   onToggleStatus: () => void;
+//   statusUpdating: boolean;
+// }) => (
+//   <tr className="transition hover:bg-blue-50/30">
+//     <td className="px-5 py-4">
+//       <div className="flex items-center gap-3">
+//         <StudentAvatar student={student} />
+//         <div className="min-w-0">
+//           <p className="max-w-[210px] truncate text-sm font-bold text-slate-900">
+//             {student.name || "Unnamed Student"}
+//           </p>
+//           <p className="mt-0.5 max-w-[210px] truncate text-xs text-slate-500">
+//             {student.email || "No email"}
+//           </p>
+//         </div>
+//       </div>
+//     </td>
+//     <td className="px-5 py-4">
+//       <p className="text-sm font-bold text-slate-800">
+//         {student.admissionNumber || "—"}
+//       </p>
+//       <p className="mt-1 text-xs text-slate-500">
+//         PEN: {student.penNumber || "—"}
+//       </p>
+//     </td>
+//     <td className="px-5 py-4 text-sm font-semibold text-slate-700">
+//       {getStudentRoll(student) ?? "—"}
+//     </td>
+//     <td className="px-5 py-4">
+//       <p className="text-sm font-bold text-slate-800">
+//         {relationName(student.classId)}
+//       </p>
+//       <p className="mt-1 text-xs text-slate-500">
+//         Section {relationName(student.sectionId)}
+//       </p>
+//     </td>
+//     <td className="px-5 py-4 text-sm font-semibold text-slate-700">
+//       {prettyText(getStudentStream(student))}
+//     </td>
+//     <td className="px-5 py-4">
+//       <EnrollmentBadge student={student} />
+//     </td>
+//     <td className="px-5 py-4">
+//       <p className="text-sm font-semibold text-slate-700">
+//         {student.mobile || "—"}
+//       </p>
+//       <p className="mt-1 max-w-[180px] truncate text-xs text-slate-500">
+//         APAAR: {student.apaarId || "—"}
+//       </p>
+//     </td>
+//     <td className="px-5 py-4">
+//       <div className="flex items-center justify-end gap-2">
+//         <ActionButton icon="lucide:eye" label="View student" onClick={onView} />
+//         <ActionButton icon="lucide:pencil" label="Edit student" onClick={onEdit} />
+//         <StatusToggle
+//           active={getStudentStatus(student) === "ACTIVE"}
+//           updating={statusUpdating}
+//           onClick={onToggleStatus}
+//         />
+//       </div>
+//     </td>
+//   </tr>
+// );
+
+// const StudentMobileCard = ({
+//   student,
+//   onView,
+//   onEdit,
+//   onToggleStatus,
+//   statusUpdating,
+// }: {
+//   student: Student;
+//   onView: () => void;
+//   onEdit: () => void;
+//   onToggleStatus: () => void;
+//   statusUpdating: boolean;
+// }) => (
+//   <article className="p-4">
+//     <div className="flex items-start gap-3">
+//       <StudentAvatar student={student} />
+//       <div className="min-w-0 flex-1">
+//         <div className="flex items-start justify-between gap-2">
+//           <div className="min-w-0">
+//             <h3 className="truncate text-sm font-bold text-slate-900">
+//               {student.name || "Unnamed Student"}
+//             </h3>
+//             <p className="mt-0.5 truncate text-xs text-slate-500">
+//               {student.admissionNumber || "No admission number"}
+//             </p>
+//           </div>
+//           <EnrollmentBadge student={student} />
+//         </div>
+
+//         <div className="mt-4 grid grid-cols-2 gap-3 rounded-xl bg-slate-50 p-3 text-xs">
+//           <MobileValue
+//             label="Class"
+//             value={`${relationName(student.classId)} - ${relationName(
+//               student.sectionId,
+//             )}`}
+//           />
+//           <MobileValue label="Roll No." value={getStudentRoll(student) ?? "—"} />
+//           <MobileValue label="Stream" value={prettyText(getStudentStream(student))} />
+//           <MobileValue label="Mobile" value={student.mobile || "—"} />
+//         </div>
+
+//         <div className="mt-3 grid grid-cols-3 gap-2">
+//           <button
+//             type="button"
+//             onClick={onView}
+//             className="inline-flex min-h-9 flex-1 items-center justify-center gap-2 rounded-lg border border-blue-200 bg-blue-50 text-xs font-bold text-blue-700"
+//           >
+//             <Icon icon="lucide:eye" className="h-4 w-4" />
+//             View
+//           </button>
+//           <button
+//             type="button"
+//             onClick={onEdit}
+//             className="inline-flex min-h-9 flex-1 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-700"
+//           >
+//             <Icon icon="lucide:pencil" className="h-4 w-4" />
+//             Edit
+//           </button>
+//           <button
+//             type="button"
+//             onClick={onToggleStatus}
+//             disabled={statusUpdating}
+//             className={`inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg border text-xs font-bold transition disabled:cursor-wait disabled:opacity-60 ${
+//               getStudentStatus(student) === "ACTIVE"
+//                 ? "border-rose-200 bg-rose-50 text-rose-700"
+//                 : "border-emerald-200 bg-emerald-50 text-emerald-700"
+//             }`}
+//           >
+//             <Icon
+//               icon={statusUpdating ? "lucide:loader-circle" : "lucide:power"}
+//               className={`h-4 w-4 ${statusUpdating ? "animate-spin" : ""}`}
+//             />
+//             {getStudentStatus(student) === "ACTIVE" ? "Inactive" : "Active"}
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   </article>
+// );
+
+// const StatusToggle = ({
+//   active,
+//   updating,
+//   onClick,
+// }: {
+//   active: boolean;
+//   updating: boolean;
+//   onClick: () => void;
+// }) => (
+//   <button
+//     type="button"
+//     role="switch"
+//     aria-checked={active}
+//     aria-label={active ? "Deactivate student" : "Activate student"}
+//     title={active ? "Deactivate student" : "Activate student"}
+//     disabled={updating}
+//     onClick={onClick}
+//     className={`relative h-7 w-12 shrink-0 rounded-full border transition-all disabled:cursor-wait disabled:opacity-60 ${
+//       active
+//         ? "border-emerald-500 bg-emerald-500"
+//         : "border-slate-300 bg-slate-300"
+//     }`}
+//   >
+//     <span
+//       className={`absolute top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm transition-transform ${
+//         active ? "translate-x-6" : "translate-x-0.5"
+//       }`}
+//     >
+//       {updating && (
+//         <Icon
+//           icon="lucide:loader-circle"
+//           className="h-3 w-3 animate-spin text-blue-700"
+//         />
+//       )}
+//     </span>
+//   </button>
+// );
+
+// const StatusConfirmModal = ({
+//   student,
+//   updating,
+//   onClose,
+//   onConfirm,
+// }: {
+//   student: Student | null;
+//   updating: boolean;
+//   onClose: () => void;
+//   onConfirm: () => void;
+// }) => {
+//   if (!student) return null;
+
+//   const isActive = getStudentStatus(student) === "ACTIVE";
+//   const actionText = isActive ? "Inactive" : "Active";
+
+//   return (
+//     <div
+//       className="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm"
+//       onMouseDown={(event) => {
+//         if (event.target === event.currentTarget && !updating) onClose();
+//       }}
+//     >
+//       <div
+//         role="dialog"
+//         aria-modal="true"
+//         aria-labelledby="status-modal-title"
+//         className="w-full max-w-md overflow-hidden rounded-2xl border border-white/50 bg-white shadow-2xl"
+//       >
+//         <div className="p-6 text-center">
+//           <div
+//             className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl ${
+//               isActive
+//                 ? "bg-rose-50 text-rose-600"
+//                 : "bg-emerald-50 text-emerald-600"
+//             }`}
+//           >
+//             <Icon icon="lucide:power" className="h-7 w-7" />
+//           </div>
+
+//           <h2
+//             id="status-modal-title"
+//             className="mt-5 text-xl font-extrabold text-slate-900"
+//           >
+//             Make student {actionText}?
+//           </h2>
+//           <p className="mt-2 text-sm leading-6 text-slate-500">
+//             <strong className="font-bold text-slate-700">{student.name}</strong>{" "}
+//             will be marked as {actionText.toLowerCase()}. You can change this
+//             status again from the student list.
+//           </p>
+//         </div>
+
+//         <div className="grid grid-cols-2 gap-3 border-t border-slate-200 bg-slate-50 p-4">
+//           <button
+//             type="button"
+//             onClick={onClose}
+//             disabled={updating}
+//             className="min-h-11 rounded-xl border border-slate-300 bg-white text-sm font-bold text-slate-700 transition hover:bg-slate-100 disabled:opacity-60"
+//           >
+//             Cancel
+//           </button>
+//           <button
+//             type="button"
+//             onClick={onConfirm}
+//             disabled={updating}
+//             className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl text-sm font-bold text-white transition disabled:cursor-wait disabled:opacity-70 ${
+//               isActive
+//                 ? "bg-rose-600 hover:bg-rose-700"
+//                 : "bg-emerald-600 hover:bg-emerald-700"
+//             }`}
+//           >
+//             <Icon
+//               icon={updating ? "lucide:loader-circle" : "lucide:check"}
+//               className={`h-4 w-4 ${updating ? "animate-spin" : ""}`}
+//             />
+//             {updating ? "Updating..." : `Yes, Make ${actionText}`}
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// const MobileValue = ({
+//   label,
+//   value,
+// }: {
+//   label: string;
+//   value: string | number;
+// }) => (
+//   <div className="min-w-0">
+//     <p className="text-slate-500">{label}</p>
+//     <p className="mt-1 truncate font-bold text-slate-800">{value}</p>
+//   </div>
+// );
+
+// const ActionButton = ({
+//   icon,
+//   label,
+//   onClick,
+// }: {
+//   icon: string;
+//   label: string;
+//   onClick: () => void;
+// }) => (
+//   <button
+//     type="button"
+//     onClick={onClick}
+//     title={label}
+//     aria-label={label}
+//     className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+//   >
+//     <Icon icon={icon} className="h-4 w-4" />
+//   </button>
+// );
+
+// const EmptyState = ({
+//   filtered,
+//   sessionName,
+//   onReset,
+//   onAdd,
+// }: {
+//   filtered: boolean;
+//   sessionName?: string;
+//   onReset: () => void;
+//   onAdd: () => void;
+// }) => (
+//   <div className="flex min-h-[340px] items-center justify-center p-6">
+//     <div className="max-w-sm text-center">
+//       <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+//         <Icon icon={filtered ? "lucide:search-x" : "lucide:users"} className="h-7 w-7" />
+//       </div>
+//       <h3 className="mt-4 text-lg font-bold text-slate-900">
+//         {filtered ? "No matching students" : "No active students found"}
+//       </h3>
+//       <p className="mt-2 text-sm leading-6 text-slate-500">
+//         {filtered
+//           ? "Try changing the search text, class or section filter."
+//           : `No active student is enrolled in ${sessionName || "this session"}.`}
+//       </p>
+//       <button
+//         type="button"
+//         onClick={filtered ? onReset : onAdd}
+//         className="mt-5 inline-flex min-h-10 items-center gap-2 rounded-lg bg-blue-700 px-4 text-sm font-bold text-white transition hover:bg-blue-800"
+//       >
+//         <Icon icon={filtered ? "lucide:rotate-ccw" : "lucide:user-plus"} className="h-4 w-4" />
+//         {filtered ? "Reset Filters" : "Add Student"}
+//       </button>
+//     </div>
+//   </div>
+// );
+
+// export default StudentList;
+
+
+
+
+
+
+
+
+
+
+
 import React, { useEffect, useMemo, useState } from "react";
 import { Icon } from "@iconify/react";
 import { useNavigate } from "react-router-dom";
@@ -3828,8 +5761,12 @@ import { getSessions } from "../../../features/academic/sessions/session.slice";
 import {
   clearStudents,
   getStudentsByEnrollment,
+  updateStudentStatus,
 } from "../../../features/student/student.slice";
-import type { Student } from "../../../features/student/student.types";
+import type {
+  Student,
+  StudentStatus,
+} from "../../../features/student/student.types";
 
 type Relation = string | { _id: string; name?: string };
 type StudentWithStream = Student & {
@@ -3858,6 +5795,9 @@ const prettyText = (value?: string): string => {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 };
 
+const getStudentStatus = (student: Student): StudentStatus =>
+  student.status ?? "ACTIVE";
+
 const StudentList: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -3875,6 +5815,12 @@ const StudentList: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [classFilter, setClassFilter] = useState("ALL");
   const [sectionFilter, setSectionFilter] = useState("ALL");
+  const [statusFilter, setStatusFilter] = useState<
+    "ALL" | "ACTIVE" | "INACTIVE"
+  >("ACTIVE");
+  const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(null);
+  const [pendingStatusStudent, setPendingStatusStudent] =
+    useState<Student | null>(null);
 
   const studentList: Student[] = Array.isArray(students) ? students : [];
 
@@ -3947,17 +5893,35 @@ const StudentList: React.FC = () => {
     [sections, selectedSessionId, classFilter],
   );
 
-  // Explicitly inactive student master records should not appear in active lists.
-  const activeStudents = useMemo(
-    () => studentList.filter((student) => student.status !== "INACTIVE"),
+  const activeCount = useMemo(
+    () =>
+      studentList.filter((student) => getStudentStatus(student) === "ACTIVE")
+        .length,
     [studentList],
+  );
+
+  const inactiveCount = useMemo(
+    () =>
+      studentList.filter((student) => getStudentStatus(student) === "INACTIVE")
+        .length,
+    [studentList],
+  );
+
+  const statusFilteredStudents = useMemo(
+    () =>
+      statusFilter === "ALL"
+        ? studentList
+        : studentList.filter(
+            (student) => getStudentStatus(student) === statusFilter,
+          ),
+    [studentList, statusFilter],
   );
 
   const filteredStudents = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    if (!query) return activeStudents;
+    if (!query) return statusFilteredStudents;
 
-    return activeStudents.filter((student) => {
+    return statusFilteredStudents.filter((student) => {
       const record = student as StudentWithStream;
       const values = [
         student.name,
@@ -3979,37 +5943,53 @@ const StudentList: React.FC = () => {
           .includes(query),
       );
     });
-  }, [activeStudents, searchQuery]);
+  }, [statusFilteredStudents, searchQuery]);
 
   const classCount = useMemo(
     () =>
       new Set(
-        activeStudents
+        studentList
           .map((student) => relationId(student.classId))
           .filter(Boolean),
       ).size,
-    [activeStudents],
-  );
-
-  const sectionCount = useMemo(
-    () =>
-      new Set(
-        activeStudents
-          .map((student) => relationId(student.sectionId))
-          .filter(Boolean),
-      ).size,
-    [activeStudents],
+    [studentList],
   );
 
   const hasFilters =
     classFilter !== "ALL" ||
     sectionFilter !== "ALL" ||
+    statusFilter !== "ACTIVE" ||
     searchQuery.trim() !== "";
 
   const resetFilters = () => {
     setSearchQuery("");
     setClassFilter("ALL");
     setSectionFilter("ALL");
+    setStatusFilter("ACTIVE");
+  };
+
+  const handleConfirmStatusChange = async () => {
+    if (!pendingStatusStudent || statusUpdatingId) return;
+
+    const nextStatus: StudentStatus =
+      getStudentStatus(pendingStatusStudent) === "ACTIVE"
+        ? "INACTIVE"
+        : "ACTIVE";
+
+    try {
+      setStatusUpdatingId(pendingStatusStudent._id);
+
+      await dispatch(
+        updateStudentStatus({
+          studentId: pendingStatusStudent._id,
+          status: nextStatus,
+        }),
+      ).unwrap();
+
+      setPendingStatusStudent(null);
+    } finally {
+      setStatusUpdatingId(null);
+    }
   };
 
   const handleRetry = () => {
@@ -4115,20 +6095,20 @@ const StudentList: React.FC = () => {
           <SummaryCard
             icon="lucide:users"
             label="Active Students"
-            value={activeStudents.length}
+            value={activeCount}
             tone="blue"
+          />
+          <SummaryCard
+            icon="lucide:user-x"
+            label="Inactive Students"
+            value={inactiveCount}
+            tone="rose"
           />
           <SummaryCard
             icon="lucide:school"
             label="Classes"
             value={classCount}
             tone="violet"
-          />
-          <SummaryCard
-            icon="lucide:layers-3"
-            label="Sections"
-            value={sectionCount}
-            tone="amber"
           />
           <SummaryCard
             icon="lucide:list-filter"
@@ -4158,7 +6138,7 @@ const StudentList: React.FC = () => {
             )}
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
             <FilterSelect
               label="Class"
               icon="lucide:school"
@@ -4171,6 +6151,21 @@ const StudentList: React.FC = () => {
                   {classItem.name}
                 </option>
               ))}
+            </FilterSelect>
+
+            <FilterSelect
+              label="Student Status"
+              icon="lucide:activity"
+              value={statusFilter}
+              onChange={(value) =>
+                setStatusFilter(
+                  value as "ALL" | "ACTIVE" | "INACTIVE",
+                )
+              }
+            >
+              <option value="ACTIVE">Active Students</option>
+              <option value="INACTIVE">Inactive Students</option>
+              <option value="ALL">All Students</option>
             </FilterSelect>
 
             <FilterSelect
@@ -4228,7 +6223,7 @@ const StudentList: React.FC = () => {
             <div>
               <h2 className="font-bold text-slate-900">Student Records</h2>
               <p className="mt-0.5 text-xs text-slate-500">
-                {filteredStudents.length} active{" "}
+                {filteredStudents.length}{" "}
                 {filteredStudents.length === 1 ? "student" : "students"}
               </p>
             </div>
@@ -4253,6 +6248,13 @@ const StudentList: React.FC = () => {
                     onEdit={() =>
                       navigate(`/school-admin/students/${student._id}/edit`)
                     }
+                    onElectives={() =>
+                      navigate(
+                        `/school-admin/students/${student._id}/electives`,
+                      )
+                    }
+                    onToggleStatus={() => setPendingStatusStudent(student)}
+                    statusUpdating={statusUpdatingId === student._id}
                   />
                 ))}
               </div>
@@ -4267,7 +6269,7 @@ const StudentList: React.FC = () => {
                         "Roll No.",
                         "Class & Section",
                         "Stream",
-                        "Enrollment",
+                        "Enrollment Status",
                         "Contact",
                         "Actions",
                       ].map((heading) => (
@@ -4295,6 +6297,13 @@ const StudentList: React.FC = () => {
                             `/school-admin/students/${student._id}/edit`,
                           )
                         }
+                        onElectives={() =>
+                          navigate(
+                            `/school-admin/students/${student._id}/electives`,
+                          )
+                        }
+                        onToggleStatus={() => setPendingStatusStudent(student)}
+                        statusUpdating={statusUpdatingId === student._id}
                       />
                     ))}
                   </tbody>
@@ -4310,6 +6319,18 @@ const StudentList: React.FC = () => {
             />
           )}
         </section>
+
+        <StatusConfirmModal
+          student={pendingStatusStudent}
+          updating={
+            Boolean(pendingStatusStudent) &&
+            statusUpdatingId === pendingStatusStudent?._id
+          }
+          onClose={() => {
+            if (!statusUpdatingId) setPendingStatusStudent(null);
+          }}
+          onConfirm={handleConfirmStatusChange}
+        />
       </div>
     </div>
   );
@@ -4346,13 +6367,14 @@ const SummaryCard = ({
   icon: string;
   label: string;
   value: number;
-  tone: "blue" | "violet" | "amber" | "emerald";
+  tone: "blue" | "violet" | "amber" | "emerald" | "rose";
 }) => {
   const tones = {
     blue: "bg-blue-50 text-blue-700",
     violet: "bg-violet-50 text-violet-700",
     amber: "bg-amber-50 text-amber-700",
     emerald: "bg-emerald-50 text-emerald-700",
+    rose: "bg-rose-50 text-rose-700",
   };
 
   return (
@@ -4463,14 +6485,33 @@ const getStudentStream = (student: Student): string | undefined => {
   return record.enrollment?.stream ?? record.stream;
 };
 
+const canAssignElective = (student: Student): boolean => {
+  const className = relationName(student.classId as Relation)
+    .toLowerCase()
+    .replace("class", "")
+    .trim();
+
+  return (
+    getStudentStatus(student) === "ACTIVE" &&
+    (className === "11" || className === "12") &&
+    Boolean(getStudentStream(student))
+  );
+};
+
 const StudentTableRow = ({
   student,
   onView,
   onEdit,
+  onElectives,
+  onToggleStatus,
+  statusUpdating,
 }: {
   student: Student;
   onView: () => void;
   onEdit: () => void;
+  onElectives: () => void;
+  onToggleStatus: () => void;
+  statusUpdating: boolean;
 }) => (
   <tr className="transition hover:bg-blue-50/30">
     <td className="px-5 py-4">
@@ -4523,6 +6564,21 @@ const StudentTableRow = ({
       <div className="flex items-center justify-end gap-2">
         <ActionButton icon="lucide:eye" label="View student" onClick={onView} />
         <ActionButton icon="lucide:pencil" label="Edit student" onClick={onEdit} />
+        <ActionButton
+          icon="lucide:book-marked"
+          label={
+            canAssignElective(student)
+              ? "Manage elective subjects"
+              : "Electives require an active Class 11/12 student with stream"
+          }
+          onClick={onElectives}
+          disabled={!canAssignElective(student)}
+        />
+        <StatusToggle
+          active={getStudentStatus(student) === "ACTIVE"}
+          updating={statusUpdating}
+          onClick={onToggleStatus}
+        />
       </div>
     </td>
   </tr>
@@ -4532,10 +6588,16 @@ const StudentMobileCard = ({
   student,
   onView,
   onEdit,
+  onElectives,
+  onToggleStatus,
+  statusUpdating,
 }: {
   student: Student;
   onView: () => void;
   onEdit: () => void;
+  onElectives: () => void;
+  onToggleStatus: () => void;
+  statusUpdating: boolean;
 }) => (
   <article className="p-4">
     <div className="flex items-start gap-3">
@@ -4565,7 +6627,7 @@ const StudentMobileCard = ({
           <MobileValue label="Mobile" value={student.mobile || "—"} />
         </div>
 
-        <div className="mt-3 flex gap-2">
+        <div className="mt-3 grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={onView}
@@ -4582,11 +6644,163 @@ const StudentMobileCard = ({
             <Icon icon="lucide:pencil" className="h-4 w-4" />
             Edit
           </button>
+          <button
+            type="button"
+            onClick={onElectives}
+            disabled={!canAssignElective(student)}
+            title={
+              canAssignElective(student)
+                ? "Manage elective subjects"
+                : "Electives require an active Class 11/12 student with stream"
+            }
+            className="inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-violet-200 bg-violet-50 text-xs font-bold text-violet-700 transition hover:bg-violet-100 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400"
+          >
+            <Icon icon="lucide:book-marked" className="h-4 w-4" />
+            Electives
+          </button>
+          <button
+            type="button"
+            onClick={onToggleStatus}
+            disabled={statusUpdating}
+            className={`inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg border text-xs font-bold transition disabled:cursor-wait disabled:opacity-60 ${
+              getStudentStatus(student) === "ACTIVE"
+                ? "border-rose-200 bg-rose-50 text-rose-700"
+                : "border-emerald-200 bg-emerald-50 text-emerald-700"
+            }`}
+          >
+            <Icon
+              icon={statusUpdating ? "lucide:loader-circle" : "lucide:power"}
+              className={`h-4 w-4 ${statusUpdating ? "animate-spin" : ""}`}
+            />
+            {getStudentStatus(student) === "ACTIVE" ? "Inactive" : "Active"}
+          </button>
         </div>
       </div>
     </div>
   </article>
 );
+
+const StatusToggle = ({
+  active,
+  updating,
+  onClick,
+}: {
+  active: boolean;
+  updating: boolean;
+  onClick: () => void;
+}) => (
+  <button
+    type="button"
+    role="switch"
+    aria-checked={active}
+    aria-label={active ? "Deactivate student" : "Activate student"}
+    title={active ? "Deactivate student" : "Activate student"}
+    disabled={updating}
+    onClick={onClick}
+    className={`relative h-7 w-12 shrink-0 rounded-full border transition-all disabled:cursor-wait disabled:opacity-60 ${
+      active
+        ? "border-emerald-500 bg-emerald-500"
+        : "border-slate-300 bg-slate-300"
+    }`}
+  >
+    <span
+      className={`absolute top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm transition-transform ${
+        active ? "translate-x-6" : "translate-x-0.5"
+      }`}
+    >
+      {updating && (
+        <Icon
+          icon="lucide:loader-circle"
+          className="h-3 w-3 animate-spin text-blue-700"
+        />
+      )}
+    </span>
+  </button>
+);
+
+const StatusConfirmModal = ({
+  student,
+  updating,
+  onClose,
+  onConfirm,
+}: {
+  student: Student | null;
+  updating: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+}) => {
+  if (!student) return null;
+
+  const isActive = getStudentStatus(student) === "ACTIVE";
+  const actionText = isActive ? "Inactive" : "Active";
+
+  return (
+    <div
+      className="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget && !updating) onClose();
+      }}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="status-modal-title"
+        className="w-full max-w-md overflow-hidden rounded-2xl border border-white/50 bg-white shadow-2xl"
+      >
+        <div className="p-6 text-center">
+          <div
+            className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl ${
+              isActive
+                ? "bg-rose-50 text-rose-600"
+                : "bg-emerald-50 text-emerald-600"
+            }`}
+          >
+            <Icon icon="lucide:power" className="h-7 w-7" />
+          </div>
+
+          <h2
+            id="status-modal-title"
+            className="mt-5 text-xl font-extrabold text-slate-900"
+          >
+            Make student {actionText}?
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-slate-500">
+            <strong className="font-bold text-slate-700">{student.name}</strong>{" "}
+            will be marked as {actionText.toLowerCase()}. You can change this
+            status again from the student list.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 border-t border-slate-200 bg-slate-50 p-4">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={updating}
+            className="min-h-11 rounded-xl border border-slate-300 bg-white text-sm font-bold text-slate-700 transition hover:bg-slate-100 disabled:opacity-60"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={updating}
+            className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl text-sm font-bold text-white transition disabled:cursor-wait disabled:opacity-70 ${
+              isActive
+                ? "bg-rose-600 hover:bg-rose-700"
+                : "bg-emerald-600 hover:bg-emerald-700"
+            }`}
+          >
+            <Icon
+              icon={updating ? "lucide:loader-circle" : "lucide:check"}
+              className={`h-4 w-4 ${updating ? "animate-spin" : ""}`}
+            />
+            {updating ? "Updating..." : `Yes, Make ${actionText}`}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const MobileValue = ({
   label,
@@ -4605,17 +6819,20 @@ const ActionButton = ({
   icon,
   label,
   onClick,
+  disabled = false,
 }: {
   icon: string;
   label: string;
   onClick: () => void;
+  disabled?: boolean;
 }) => (
   <button
     type="button"
     onClick={onClick}
     title={label}
     aria-label={label}
-    className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+    disabled={disabled}
+    className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-300 disabled:hover:border-slate-200"
   >
     <Icon icon={icon} className="h-4 w-4" />
   </button>
@@ -4658,3 +6875,4 @@ const EmptyState = ({
 );
 
 export default StudentList;
+

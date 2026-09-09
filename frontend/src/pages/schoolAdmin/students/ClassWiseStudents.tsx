@@ -1205,8 +1205,9 @@
 
 
 
-
 import React, { useEffect, useMemo, useState } from "react";
+
+import { createPortal } from "react-dom";
 
 import { useNavigate } from "react-router-dom";
 
@@ -1219,6 +1220,7 @@ import { getClasses } from "../../../features/academic/classes/class.slice";
 import { getSections } from "../../../features/academic/sections/section.slice";
 
 import {
+  clearStudentError,
   clearStudents,
   getStudentsByEnrollment,
   updateStudentStatus,
@@ -1230,6 +1232,18 @@ import type {
   StudentStatus,
 } from "../../../features/student/student.types";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+
+import {
+  showConfirmAlert,
+  showErrorAlert,
+  showSuccessAlert,
+} from "../../../components/common/sweetAlert";
+
+interface ActionMenuState {
+  student: Student;
+  top: number;
+  left: number;
+}
 
 const formatStatus = (status?: string) =>
   status
@@ -1316,6 +1330,34 @@ const ClassWiseStudents: React.FC = () => {
   const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(
     null,
   );
+
+  const [actionMenu, setActionMenu] = useState<ActionMenuState | null>(null);
+
+  useEffect(() => {
+    const handleDocumentClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+
+      if (!target.closest("[data-student-action-menu]")) {
+        setActionMenu(null);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      setActionMenu(null);
+    };
+
+    document.addEventListener("mousedown", handleDocumentClick);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handleDocumentClick);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
 
   // ============================================
   // LOAD ACADEMIC SESSIONS
@@ -1539,16 +1581,25 @@ const ClassWiseStudents: React.FC = () => {
       return;
     }
 
+    setActionMenu(null);
+    dispatch(clearStudentError());
+
     const currentStatus = getStudentStatus(student);
 
     const nextStatus: StudentStatus =
       currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE";
 
-    const confirmed = window.confirm(
-      `Are you sure you want to ${
-        nextStatus === "ACTIVE" ? "activate" : "deactivate"
-      } ${student.name}?`,
-    );
+    const activating = nextStatus === "ACTIVE";
+
+    const confirmed = await showConfirmAlert({
+      title: activating ? "Activate student?" : "Deactivate student?",
+      text: activating
+        ? `${student.name || "This student"} will regain access and appear as active in school records.`
+        : `${student.name || "This student"} will be marked inactive. Academic history and existing records will remain preserved.`,
+      confirmButtonText: activating ? "Yes, Activate" : "Yes, Deactivate",
+      icon: "warning",
+      confirmButtonColor: activating ? "#059669" : "#DC2626",
+    });
 
     if (!confirmed) {
       return;
@@ -1563,6 +1614,25 @@ const ClassWiseStudents: React.FC = () => {
           status: nextStatus,
         }),
       ).unwrap();
+
+      await showSuccessAlert(
+        activating ? "Student activated" : "Student deactivated",
+        `${student.name || "Student"} has been ${
+          activating ? "activated" : "deactivated"
+        } successfully.`,
+      );
+    } catch (statusError) {
+      const message =
+        typeof statusError === "string"
+          ? statusError
+          : "Unable to update student status. Please try again.";
+
+      await showErrorAlert(
+        "Status update failed",
+        message,
+      );
+
+      dispatch(clearStudentError());
     } finally {
       setStatusUpdatingId(null);
     }
@@ -2378,93 +2448,59 @@ const ClassWiseStudents: React.FC = () => {
                         })()}
                       </td>
 
-                      <td
-                        className="
-                            px-5
-                            py-4
-                          "
-                      >
+                      <td className="px-5 py-4">
                         <div
-                          className="
-                              flex
-                              items-center
-                              justify-end
-                              gap-1
-                            "
+                          data-student-action-menu
+                          className="flex justify-end"
                         >
                           <button
                             type="button"
-                            onClick={() => handleViewStudent(student)}
-                            title="View Student"
-                            className="
-                                flex
-                                h-9
-                                w-9
-                                items-center
-                                justify-center
-                                rounded-lg
-                                text-[#6B7280]
-                                transition-colors
-                                hover:bg-[#E8F0FB]
-                                hover:text-[#1F5FAE]
-                              "
-                          >
-                            <Icon icon="lucide:eye" className="text-lg" />
-                          </button>
+                            aria-label={`Open actions for ${student.name}`}
+                            aria-haspopup="menu"
+                            aria-expanded={actionMenu?.student._id === student._id}
+                            onClick={(event) => {
+                              if (actionMenu?.student._id === student._id) {
+                                setActionMenu(null);
 
-                          <button
-                            type="button"
-                            onClick={() => handleEditStudent(student)}
-                            title="Edit Student"
-                            className="
-                                flex
-                                h-9
-                                w-9
-                                items-center
-                                justify-center
-                                rounded-lg
-                                text-[#6B7280]
-                                transition-colors
-                                hover:bg-[#F3F4F6]
-                                hover:text-[#15243B]
-                              "
-                          >
-                            <Icon icon="lucide:pencil" className="text-lg" />
-                          </button>
+                                return;
+                              }
 
-                          <button
-                            type="button"
-                            onClick={() => void handleToggleStatus(student)}
-                            disabled={statusUpdatingId !== null}
-                            title={
-                              getStudentStatus(student) === "INACTIVE"
-                                ? "Activate Student"
-                                : "Deactivate Student"
-                            }
-                            aria-label={
-                              getStudentStatus(student) === "INACTIVE"
-                                ? `Activate ${student.name}`
-                                : `Deactivate ${student.name}`
-                            }
-                            className={`flex h-9 w-9 items-center justify-center rounded-lg border transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-                              getStudentStatus(student) === "INACTIVE"
-                                ? "border-emerald-200 bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
-                                : "border-red-200 bg-red-50 text-red-500 hover:bg-red-100"
+                              const rect = event.currentTarget.getBoundingClientRect();
+                              const menuWidth = 224;
+                              const menuHeight = 210;
+                              const gap = 8;
+
+                              const left = Math.min(
+                                window.innerWidth - menuWidth - 12,
+                                Math.max(12, rect.right - menuWidth),
+                              );
+
+                              const top =
+                                rect.bottom + gap + menuHeight <= window.innerHeight
+                                  ? rect.bottom + gap
+                                  : Math.max(12, rect.top - menuHeight - gap);
+
+                              setActionMenu({
+                                student,
+                                top,
+                                left,
+                              });
+                            }}
+                            className={`flex size-10 items-center justify-center rounded-xl border transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1F5FAE] ${
+                              actionMenu?.student._id === student._id
+                                ? "border-blue-200 bg-blue-50 text-[#1F5FAE]"
+                                : "border-[#E2E8F0] bg-white text-[#64748B] hover:border-blue-200 hover:bg-blue-50 hover:text-[#1F5FAE]"
                             }`}
                           >
                             {statusUpdatingId === student._id ? (
                               <Icon
                                 icon="lucide:loader-circle"
-                                className="animate-spin text-lg"
+                                className="animate-spin text-xl"
                               />
                             ) : (
                               <Icon
-                                icon={
-                                  getStudentStatus(student) === "INACTIVE"
-                                    ? "lucide:user-check"
-                                    : "lucide:user-x"
-                                }
-                                className="text-lg"
+                                icon="lucide:ellipsis-vertical"
+                                className="text-xl"
                               />
                             )}
                           </button>
@@ -2567,6 +2603,81 @@ const ClassWiseStudents: React.FC = () => {
           )}
         </div>
       )}
+
+      {actionMenu &&
+        createPortal(
+          <div
+            data-student-action-menu
+            role="menu"
+            style={{
+              top: actionMenu.top,
+              left: actionMenu.left,
+            }}
+            className="fixed z-[1400] w-56 overflow-hidden rounded-xl border border-[#E2E8F0] bg-white p-1.5 shadow-[0_20px_50px_rgba(15,23,42,0.22)]"
+          >
+            <div className="border-b border-[#E2E8F0] px-3 py-2.5">
+              <p className="truncate text-sm font-bold text-[#15243B]">
+                {actionMenu.student.name || "Student"}
+              </p>
+              <p className="mt-0.5 truncate text-xs text-[#64748B]">
+                {actionMenu.student.admissionNumber || "No admission number"}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setActionMenu(null);
+                handleViewStudent(actionMenu.student);
+              }}
+              className="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-[#334155] transition hover:bg-blue-50 hover:text-[#1F5FAE]"
+            >
+              <Icon icon="lucide:eye" className="text-lg" />
+              View Details
+            </button>
+
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setActionMenu(null);
+                handleEditStudent(actionMenu.student);
+              }}
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-[#334155] transition hover:bg-slate-100"
+            >
+              <Icon icon="lucide:pencil" className="text-lg" />
+              Edit Student
+            </button>
+
+            <div className="my-1 border-t border-[#E2E8F0]" />
+
+            <button
+              type="button"
+              role="menuitem"
+              disabled={statusUpdatingId !== null}
+              onClick={() => void handleToggleStatus(actionMenu.student)}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                getStudentStatus(actionMenu.student) === "INACTIVE"
+                  ? "text-emerald-700 hover:bg-emerald-50"
+                  : "text-red-600 hover:bg-red-50"
+              }`}
+            >
+              <Icon
+                icon={
+                  getStudentStatus(actionMenu.student) === "INACTIVE"
+                    ? "lucide:user-check"
+                    : "lucide:user-x"
+                }
+                className="text-lg"
+              />
+              {getStudentStatus(actionMenu.student) === "INACTIVE"
+                ? "Activate Student"
+                : "Deactivate Student"}
+            </button>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };

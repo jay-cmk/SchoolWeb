@@ -306,3 +306,11 @@ export interface IUpdateStudentEnrollmentData {
 
   updatedBy: string;
 }
+
+interface UpdateStudentEnrollmentData {
+  stream?: StudentStream | null;
+  classId?: string;
+  sectionId?: string;
+  rollNumber?: number;
+  remarks?: string;
+}

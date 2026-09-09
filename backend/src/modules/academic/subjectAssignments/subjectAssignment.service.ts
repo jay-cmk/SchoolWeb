@@ -1,723 +1,3 @@
-// import mongoose from "mongoose";
-
-// import {
-//   SubjectAssignment,
-// } from "./subjectAssignment.model";
-
-// import {
-//   AcademicSession,
-// } from "../academicSession.model";
-
-// import {
-//   ClassModel,
-// } from "../classes/class.model";
-
-// import {
-//   Section,
-// } from "../sections/section.model";
-
-// import {
-//   Subject,
-// } from "../subjects/subject.model";
-
-// import {
-//   Teacher,
-// } from "../../teachers/teacher.model";
-
-// import type {
-//   CreateSubjectAssignmentData,
-//   UpdateSubjectAssignmentData,
-// } from "./subjectAssignment.types";
-
-
-// // ============================================
-// // CREATE
-// // ============================================
-
-// export const createSubjectAssignment =
-//   async (
-//     schoolId: string,
-//     data:
-//       CreateSubjectAssignmentData
-//   ) => {
-//     // ========================================
-//     // SCHOOL
-//     // ========================================
-
-//     if (
-//       !mongoose.Types.ObjectId.isValid(
-//         schoolId
-//       )
-//     ) {
-//       throw new Error(
-//         "Invalid school ID"
-//       );
-//     }
-
-
-//     // ========================================
-//     // ALL IDS VALIDATE
-//     // ========================================
-
-//     const ids = [
-//       data.sessionId,
-//       data.subjectId,
-//       data.classId,
-//       data.sectionId,
-//       data.teacherId,
-//     ];
-
-
-//     if (
-//       ids.some(
-//         (id) =>
-//           !mongoose.Types.ObjectId.isValid(
-//             id
-//           )
-//       )
-//     ) {
-//       throw new Error(
-//         "One or more assignment IDs are invalid"
-//       );
-//     }
-
-
-//     // ========================================
-//     // SESSION CHECK
-//     // ========================================
-
-//     const session =
-//       await AcademicSession.findOne({
-//         _id:
-//           data.sessionId,
-
-//         schoolId,
-//       });
-
-
-//     if (!session) {
-//       throw new Error(
-//         "Academic session not found"
-//       );
-//     }
-
-
-//     // ========================================
-//     // CLASS CHECK
-//     // ========================================
-
-//     const classData =
-//       await ClassModel.findOne({
-//         _id:
-//           data.classId,
-
-//         schoolId,
-
-//         sessionId:
-//           data.sessionId,
-//       });
-
-
-//     if (!classData) {
-//       throw new Error(
-//         "Class not found in this academic session"
-//       );
-//     }
-
-
-//     // ========================================
-//     // SECTION CHECK
-//     // ========================================
-
-//     const section =
-//       await Section.findOne({
-//         _id:
-//           data.sectionId,
-
-//         schoolId,
-
-//         sessionId:
-//           data.sessionId,
-
-//         classId:
-//           data.classId,
-//       });
-
-
-//     if (!section) {
-//       throw new Error(
-//         "Section not found in this class"
-//       );
-//     }
-
-
-//     // ========================================
-//     // SUBJECT CHECK
-//     // ========================================
-
-//     const subject =
-//       await Subject.findOne({
-//         _id:
-//           data.subjectId,
-
-//         schoolId,
-
-//         sessionId:
-//           data.sessionId,
-//       });
-
-
-//     if (!subject) {
-//       throw new Error(
-//         "Subject not found in this academic session"
-//       );
-//     }
-
-
-//     // ========================================
-//     // TEACHER CHECK
-//     // ========================================
-
-//     const teacher =
-//       await Teacher.findOne({
-//         _id:
-//           data.teacherId,
-
-//         schoolId,
-//       });
-
-
-//     if (!teacher) {
-//       throw new Error(
-//         "Teacher not found"
-//       );
-//     }
-
-
-//     // ========================================
-//     // WEEKLY PERIOD VALIDATION
-//     // ========================================
-
-//     if (
-//       typeof data.weeklyPeriods !==
-//         "number" ||
-//       data.weeklyPeriods < 1
-//     ) {
-//       throw new Error(
-//         "Weekly periods must be greater than 0"
-//       );
-//     }
-
-
-//     // ========================================
-//     // DUPLICATE CHECK
-//     // ========================================
-
-//     const existing =
-//       await SubjectAssignment.findOne({
-//         schoolId,
-
-//         sessionId:
-//           data.sessionId,
-
-//         subjectId:
-//           data.subjectId,
-
-//         classId:
-//           data.classId,
-
-//         sectionId:
-//           data.sectionId,
-//       });
-
-
-//     if (existing) {
-//       throw new Error(
-//         "Subject is already assigned to this class and section"
-//       );
-//     }
-
-
-//     // ========================================
-//     // CREATE
-//     // ========================================
-
-//     const assignment =
-//       await SubjectAssignment.create({
-//         schoolId,
-
-//         sessionId:
-//           data.sessionId,
-
-//         subjectId:
-//           data.subjectId,
-
-//         classId:
-//           data.classId,
-
-//         sectionId:
-//           data.sectionId,
-
-//         teacherId:
-//           data.teacherId,
-
-//         weeklyPeriods:
-//           data.weeklyPeriods,
-
-//         isActive: true,
-//       });
-
-
-//     return assignment;
-//   };
-
-
-// // ============================================
-// // GET ALL
-// // ============================================
-
-// export const getSubjectAssignments =
-//   async (
-//     schoolId: string,
-
-//     filters?: {
-//       sessionId?: string;
-
-//       subjectId?: string;
-
-//       classId?: string;
-
-//       sectionId?: string;
-
-//       teacherId?: string;
-
-//       isActive?: boolean;
-//     }
-//   ) => {
-//     if (
-//       !mongoose.Types.ObjectId.isValid(
-//         schoolId
-//       )
-//     ) {
-//       throw new Error(
-//         "Invalid school ID"
-//       );
-//     }
-
-
-//     const query: Record<
-//       string,
-//       unknown
-//     > = {
-//       schoolId,
-//     };
-
-
-//     if (
-//       filters?.sessionId
-//     ) {
-//       if (
-//         !mongoose.Types.ObjectId.isValid(
-//           filters.sessionId
-//         )
-//       ) {
-//         throw new Error(
-//           "Invalid academic session ID"
-//         );
-//       }
-
-//       query.sessionId =
-//         filters.sessionId;
-//     }
-
-
-//     if (
-//       filters?.subjectId
-//     ) {
-//       if (
-//         !mongoose.Types.ObjectId.isValid(
-//           filters.subjectId
-//         )
-//       ) {
-//         throw new Error(
-//           "Invalid subject ID"
-//         );
-//       }
-
-//       query.subjectId =
-//         filters.subjectId;
-//     }
-
-
-//     if (
-//       filters?.classId
-//     ) {
-//       if (
-//         !mongoose.Types.ObjectId.isValid(
-//           filters.classId
-//         )
-//       ) {
-//         throw new Error(
-//           "Invalid class ID"
-//         );
-//       }
-
-//       query.classId =
-//         filters.classId;
-//     }
-
-
-//     if (
-//       filters?.sectionId
-//     ) {
-//       if (
-//         !mongoose.Types.ObjectId.isValid(
-//           filters.sectionId
-//         )
-//       ) {
-//         throw new Error(
-//           "Invalid section ID"
-//         );
-//       }
-
-//       query.sectionId =
-//         filters.sectionId;
-//     }
-
-
-//     if (
-//       filters?.teacherId
-//     ) {
-//       if (
-//         !mongoose.Types.ObjectId.isValid(
-//           filters.teacherId
-//         )
-//       ) {
-//         throw new Error(
-//           "Invalid teacher ID"
-//         );
-//       }
-
-//       query.teacherId =
-//         filters.teacherId;
-//     }
-
-
-//     if (
-//       filters?.isActive !==
-//       undefined
-//     ) {
-//       query.isActive =
-//         filters.isActive;
-//     }
-
-
-//     const assignments =
-//       await SubjectAssignment.find(
-//         query
-//       )
-
-//         .populate(
-//           "sessionId",
-//           "name startDate endDate isCurrent"
-//         )
-
-//         .populate(
-//           "subjectId",
-//           "name code subjectType"
-//         )
-
-//         .populate(
-//           "classId",
-//           "name order"
-//         )
-
-//         .populate(
-//           "sectionId",
-//           "name roomNumber"
-//         )
-
-//         .populate(
-//           "teacherId",
-//           "name employeeId email mobile profileImage"
-//         )
-
-//         .sort({
-//           createdAt: -1,
-//         })
-
-//         .lean();
-
-
-//     return assignments;
-//   };
-
-
-// // ============================================
-// // GET BY ID
-// // ============================================
-
-// export const getSubjectAssignmentById =
-//   async (
-//     schoolId: string,
-//     assignmentId: string
-//   ) => {
-//     if (
-//       !mongoose.Types.ObjectId.isValid(
-//         schoolId
-//       )
-//     ) {
-//       throw new Error(
-//         "Invalid school ID"
-//       );
-//     }
-
-
-//     if (
-//       !mongoose.Types.ObjectId.isValid(
-//         assignmentId
-//       )
-//     ) {
-//       throw new Error(
-//         "Invalid assignment ID"
-//       );
-//     }
-
-
-//     const assignment =
-//       await SubjectAssignment.findOne({
-//         _id:
-//           assignmentId,
-
-//         schoolId,
-//       })
-
-//         .populate(
-//           "sessionId",
-//           "name startDate endDate isCurrent"
-//         )
-
-//         .populate(
-//           "subjectId",
-//           "name code subjectType"
-//         )
-
-//         .populate(
-//           "classId",
-//           "name order"
-//         )
-
-//         .populate(
-//           "sectionId",
-//           "name roomNumber"
-//         )
-
-//         .populate(
-//           "teacherId",
-//           "name employeeId email mobile profileImage"
-//         )
-
-//         .lean();
-
-
-//     if (!assignment) {
-//       throw new Error(
-//         "Subject assignment not found"
-//       );
-//     }
-
-
-//     return assignment;
-//   };
-
-
-// // ============================================
-// // UPDATE
-// // ============================================
-
-// export const updateSubjectAssignment =
-//   async (
-//     schoolId: string,
-//     assignmentId: string,
-//     data:
-//       UpdateSubjectAssignmentData
-//   ) => {
-//     if (
-//       !mongoose.Types.ObjectId.isValid(
-//         schoolId
-//       )
-//     ) {
-//       throw new Error(
-//         "Invalid school ID"
-//       );
-//     }
-
-
-//     if (
-//       !mongoose.Types.ObjectId.isValid(
-//         assignmentId
-//       )
-//     ) {
-//       throw new Error(
-//         "Invalid assignment ID"
-//       );
-//     }
-
-
-//     const assignment =
-//       await SubjectAssignment.findOne({
-//         _id:
-//           assignmentId,
-
-//         schoolId,
-//       });
-
-
-//     if (!assignment) {
-//       throw new Error(
-//         "Subject assignment not found"
-//       );
-//     }
-
-
-//     // ========================================
-//     // TEACHER
-//     // ========================================
-
-//     if (
-//       data.teacherId !==
-//       undefined
-//     ) {
-//       if (
-//         !mongoose.Types.ObjectId.isValid(
-//           data.teacherId
-//         )
-//       ) {
-//         throw new Error(
-//           "Invalid teacher ID"
-//         );
-//       }
-
-
-//       const teacher =
-//         await Teacher.findOne({
-//           _id:
-//             data.teacherId,
-
-//           schoolId,
-//         });
-
-
-//       if (!teacher) {
-//         throw new Error(
-//           "Teacher not found"
-//         );
-//       }
-
-
-//       assignment.teacherId =
-//         new mongoose.Types.ObjectId(
-//           data.teacherId
-//         );
-//     }
-
-
-//     // ========================================
-//     // WEEKLY PERIODS
-//     // ========================================
-
-//     if (
-//       data.weeklyPeriods !==
-//       undefined
-//     ) {
-//       if (
-//         typeof data.weeklyPeriods !==
-//           "number" ||
-//         data.weeklyPeriods <
-//           1
-//       ) {
-//         throw new Error(
-//           "Weekly periods must be greater than 0"
-//         );
-//       }
-
-
-//       assignment.weeklyPeriods =
-//         data.weeklyPeriods;
-//     }
-
-
-//     await assignment.save();
-
-
-//     return assignment;
-//   };
-
-
-// // ============================================
-// // STATUS
-// // ============================================
-
-// export const updateSubjectAssignmentStatus =
-//   async (
-//     schoolId: string,
-//     assignmentId: string,
-//     isActive: boolean
-//   ) => {
-//     if (
-//       !mongoose.Types.ObjectId.isValid(
-//         assignmentId
-//       )
-//     ) {
-//       throw new Error(
-//         "Invalid assignment ID"
-//       );
-//     }
-
-
-//     if (
-//       typeof isActive !==
-//       "boolean"
-//     ) {
-//       throw new Error(
-//         "isActive must be boolean"
-//       );
-//     }
-
-
-//     const assignment =
-//       await SubjectAssignment.findOneAndUpdate(
-//         {
-//           _id:
-//             assignmentId,
-
-//           schoolId,
-//         },
-
-//         {
-//           isActive,
-//         },
-
-//         {
-//           new: true,
-
-//           runValidators: true,
-//         }
-//       );
-
-
-//     if (!assignment) {
-//       throw new Error(
-//         "Subject assignment not found"
-//       );
-//     }
-
-
-//     return assignment;
-//   };
-
-
-
 
 
 
@@ -726,873 +6,390 @@ import mongoose from "mongoose";
 import {
   SubjectAssignment,
 } from "./subjectAssignment.model";
-
 import {
   AcademicSession,
 } from "../academicSession.model";
-
 import {
   ClassModel,
 } from "../classes/class.model";
-
 import {
   Section,
 } from "../sections/section.model";
-
 import {
   Subject,
 } from "../subjects/subject.model";
-
 import {
   Teacher,
 } from "../../teachers/teacher.model";
 
 import type {
   CreateSubjectAssignmentData,
+  GetSubjectAssignmentsFilters,
+  SubjectAssignmentStream,
+  SubjectAssignmentType,
   UpdateSubjectAssignmentData,
 } from "./subjectAssignment.types";
 
+const ASSIGNMENT_TYPES: SubjectAssignmentType[] = [
+  "CLASS",
+  "STREAM",
+];
 
-// ============================================
-// CREATE
-// ============================================
+const STUDENT_STREAMS: SubjectAssignmentStream[] = [
+  "SCIENCE",
+  "COMMERCE",
+  "ARTS",
+  "VOCATIONAL",
+];
 
-export const createSubjectAssignment =
-  async (
-    schoolId: string,
-    data:
-      CreateSubjectAssignmentData
-  ) => {
+const isValidId = (value: string): boolean =>
+  mongoose.Types.ObjectId.isValid(value);
 
-    // ========================================
-    // SCHOOL
-    // ========================================
+const normalizeClassName = (value: string): string =>
+  value.toLowerCase().replace("class", "").trim();
 
-    if (
-      !mongoose.Types.ObjectId.isValid(
-        schoolId
-      )
-    ) {
-      throw new Error(
-        "Invalid school ID"
-      );
+const isSeniorSecondaryClass = (className: string): boolean =>
+  ["11", "12"].includes(normalizeClassName(className));
+
+const validateAssignmentScope = (
+  assignmentType: SubjectAssignmentType,
+  stream: SubjectAssignmentStream | undefined,
+  className: string,
+): void => {
+  if (!ASSIGNMENT_TYPES.includes(assignmentType)) {
+    throw new Error("Invalid subject assignment type");
+  }
+
+  if (assignmentType === "CLASS") {
+    if (stream !== undefined) {
+      throw new Error("Stream must not be provided for a class assignment");
     }
+    return;
+  }
 
+  if (!isSeniorSecondaryClass(className)) {
+    throw new Error(
+      "Stream subject assignments are allowed only for Class 11 and Class 12",
+    );
+  }
 
-    // ========================================
-    // ALL IDS VALIDATE
-    // ========================================
+  if (!stream || !STUDENT_STREAMS.includes(stream)) {
+    throw new Error("A valid stream is required for a stream assignment");
+  }
+};
 
-    const ids = [
-      data.sessionId,
-      data.subjectId,
-      data.classId,
-      data.sectionId,
-      data.teacherId,
-    ];
+const populateAssignment = (query: any) =>
+  query
+    .populate("sessionId", "name startDate endDate isCurrent")
+    .populate("subjectId", "name code subjectType")
+    .populate("classId", "name order")
+    .populate("sectionId", "name roomNumber")
+    .populate(
+      "teacherId",
+      "name employeeId email mobile profileImage",
+    );
 
+export const createSubjectAssignment = async (
+  schoolId: string,
+  data: CreateSubjectAssignmentData,
+) => {
+  if (!isValidId(schoolId)) {
+    throw new Error("Invalid school ID");
+  }
 
-    if (
-      ids.some(
-        (id) =>
-          !mongoose.Types.ObjectId.isValid(
-            id
-          )
-      )
-    ) {
-      throw new Error(
-        "One or more assignment IDs are invalid"
-      );
-    }
+  const ids = [
+    data.sessionId,
+    data.subjectId,
+    data.classId,
+    data.sectionId,
+    data.teacherId,
+  ];
 
+  if (ids.some((id) => !isValidId(id))) {
+    throw new Error("One or more assignment IDs are invalid");
+  }
 
-    // ========================================
-    // SESSION CHECK
-    // ========================================
-
-    const session =
-      await AcademicSession.findOne({
-        _id:
-          data.sessionId,
-
+  const [session, classData, section, subject, teacher] =
+    await Promise.all([
+      AcademicSession.findOne({
+        _id: data.sessionId,
         schoolId,
-      });
-
-
-    if (!session) {
-      throw new Error(
-        "Academic session not found"
-      );
-    }
-
-
-    // ========================================
-    // CLASS CHECK
-    // ========================================
-
-    const classData =
-      await ClassModel.findOne({
-        _id:
-          data.classId,
-
+      }).lean(),
+      ClassModel.findOne({
+        _id: data.classId,
         schoolId,
-
-        sessionId:
-          data.sessionId,
-      });
-
-
-    if (!classData) {
-      throw new Error(
-        "Class not found in this academic session"
-      );
-    }
-
-
-    // ========================================
-    // SECTION CHECK
-    // ========================================
-
-    const section =
-      await Section.findOne({
-        _id:
-          data.sectionId,
-
+        sessionId: data.sessionId,
+      }).lean(),
+      Section.findOne({
+        _id: data.sectionId,
         schoolId,
-
-        sessionId:
-          data.sessionId,
-
-        classId:
-          data.classId,
-      });
-
-
-    if (!section) {
-      throw new Error(
-        "Section not found in this class"
-      );
-    }
-
-
-    // ========================================
-    // SUBJECT CHECK
-    // ========================================
-
-    const subject =
-      await Subject.findOne({
-        _id:
-          data.subjectId,
-
+        sessionId: data.sessionId,
+        classId: data.classId,
+      }).lean(),
+      Subject.findOne({
+        _id: data.subjectId,
         schoolId,
-
-        sessionId:
-          data.sessionId,
-      });
-
-
-    if (!subject) {
-      throw new Error(
-        "Subject not found in this academic session"
-      );
-    }
-
-
-    // ========================================
-    // TEACHER CHECK
-    // ========================================
-
-    const teacher =
-      await Teacher.findOne({
-        _id:
-          data.teacherId,
-
+        sessionId: data.sessionId,
+      }).lean(),
+      Teacher.findOne({
+        _id: data.teacherId,
         schoolId,
-
-        isActive:
-          true,
-      });
-
-
-    if (!teacher) {
-      throw new Error(
-        "Teacher not found or inactive"
-      );
-    }
-
-
-    // ========================================
-    // WEEKLY PERIOD VALIDATION
-    // ========================================
-
-    if (
-      typeof data.weeklyPeriods !==
-        "number" ||
-      data.weeklyPeriods < 1
-    ) {
-      throw new Error(
-        "Weekly periods must be greater than 0"
-      );
-    }
-
-
-    // ========================================
-    // DUPLICATE CHECK
-    // ========================================
-
-    const existing =
-      await SubjectAssignment.findOne({
-        schoolId,
-
-        sessionId:
-          data.sessionId,
-
-        subjectId:
-          data.subjectId,
-
-        classId:
-          data.classId,
-
-        sectionId:
-          data.sectionId,
-      });
-
-
-    if (existing) {
-      throw new Error(
-        "Subject is already assigned to this class and section"
-      );
-    }
-
-
-    // ========================================
-    // CREATE
-    // ========================================
-
-    const assignment =
-      await SubjectAssignment.create({
-        schoolId,
-
-        sessionId:
-          data.sessionId,
-
-        subjectId:
-          data.subjectId,
-
-        classId:
-          data.classId,
-
-        sectionId:
-          data.sectionId,
-
-        teacherId:
-          data.teacherId,
-
-        weeklyPeriods:
-          data.weeklyPeriods,
-
         isActive: true,
-      });
+      }).lean(),
+    ]);
 
+  if (!session) throw new Error("Academic session not found");
+  if (!classData) {
+    throw new Error("Class not found in this academic session");
+  }
+  if (!section) throw new Error("Section not found in this class");
+  if (!subject) {
+    throw new Error("Subject not found in this academic session");
+  }
+  if (!teacher) throw new Error("Teacher not found or inactive");
 
-    return assignment;
+  if (typeof data.weeklyPeriods !== "number" || data.weeklyPeriods < 1) {
+    throw new Error("Weekly periods must be greater than 0");
+  }
+
+  const assignmentType = data.assignmentType ?? "CLASS";
+  const stream =
+    assignmentType === "STREAM" ? data.stream : undefined;
+
+  validateAssignmentScope(assignmentType, stream, classData.name);
+
+  const duplicateFilter: Record<string, unknown> = {
+    schoolId,
+    sessionId: data.sessionId,
+    subjectId: data.subjectId,
+    classId: data.classId,
+    sectionId: data.sectionId,
+    assignmentType,
+    stream: stream ?? { $exists: false },
   };
 
+  const existing = await SubjectAssignment.findOne(duplicateFilter).lean();
 
-// ============================================
-// GET ALL
-// ============================================
+  if (existing) {
+    throw new Error(
+      assignmentType === "STREAM"
+        ? `Subject is already assigned to this class, section and ${stream} stream`
+        : "Subject is already assigned to this class and section",
+    );
+  }
 
-export const getSubjectAssignments =
-  async (
-    schoolId: string,
+  const assignment = await SubjectAssignment.create({
+    schoolId,
+    sessionId: data.sessionId,
+    subjectId: data.subjectId,
+    classId: data.classId,
+    sectionId: data.sectionId,
+    teacherId: data.teacherId,
+    assignmentType,
+    ...(stream ? { stream } : {}),
+    weeklyPeriods: data.weeklyPeriods,
+    isActive: true,
+  });
 
-    filters?: {
-      sessionId?: string;
+  return populateAssignment(
+    SubjectAssignment.findById(assignment._id),
+  ).lean();
+};
 
-      subjectId?: string;
+export const getSubjectAssignments = async (
+  schoolId: string,
+  filters?: GetSubjectAssignmentsFilters,
+) => {
+  if (!isValidId(schoolId)) throw new Error("Invalid school ID");
 
-      classId?: string;
+  const query: Record<string, unknown> = { schoolId };
+  const idFilters = [
+    ["sessionId", filters?.sessionId],
+    ["subjectId", filters?.subjectId],
+    ["classId", filters?.classId],
+    ["sectionId", filters?.sectionId],
+    ["teacherId", filters?.teacherId],
+  ] as const;
 
-      sectionId?: string;
+  for (const [key, value] of idFilters) {
+    if (!value) continue;
+    if (!isValidId(value)) throw new Error(`Invalid ${key}`);
+    query[key] = value;
+  }
 
-      teacherId?: string;
-
-      isActive?: boolean;
+  if (filters?.assignmentType) {
+    if (!ASSIGNMENT_TYPES.includes(filters.assignmentType)) {
+      throw new Error("Invalid subject assignment type");
     }
-  ) => {
+    query.assignmentType = filters.assignmentType;
+  }
 
-    if (
-      !mongoose.Types.ObjectId.isValid(
-        schoolId
-      )
-    ) {
-      throw new Error(
-        "Invalid school ID"
-      );
+  if (filters?.stream) {
+    if (!STUDENT_STREAMS.includes(filters.stream)) {
+      throw new Error("Invalid student stream");
     }
+    query.stream = filters.stream;
+  }
 
+  if (filters?.isActive !== undefined) {
+    query.isActive = filters.isActive;
+  }
 
-    const query: Record<
-      string,
-      unknown
-    > = {
+  return populateAssignment(SubjectAssignment.find(query))
+    .sort({ createdAt: -1 })
+    .lean();
+};
+
+export const getMySubjectAssignments = async (
+  schoolId: string,
+  teacherId: string,
+  userId: string,
+) => {
+  if (!isValidId(schoolId)) throw new Error("Invalid school ID");
+  if (!isValidId(teacherId)) throw new Error("Invalid teacher ID");
+  if (!isValidId(userId)) throw new Error("Invalid user ID");
+
+  const teacher = await Teacher.findOne({
+    _id: teacherId,
+    schoolId,
+    userId,
+    isActive: true,
+  })
+    .select("_id name employeeId email")
+    .lean();
+
+  if (!teacher) throw new Error("Teacher profile not found or inactive");
+
+  const assignments = await populateAssignment(
+    SubjectAssignment.find({
       schoolId,
-    };
+      teacherId,
+      isActive: true,
+    }),
+  )
+    .sort({ createdAt: -1 })
+    .lean();
 
+  return { teacher, assignments };
+};
 
-    if (
-      filters?.sessionId
-    ) {
+export const getSubjectAssignmentById = async (
+  schoolId: string,
+  assignmentId: string,
+) => {
+  if (!isValidId(schoolId)) throw new Error("Invalid school ID");
+  if (!isValidId(assignmentId)) throw new Error("Invalid assignment ID");
 
-      if (
-        !mongoose.Types.ObjectId.isValid(
-          filters.sessionId
-        )
-      ) {
-        throw new Error(
-          "Invalid academic session ID"
-        );
-      }
+  const assignment = await populateAssignment(
+    SubjectAssignment.findOne({
+      _id: assignmentId,
+      schoolId,
+    }),
+  ).lean();
 
-      query.sessionId =
-        filters.sessionId;
+  if (!assignment) throw new Error("Subject assignment not found");
+  return assignment;
+};
+
+export const updateSubjectAssignment = async (
+  schoolId: string,
+  assignmentId: string,
+  data: UpdateSubjectAssignmentData,
+) => {
+  if (!isValidId(schoolId)) throw new Error("Invalid school ID");
+  if (!isValidId(assignmentId)) throw new Error("Invalid assignment ID");
+
+  const assignment = await SubjectAssignment.findOne({
+    _id: assignmentId,
+    schoolId,
+  });
+
+  if (!assignment) throw new Error("Subject assignment not found");
+
+  if (data.teacherId !== undefined) {
+    if (!isValidId(data.teacherId)) throw new Error("Invalid teacher ID");
+    const teacher = await Teacher.exists({
+      _id: data.teacherId,
+      schoolId,
+      isActive: true,
+    });
+    if (!teacher) throw new Error("Teacher not found or inactive");
+    assignment.teacherId = new mongoose.Types.ObjectId(data.teacherId);
+  }
+
+  if (data.weeklyPeriods !== undefined) {
+    if (typeof data.weeklyPeriods !== "number" || data.weeklyPeriods < 1) {
+      throw new Error("Weekly periods must be greater than 0");
+    }
+    assignment.weeklyPeriods = data.weeklyPeriods;
+  }
+
+  if (data.assignmentType !== undefined || data.stream !== undefined) {
+    const classData = await ClassModel.findOne({
+      _id: assignment.classId,
+      schoolId,
+      sessionId: assignment.sessionId,
+    })
+      .select("name")
+      .lean();
+
+    if (!classData) throw new Error("Assignment class not found");
+
+    const assignmentType =
+      data.assignmentType ?? assignment.assignmentType ?? "CLASS";
+    const stream =
+      assignmentType === "STREAM"
+        ? data.stream === null
+          ? undefined
+          : data.stream ?? assignment.stream
+        : undefined;
+
+    validateAssignmentScope(assignmentType, stream, classData.name);
+
+    const duplicate = await SubjectAssignment.findOne({
+      _id: { $ne: assignment._id },
+      schoolId,
+      sessionId: assignment.sessionId,
+      subjectId: assignment.subjectId,
+      classId: assignment.classId,
+      sectionId: assignment.sectionId,
+      assignmentType,
+      stream: stream ?? { $exists: false },
+    }).lean();
+
+    if (duplicate) {
+      throw new Error("A matching subject assignment already exists");
     }
 
-
-    if (
-      filters?.subjectId
-    ) {
-
-      if (
-        !mongoose.Types.ObjectId.isValid(
-          filters.subjectId
-        )
-      ) {
-        throw new Error(
-          "Invalid subject ID"
-        );
-      }
-
-      query.subjectId =
-        filters.subjectId;
-    }
-
-
-    if (
-      filters?.classId
-    ) {
-
-      if (
-        !mongoose.Types.ObjectId.isValid(
-          filters.classId
-        )
-      ) {
-        throw new Error(
-          "Invalid class ID"
-        );
-      }
-
-      query.classId =
-        filters.classId;
-    }
-
-
-    if (
-      filters?.sectionId
-    ) {
-
-      if (
-        !mongoose.Types.ObjectId.isValid(
-          filters.sectionId
-        )
-      ) {
-        throw new Error(
-          "Invalid section ID"
-        );
-      }
-
-      query.sectionId =
-        filters.sectionId;
-    }
-
-
-    if (
-      filters?.teacherId
-    ) {
-
-      if (
-        !mongoose.Types.ObjectId.isValid(
-          filters.teacherId
-        )
-      ) {
-        throw new Error(
-          "Invalid teacher ID"
-        );
-      }
-
-      query.teacherId =
-        filters.teacherId;
-    }
-
-
-    if (
-      filters?.isActive !==
-      undefined
-    ) {
-
-      query.isActive =
-        filters.isActive;
-    }
-
-
-    const assignments =
-      await SubjectAssignment.find(
-        query
-      )
-
-        .populate(
-          "sessionId",
-          "name startDate endDate isCurrent"
-        )
-
-        .populate(
-          "subjectId",
-          "name code subjectType"
-        )
-
-        .populate(
-          "classId",
-          "name order"
-        )
-
-        .populate(
-          "sectionId",
-          "name roomNumber"
-        )
-
-        .populate(
-          "teacherId",
-          "name employeeId email mobile profileImage"
-        )
-
-        .sort({
-          createdAt: -1,
-        })
-
-        .lean();
-
-
-    return assignments;
-  };
-
-
-// ============================================
-// TEACHER - MY SUBJECTS / MY CLASSES
-// ============================================
-
-export const getMySubjectAssignments =
-  async (
-    schoolId: string,
-
-    teacherId: string,
-
-    userId: string
-  ) => {
-
-    // ========================================
-    // VALIDATE IDS
-    // ========================================
-
-    if (
-      !mongoose.Types.ObjectId.isValid(
-        schoolId
-      )
-    ) {
-      throw new Error(
-        "Invalid school ID"
-      );
-    }
-
-
-    if (
-      !mongoose.Types.ObjectId.isValid(
-        teacherId
-      )
-    ) {
-      throw new Error(
-        "Invalid teacher ID"
-      );
-    }
-
-
-    if (
-      !mongoose.Types.ObjectId.isValid(
-        userId
-      )
-    ) {
-      throw new Error(
-        "Invalid user ID"
-      );
-    }
-
-
-    // ========================================
-    // VERIFY TEACHER IDENTITY
-    // ========================================
-
-    const teacher =
-      await Teacher.findOne({
-        _id:
-          teacherId,
-
-        schoolId,
-
-        userId,
-
-        isActive:
-          true,
-      })
-        .select(
-          "_id name employeeId email"
-        )
-        .lean();
-
-
-    if (!teacher) {
-      throw new Error(
-        "Teacher profile not found or inactive"
-      );
-    }
-
-
-    // ========================================
-    // GET ONLY THIS TEACHER'S ASSIGNMENTS
-    // ========================================
-
-    const assignments =
-      await SubjectAssignment.find({
-        schoolId,
-
-        teacherId,
-
-        isActive:
-          true,
-      })
-
-        .populate(
-          "sessionId",
-          "name startDate endDate isCurrent"
-        )
-
-        .populate(
-          "subjectId",
-          "name code subjectType"
-        )
-
-        .populate(
-          "classId",
-          "name order"
-        )
-
-        .populate(
-          "sectionId",
-          "name roomNumber"
-        )
-
-        .sort({
-          createdAt: -1,
-        })
-
-        .lean();
-
-
-    return {
-      teacher,
-
-      assignments,
-    };
-  };
-
-
-// ============================================
-// GET BY ID
-// ============================================
-
-export const getSubjectAssignmentById =
-  async (
-    schoolId: string,
-    assignmentId: string
-  ) => {
-
-    if (
-      !mongoose.Types.ObjectId.isValid(
-        schoolId
-      )
-    ) {
-      throw new Error(
-        "Invalid school ID"
-      );
-    }
-
-
-    if (
-      !mongoose.Types.ObjectId.isValid(
-        assignmentId
-      )
-    ) {
-      throw new Error(
-        "Invalid assignment ID"
-      );
-    }
-
-
-    const assignment =
-      await SubjectAssignment.findOne({
-        _id:
-          assignmentId,
-
-        schoolId,
-      })
-
-        .populate(
-          "sessionId",
-          "name startDate endDate isCurrent"
-        )
-
-        .populate(
-          "subjectId",
-          "name code subjectType"
-        )
-
-        .populate(
-          "classId",
-          "name order"
-        )
-
-        .populate(
-          "sectionId",
-          "name roomNumber"
-        )
-
-        .populate(
-          "teacherId",
-          "name employeeId email mobile profileImage"
-        )
-
-        .lean();
-
-
-    if (!assignment) {
-      throw new Error(
-        "Subject assignment not found"
-      );
-    }
-
-
-    return assignment;
-  };
-
-
-// ============================================
-// UPDATE
-// ============================================
-
-export const updateSubjectAssignment =
-  async (
-    schoolId: string,
-    assignmentId: string,
-    data:
-      UpdateSubjectAssignmentData
-  ) => {
-
-    if (
-      !mongoose.Types.ObjectId.isValid(
-        schoolId
-      )
-    ) {
-      throw new Error(
-        "Invalid school ID"
-      );
-    }
-
-
-    if (
-      !mongoose.Types.ObjectId.isValid(
-        assignmentId
-      )
-    ) {
-      throw new Error(
-        "Invalid assignment ID"
-      );
-    }
-
-
-    const assignment =
-      await SubjectAssignment.findOne({
-        _id:
-          assignmentId,
-
-        schoolId,
-      });
-
-
-    if (!assignment) {
-      throw new Error(
-        "Subject assignment not found"
-      );
-    }
-
-
-    // ========================================
-    // TEACHER
-    // ========================================
-
-    if (
-      data.teacherId !==
-      undefined
-    ) {
-
-      if (
-        !mongoose.Types.ObjectId.isValid(
-          data.teacherId
-        )
-      ) {
-        throw new Error(
-          "Invalid teacher ID"
-        );
-      }
-
-
-      const teacher =
-        await Teacher.findOne({
-          _id:
-            data.teacherId,
-
-          schoolId,
-
-          isActive:
-            true,
-        });
-
-
-      if (!teacher) {
-        throw new Error(
-          "Teacher not found or inactive"
-        );
-      }
-
-
-      assignment.teacherId =
-        new mongoose.Types.ObjectId(
-          data.teacherId
-        );
-    }
-
-
-    // ========================================
-    // WEEKLY PERIODS
-    // ========================================
-
-    if (
-      data.weeklyPeriods !==
-      undefined
-    ) {
-
-      if (
-        typeof data.weeklyPeriods !==
-          "number" ||
-        data.weeklyPeriods <
-          1
-      ) {
-        throw new Error(
-          "Weekly periods must be greater than 0"
-        );
-      }
-
-
-      assignment.weeklyPeriods =
-        data.weeklyPeriods;
-    }
-
-
-    await assignment.save();
-
-
-    return assignment;
-  };
-
-
-// ============================================
-// STATUS
-// ============================================
-
-export const updateSubjectAssignmentStatus =
-  async (
-    schoolId: string,
-    assignmentId: string,
-    isActive: boolean
-  ) => {
-
-    if (
-      !mongoose.Types.ObjectId.isValid(
-        schoolId
-      )
-    ) {
-      throw new Error(
-        "Invalid school ID"
-      );
-    }
-
-
-    if (
-      !mongoose.Types.ObjectId.isValid(
-        assignmentId
-      )
-    ) {
-      throw new Error(
-        "Invalid assignment ID"
-      );
-    }
-
-
-    if (
-      typeof isActive !==
-      "boolean"
-    ) {
-      throw new Error(
-        "isActive must be boolean"
-      );
-    }
-
-
-    const assignment =
-      await SubjectAssignment.findOneAndUpdate(
-        {
-          _id:
-            assignmentId,
-
-          schoolId,
-        },
-
-        {
-          isActive,
-        },
-
-        {
-          new: true,
-
-          runValidators: true,
-        }
-      );
-
-
-    if (!assignment) {
-      throw new Error(
-        "Subject assignment not found"
-      );
-    }
-
-
-    return assignment;
-  };
+    assignment.assignmentType = assignmentType;
+    if (stream) assignment.stream = stream;
+    else assignment.set("stream", undefined);
+  }
+
+  await assignment.save();
+
+  return populateAssignment(
+    SubjectAssignment.findById(assignment._id),
+  ).lean();
+};
+
+export const updateSubjectAssignmentStatus = async (
+  schoolId: string,
+  assignmentId: string,
+  isActive: boolean,
+) => {
+  if (!isValidId(schoolId)) throw new Error("Invalid school ID");
+  if (!isValidId(assignmentId)) throw new Error("Invalid assignment ID");
+  if (typeof isActive !== "boolean") {
+    throw new Error("isActive must be boolean");
+  }
+
+  const assignment = await SubjectAssignment.findOneAndUpdate(
+    { _id: assignmentId, schoolId },
+    { isActive },
+    { new: true, runValidators: true },
+  );
+
+  if (!assignment) throw new Error("Subject assignment not found");
+  return assignment;
+};
