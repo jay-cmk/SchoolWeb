@@ -45,7 +45,8 @@ import locationRoutes from "./modules/master/location/location.routes";
 import studentSubjectEnrollmentRoutes
   from "./modules/students/studentSubjectEnrollment.routes";
 
-
+import notificationRoutes
+  from "./modules/notifications/notification.routes";
 import teacherAttendanceRoutes from "./modules/teacherAttendance/teacherAttendance.routes";  
 
 
@@ -236,6 +237,15 @@ app.use(
 app.use(
   "/api/v1/teacher-attendance",
   teacherAttendanceRoutes
+);
+
+// ============================================
+// NOTIFICATIONS
+// ============================================
+
+app.use(
+  "/api/v1/notifications",
+  notificationRoutes
 );
 // ============================================
 // FEES
