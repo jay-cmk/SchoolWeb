@@ -376,6 +376,8 @@ import HomeworkDetails from "../pages/schoolAdmin/homework/HomeworkDetails";
 import StudentSubmissions from "../pages/schoolAdmin/homework/StudentSubmissions";
 import EditHomework from "../pages/schoolAdmin/homework/EditHomework";
 import MyTeacherAttendance from "../pages/schoolAdmin/teacherAttendance/MyTeacherAttendance";
+import Notifications from
+  "../pages/notifications/Notifications";
 
 const AppRoutes = () => {
   return (
@@ -459,6 +461,12 @@ const AppRoutes = () => {
         <Route path="/school-admin/homework/:homeworkId" element={<HomeworkDetails />} />
         <Route path="/school-admin/homework/:homeworkId/submissions" element={<StudentSubmissions />} />
         <Route path="/school-admin/homework/:homeworkId/edit" element={<EditHomework />} />
+        <Route
+  path="/notifications"
+  element={
+    <Notifications />
+  }
+/>
       </Route>
 
       <Route path="*" element={<Navigate to="/login" replace />} />

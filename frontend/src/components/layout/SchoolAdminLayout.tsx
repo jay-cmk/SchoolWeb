@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../../pages/schoolAdmin/Sidebar';
 import Topbar from '../../pages/schoolAdmin/Topbar';
+import NotificationToast from '../notifications/NotificationToast';
+import WebPushPermission from '../WebPushPermission';
 
 const SchoolAdminLayout: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -48,6 +50,9 @@ const SchoolAdminLayout: React.FC = () => {
           <main className="flex-1 overflow-y-auto">
             <Outlet /> {/* ← यहाँ Child routes render होंगे */}
           </main>
+
+          <NotificationToast/>
+          <WebPushPermission />
         </div>
       </div>
     </div>

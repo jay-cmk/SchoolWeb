@@ -95,6 +95,9 @@ import {
 import {
   setSelectedSessionId,
 } from "../../features/academic/sessions/sessionSelection.slice";
+import NotificationBell from "../../components/notifications/NotificationBell";
+
+
 
 interface TopbarProps {
   onToggleSidebar: () => void;
@@ -324,7 +327,14 @@ const Topbar: React.FC<TopbarProps> = ({
             placeholder="Search students, staff, classes or records"
           />
         </label>
+
+
       </div>
+              <div className="flex items-center gap-3">
+  <NotificationBell />
+
+  {/* Existing profile section */}
+</div>
 
       <div className="ml-auto flex items-center gap-3">
         {/* Academic Session Selector */}

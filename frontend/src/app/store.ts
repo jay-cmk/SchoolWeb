@@ -41,7 +41,8 @@ import sessionSelectionReducer from
 
  import studentElectiveReducer from "../features/student/studentElective.slice"; 
 import teacherAttendanceReducer from "../features/teacherAttendance/teacherAttendance.slice";
-
+import notificationReducer from
+  "../features/notifications/notification.slice";
 
 
 
@@ -82,6 +83,8 @@ export const store = configureStore({
       studentElectiveReducer,
 
   teacherAttendance: teacherAttendanceReducer,    
+  notifications:
+      notificationReducer,
   },
 
 });
