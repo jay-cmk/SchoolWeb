@@ -146,7 +146,7 @@ export interface INotification {
 
   isRead: boolean;
 
-  readAt?: Date;
+  readAt?: Date | undefined;
 
   createdAt: Date;
 
