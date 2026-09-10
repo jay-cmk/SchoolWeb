@@ -39,6 +39,12 @@ import studentPromotionReducer from "../features/student/studentPromotion.slice"
 import sessionSelectionReducer from
   "../features/academic/sessions/sessionSelection.slice";
 
+ import studentElectiveReducer from "../features/student/studentElective.slice"; 
+import teacherAttendanceReducer from "../features/teacherAttendance/teacherAttendance.slice";
+import notificationReducer from
+  "../features/notifications/notification.slice";
+
+
 
 export const store = configureStore({
   reducer: {
@@ -73,6 +79,12 @@ export const store = configureStore({
   studentPromotion: studentPromotionReducer,
   sessionSelection:
   sessionSelectionReducer,
+  studentElectives:
+      studentElectiveReducer,
+
+  teacherAttendance: teacherAttendanceReducer,    
+  notifications:
+      notificationReducer,
   },
 
 });

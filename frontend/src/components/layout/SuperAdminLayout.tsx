@@ -15,7 +15,7 @@ const SuperAdminLayout: React.FC = () => {
       <div className="ml-[220px] min-h-screen">
 
         {/* Topbar */}
-        <Topbar />
+        <Topbar/>
 
         {/* Page Content */}
         <main className="min-h-[calc(100vh-68px)]">

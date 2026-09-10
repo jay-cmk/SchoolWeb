@@ -47,3 +47,21 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #38BDF8;
 }
+
+@keyframes notification-toast-progress {
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0%;
+  }
+}
+
+.notification-toast-progress {
+  animation:
+    notification-toast-progress
+    7s
+    linear
+    forwards;
+}

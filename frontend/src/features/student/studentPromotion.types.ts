@@ -24,7 +24,11 @@ export type EnrollmentPromotionStatus =
   | "LEFT"
   | "GRADUATED";
 
-
+export type StudentStream =
+  | "SCIENCE"
+  | "COMMERCE"
+  | "ARTS"
+  | "VOCATIONAL";
 // ==========================================
 // POPULATED STUDENT
 // ==========================================
@@ -137,6 +141,8 @@ export interface StudentEnrollment {
   createdAt: string;
 
   updatedAt: string;
+  stream?: StudentStream;
+
 }
 
 
@@ -176,6 +182,9 @@ export interface PromotionCandidate {
   createdAt: string;
 
   updatedAt: string;
+
+  stream?: StudentStream;
+
 }
 
 
@@ -348,6 +357,8 @@ export interface UpdateStudentEnrollmentData {
   sectionId?: string;
 
   rollNumber?: number;
+
+  stream?: StudentStream | null;
 
   remarks?: string;
 }

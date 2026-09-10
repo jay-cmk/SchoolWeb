@@ -5126,7 +5126,7 @@ const AddStudent: React.FC = () => {
                   />
                 </div>
 
-                {/* Mother Mobile Number - Currently Hidden
+                
         <div>
           <label className={labelClassName}>
             Mobile
@@ -5142,7 +5142,7 @@ const AddStudent: React.FC = () => {
             className={inputClassName}
           />
         </div>
-        */}
+        
 
                 <div>
                   <label className={labelClassName}>Occupation</label>
