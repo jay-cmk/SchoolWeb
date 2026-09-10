@@ -231,8 +231,6 @@ export const updateAcademicSessionController =
     }
   };
 
-
-
 export const setCurrentAcademicSessionController =
   async (
     req: Request,

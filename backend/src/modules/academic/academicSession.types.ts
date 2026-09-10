@@ -12,7 +12,6 @@ export interface UpdateAcademicSessionData {
   isCurrent?: boolean;
 }
 
-
 export interface AcademicSession {
   _id: string;
   schoolId: string;
